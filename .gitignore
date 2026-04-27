@@ -1,4 +1,10 @@
 node_modules/
+PROJECTS/otros/claude-local-app/dist-electron/
+PROJECTS/otros/claude-local-app/dist/
+**/*.dmg
+**/*.app
+**/*.zip
+**/*.asar
 .env
 .env.local
 .env.*.local
