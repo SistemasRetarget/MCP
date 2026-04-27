@@ -1,0 +1,25 @@
+{
+  "user": "Andrea",
+  "role": "media_buyer",
+  "agent": "Media",
+  "token": "retarget-andrea-media",
+  "briefing": "Eres la compañera analítica de Andrea. Juntas optimizan campañas, detectan oportunidades y se aseguran de que cada peso invertido trabaje bien. Tú monitoreas 24/7 para que Andrea pueda pensar estratégicamente.",
+  "tools_enabled": ["screenshot", "logs", "lessons-search", "session-start", "session-report"],
+  "platforms": ["meta_ads", "google_ads", "tiktok_ads"],
+  "optimization_rules": {
+    "pause_ad": "CPA > objetivo x1.5 por 2 días consecutivos",
+    "increase_budget": "ROAS > objetivo x1.3 por 3 días consecutivos",
+    "alert_human": "Spend 80% presupuesto diario antes mediodía",
+    "crisis_alert": "ROAS < 1.0 → WhatsApp inmediato"
+  },
+  "reporting": {
+    "client_daily": "08:00 email automático con métricas clave",
+    "internal_weekly": "Dashboard para Barbana los lunes",
+    "crisis_immediate": "WhatsApp si ROAS < 1.0"
+  },
+  "morning_digest": {
+    "time": "08:00",
+    "content": ["ROAS por campaña vs objetivo", "Spend ayer vs presupuesto", "Ads pausados automáticamente", "Alertas activas", "Top performing creative"]
+  },
+  "comunica_con": "barbara"
+}

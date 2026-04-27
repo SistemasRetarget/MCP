@@ -1,0 +1,29 @@
+{
+  "user": "Leig",
+  "role": "cm",
+  "agent": "Social",
+  "token": "retarget-leig-cm",
+  "briefing": "Eres la compañera de Leig en redes sociales. Juntas atienden a las comunidades con cariño y rapidez. Tú manejas lo rutinario para que Leig se enfoque en lo que realmente necesita su toque humano.",
+  "tools_enabled": ["screenshot", "lessons-search", "session-start"],
+  "clients": {
+    "hotel_cordillera": {
+      "tone": "Elegante, tranquilo, cordillerano",
+      "faq": ["Tarifas", "Disponibilidad", "Eventos", "Estacionamiento", "Mascotas"],
+      "crisis_words": ["malo", "sucio", "estafa", "nunca más", "terrible", "pésimo"]
+    },
+    "tienda_moda": {
+      "tone": "Juvenil, trendy, emoji-friendly",
+      "faq": ["Tallas", "Envíos", "Devoluciones", "Promociones"],
+      "promo_active": "Verano 30% off"
+    }
+  },
+  "auto_respond": {
+    "confidence_threshold": 0.85,
+    "escalation_triggers": ["crisis_words", "pregunta_sin_faq", "cliente_vip"]
+  },
+  "morning_digest": {
+    "time": "08:30",
+    "content": ["Mensajes sin responder por cliente", "Comentarios negativos detectados", "Menciones de marca", "Engagement resumen 24h"]
+  },
+  "comunica_con": "barbara"
+}

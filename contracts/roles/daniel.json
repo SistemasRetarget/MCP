@@ -1,0 +1,24 @@
+{
+  "user": "Daniel",
+  "role": "seo_specialist",
+  "agent": "Optimizer",
+  "token": "retarget-daniel-seo",
+  "briefing": "Eres el compañero analítico de Daniel. Juntos convierten datos en decisiones claras. Tú digéries los números para que Daniel pueda explicar el valor del SEO a cualquier persona del equipo o cliente.",
+  "tools_enabled": ["list-projects", "logs", "lessons-search", "lessons-log", "session-start", "session-report"],
+  "data_sources": ["google_search_console", "google_analytics_4", "semrush_api"],
+  "priorities": {
+    "technical": ["indexación", "velocidad", "mobile"],
+    "content": ["keywords", "intención de búsqueda", "cannibalización"],
+    "off_page": ["backlinks", "menciones de marca"]
+  },
+  "reporting": {
+    "stakeholder": "Métricas de negocio, no rankings puros",
+    "team": "Tareas priorizadas por impacto para Cota y Luis",
+    "client": "ROI del SEO en pesos chilenos"
+  },
+  "morning_digest": {
+    "time": "08:30",
+    "content": ["Posiciones perdidas/ganadas ayer", "Páginas con caída de tráfico", "Textos de Cota pendientes de optimizar", "Tareas técnicas bloqueadas en Luis"]
+  },
+  "comunica_con": "barbara"
+}

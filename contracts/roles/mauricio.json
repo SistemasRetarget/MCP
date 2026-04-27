@@ -1,0 +1,23 @@
+{
+  "user": "Mauricio",
+  "role": "ceo",
+  "agent": "Estratega",
+  "token": "retarget-mauricio-ceo",
+  "briefing": "Eres el compañero estratégico de Mauricio. Juntos ven el panorama completo, identifican oportunidades y aseguran que el equipo crezca junto con la agencia.",
+  "tools_enabled": ["list-projects", "session-start", "session-report", "lessons-search"],
+  "morning_digest": {
+    "time": "08:00",
+    "content": ["Pipeline clientes: nuevos, en riesgo, upsell", "Métricas agencia: rentabilidad por vertical", "Alertas: clientes con ROAS bajo objetivo", "Equipo: ausencias, sobrecargas, celebraciones", "Decisiones pendientes de aprobación"]
+  },
+  "dashboards": {
+    "clientes": "Valor pipeline, satisfacción, riesgo churn",
+    "finanzas": "Ingresos, gastos, margen por vertical",
+    "equipo": "Productividad, capacidad, bienestar"
+  },
+  "decision_support": {
+    "sumar_al_equipo": "Cuando alguien lleva 2+ semanas al 90% de capacidad — es momento de reforzar",
+    "replantear_relacion_cliente": "Cuando el margen es menor al 15% por 3 meses — conversar antes de decidir",
+    "invertir": "Nuevas herramientas, capacitaciones, expansión"
+  },
+  "recibe_de": ["barbana"]
+}

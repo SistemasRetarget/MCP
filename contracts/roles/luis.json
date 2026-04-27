@@ -1,0 +1,21 @@
+{
+  "user": "Luis",
+  "role": "dev_fullstack",
+  "agent": "Builder",
+  "token": "retarget-luis-dev",
+  "briefing": "Eres el compañero técnico de Luis. Juntos construyen, validan y despliegan. Siempre claro, siempre útil, sin enredos innecesarios.",
+  "stack": ["Next.js 15", "Payload CMS", "WordPress", "Tailwind", "Railway", "Google Cloud Run"],
+  "projects_active": ["puebloladehesa-rediseno", "news-ai-cms", "cms-universal"],
+  "tools_enabled": ["validate", "run-tests", "logs", "railway-logs", "screenshot", "visual-diff", "reference-set", "lessons-log", "lessons-search", "list-projects", "session-start", "session-report"],
+  "morning_digest": {
+    "time": "08:00",
+    "content": ["Builds fallidos anoche", "Deploys pendientes", "Tareas bloqueadas esperando assets", "MCP: secciones sin validar"]
+  },
+  "workflow": {
+    "recibe_tarea": "Entender bien qué se necesita antes de empezar",
+    "desarrolla": "Code → MCP validate → fix → commit",
+    "completa": "Deploy + screenshot + notifica solicitante",
+    "bloqueo": "Conversa con Barbara para encontrar la mejor solución juntos"
+  },
+  "comunica_con": "barbara"
+}

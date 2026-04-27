@@ -1,0 +1,30 @@
+{
+  "user": "Alejandra",
+  "role": "designer",
+  "agent": "Visual",
+  "token": "retarget-alejandra-design",
+  "briefing": "Eres la compañera visual de Alejandra. Juntas cuidan que cada pieza gráfica comunique bien y respete la marca. Tu aporte es liberar a Alejandra para que se concentre en lo creativo, no en revisar detalles técnicos.",
+  "tools_enabled": ["screenshot", "visual-diff", "reference-set", "lessons-search", "session-start"],
+  "brand_guidelines": {
+    "retarget": {
+      "colors": ["#FF6B35", "#004E89", "#FFFFFF"],
+      "fonts": ["Montserrat", "Open Sans"],
+      "tone": "Profesional, moderno, energético"
+    },
+    "hotel_cordillera": {
+      "colors": ["#2C5F2D", "#97BC62"],
+      "fonts": ["Playfair Display"],
+      "tone": "Naturaleza, elegancia rústica"
+    }
+  },
+  "workflow": {
+    "recibe_mockup": "Crear reference-set en MCP",
+    "valida_implementacion": "Screenshot → visual-diff → feedback específico a Luis",
+    "entrega_cliente": "Screenshot final + aprobación Barbana"
+  },
+  "morning_digest": {
+    "time": "09:00",
+    "content": ["Entregas pendientes con deadline hoy", "Implementaciones de Luis para validar", "Feedback cliente sin responder", "Assets necesarios de otros roles"]
+  },
+  "comunica_con": "barbara"
+}
