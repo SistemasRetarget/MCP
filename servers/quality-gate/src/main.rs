@@ -263,6 +263,17 @@ fn tool_definitions() -> Value {
             }
         },
         {
+            "name": "who-am-i",
+            "description": "Detecta tu rol en Retarget por token y carga tu contexto personalizado. Cada colaborador tiene su propio token. Llama esto al inicio de cada sesión.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "token": { "type": "string", "description": "Tu token personal (ej: retarget-luis-dev)" }
+                },
+                "required": ["token"]
+            }
+        },
+        {
             "name": "session.start",
             "description": "FAT TOOL: Load complete project context in one call. Returns contract, QA state, recent lessons, last commit, next task, and antipatterns.",
             "inputSchema": {
@@ -355,6 +366,7 @@ fn handle_tool_call(id: Value, params: Option<&Value>) -> Value {
         "wait-for-deploy" => wait_for_deploy_tool(id, &args),
         
         // FAT TOOLS — Autonomous supervisor
+        "who-am-i" => tools::session::who_am_i_tool(id, &args),
         "session.start" => tools::session::session_start_tool(id, &args, &workspace_root),
         "session.report" => tools::session::session_report_tool(id, &args, &workspace_root),
         "iterate.section" => tools::iterate::iterate_section_tool(id, &args),

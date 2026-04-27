@@ -129,6 +129,82 @@ fn load_antipatterns(project_path: &Path) -> Vec<String> {
     }
 }
 
+/// Carga el rol del usuario por token desde contracts/roles/index o escaneando los archivos
+fn load_role_by_token(token: &str) -> Option<Value> {
+    let mcp_home = std::env::var("WORKSPACE_MCP_HOME")
+        .unwrap_or_else(|_| {
+            let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
+            format!("{}/Documents/workspace-mcp-global", home)
+        });
+
+    let roles_dir = PathBuf::from(&mcp_home).join("contracts/roles");
+    if !roles_dir.is_dir() { return None; }
+
+    for entry in fs::read_dir(&roles_dir).ok()?.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("json") { continue; }
+        if path.file_name().and_then(|n| n.to_str()) == Some("index.json") { continue; }
+        let content = fs::read_to_string(&path).ok()?;
+        let role: Value = serde_json::from_str(&content).ok()?;
+        if role.get("token").and_then(|t| t.as_str()) == Some(token) {
+            return Some(role);
+        }
+    }
+    None
+}
+
+/// Tool: who-am-i
+/// Detecta el rol del usuario por token y devuelve su contexto personalizado
+pub fn who_am_i_tool(id: Value, args: &Value) -> Value {
+    let token = match args.get("token").and_then(|v| v.as_str()) {
+        Some(t) => t,
+        None => return tool_error(id, "Missing argument: token"),
+    };
+
+    match load_role_by_token(token) {
+        Some(role) => {
+            let user = role.get("user").and_then(|u| u.as_str()).unwrap_or("Colaborador");
+            let agent = role.get("agent").and_then(|a| a.as_str()).unwrap_or("Agente");
+            let briefing = role.get("briefing").and_then(|b| b.as_str()).unwrap_or("");
+            let tools = role.get("tools_enabled")
+                .and_then(|t| t.as_array())
+                .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>().join(", "))
+                .unwrap_or_default();
+
+            let summary = format!(
+                "Hola {user}! Soy {agent}, tu compañero en Retarget.\n\n\
+                {briefing}\n\n\
+                Herramientas disponibles para ti: {tools}\n\n\
+                ¿En qué trabajamos hoy?",
+                user = user,
+                agent = agent,
+                briefing = briefing,
+                tools = tools
+            );
+
+            json!({
+                "jsonrpc": "2.0",
+                "id": id,
+                "result": {
+                    "isError": false,
+                    "content": [
+                        { "type": "text", "text": summary },
+                        { "type": "resource", "resource": {
+                            "uri": format!("role://{}", token),
+                            "mimeType": "application/json",
+                            "text": serde_json::to_string_pretty(&role).unwrap()
+                        }}
+                    ]
+                }
+            })
+        }
+        None => tool_error(id, &format!(
+            "Token '{}' no reconocido. Pide a Luis que agregue tu token al sistema.",
+            token
+        )),
+    }
+}
+
 /// Tool: session.start
 /// Carga TODO el contexto del proyecto en una sola llamada
 pub fn session_start_tool(id: Value, args: &Value, workspace_root: &Path) -> Value {
