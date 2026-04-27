@@ -20,3 +20,4 @@ build/
 .cache/
 .next/
 out/
+servers/quality-gate/target/

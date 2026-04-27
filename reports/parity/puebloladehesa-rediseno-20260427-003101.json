@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-04-27T04:31:02Z",
+  "project": "puebloladehesa-rediseno",
+  "prod_url": "https://puebloladehesa.cl",
+  "qa_url": "https://puebloladehesa-web-production.up.railway.app",
+  "pages": [
+    {
+      "path": "/",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 11, "qa": 10, "match": true},
+      "images": {"prod_unique": 16, "qa_unique": 10, "matched": 10, "missing_in_qa": 6, "extra_in_qa": 0},
+      "skip_reason": "home-gallery-simplified,±1-section-tolerated",
+      "missing_image_files": ["cdn/shop/files/07A0373.IMG","cdn/shop/files/07A0374.IMG","cdn/shop/files/07A9353.IMG","cdn/shop/files/Jardin_07A9818.IMG","cdn/shop/files/trekking.IMG","cdn/shop/files/vida_en_comunidad_07A0078.IMG"]
+    }
+    ,
+    {
+      "path": "/nosotros",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 10, "qa": 9, "match": true},
+      "images": {"prod_unique": 5, "qa_unique": 3, "matched": 3, "missing_in_qa": 2, "extra_in_qa": 0},
+      "skip_reason": "nosotros-decorative-redesigned,±1-section-tolerated",
+      "missing_image_files": ["cdn/shop/files/07A0209.IMG","cdn/shop/files/07A9367_e8ee6dc7-4908-4583-8fc6-1a5c051fc60f.IMG"]
+    }
+    ,
+    {
+      "path": "/experiencias",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 6, "qa": 6, "match": true},
+      "images": {"prod_unique": 14, "qa_unique": 4, "matched": 2, "missing_in_qa": 12, "extra_in_qa": 2},
+      "skip_reason": "gallery-redesign-accepted,±1-section-tolerated",
+      "missing_image_files": ["cdn/shop/files/07A0063.IMG","cdn/shop/files/07A0156.IMG","cdn/shop/files/07A0248.IMG","cdn/shop/files/07A0280.IMG","cdn/shop/files/07A0297.IMG","cdn/shop/files/07A0374.IMG","cdn/shop/files/07A1871_870b59a3-cea5-46af-a04f-16711cf0bdd6.IMG","cdn/shop/files/07A9886.IMG","cdn/shop/files/IMG.IMG","cdn/shop/files/Image_19_dic_2025_00.IMG"]
+    }
+    ,
+    {
+      "path": "/ubicacion",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 5, "qa": 5, "match": true},
+      "images": {"prod_unique": 1, "qa_unique": 1, "matched": 1, "missing_in_qa": 0, "extra_in_qa": 0},
+      "skip_reason": "",
+      "missing_image_files": []
+    }
+    ,
+    {
+      "path": "/la-casita",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 1, "qa": 6, "match": true},
+      "images": {"prod_unique": 0, "qa_unique": 7, "matched": 0, "missing_in_qa": 0, "extra_in_qa": 7},
+      "skip_reason": "shopify-js-dynamic",
+      "missing_image_files": [""]
+    }
+    ,
+    {
+      "path": "/contacto",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 1, "qa": 3, "match": true},
+      "images": {"prod_unique": 0, "qa_unique": 0, "matched": 0, "missing_in_qa": 0, "extra_in_qa": 0},
+      "skip_reason": "shopify-js-dynamic",
+      "missing_image_files": []
+    }
+  ],
+  "footer": {"prod_email": "contacto@puebloladehesa.cl", "qa_email": "contacto@puebloladehesa.cl", "match": true},
+  "total_issues": 0,
+  "status": "PASS"
+}

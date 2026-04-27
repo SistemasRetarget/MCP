@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-04-27T04:22:36Z",
+  "project": "puebloladehesa-rediseno",
+  "prod_url": "https://puebloladehesa.cl",
+  "qa_url": "https://puebloladehesa-web-production.up.railway.app",
+  "pages": [
+    {
+      "path": "/",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 11, "qa": 10, "match": false},
+      "images": {"prod_unique": 25, "qa_unique": 10, "matched": 10, "missing_in_qa": 15, "extra_in_qa": 0},
+      "missing_image_files": ["cdn/shop/files/07A0248_1.webp","cdn/shop/files/07A0373_1_9306cd35-d2d4-4c49-b3de-55aa005f487c.webp","cdn/shop/files/07A0374_1.webp","cdn/shop/files/07A9353_1_1.webp","cdn/shop/files/Cabalgata_1_1.webp","cdn/shop/files/Captura_de_pantalla_2025-12-24_a_la_s_11.31.38_a.m._1398x1680.png","cdn/shop/files/IMG_0153_1.webp","cdn/shop/files/IMG_0239_1.webp","cdn/shop/files/IMG_3510_1.webp","cdn/shop/files/IMG_7678_1.webp"]
+    }
+    ,
+    {
+      "path": "/nosotros",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 10, "qa": 9, "match": false},
+      "images": {"prod_unique": 7, "qa_unique": 3, "matched": 3, "missing_in_qa": 4, "extra_in_qa": 0},
+      "missing_image_files": ["cdn/shop/files/07A0209.png","cdn/shop/files/07A9367_e8ee6dc7-4908-4583-8fc6-1a5c051fc60f.jpg","cdn/shop/files/Captura_de_pantalla_2025-12-24_a_la_s_11.31.38_a.m..png","cdn/shop/files/Captura_de_pantalla_2025-12-24_a_la_s_11.31.38_a.m._1398x1680.png"]
+    }
+    ,
+    {
+      "path": "/experiencias",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 6, "qa": 6, "match": true},
+      "images": {"prod_unique": 19, "qa_unique": 4, "matched": 2, "missing_in_qa": 17, "extra_in_qa": 2},
+      "missing_image_files": ["cdn/shop/files/07A0063.jpg","cdn/shop/files/07A0156.jpg","cdn/shop/files/07A0248.jpg","cdn/shop/files/07A0280.jpg","cdn/shop/files/07A0297.png","cdn/shop/files/07A0374.jpg","cdn/shop/files/07A1871_870b59a3-cea5-46af-a04f-16711cf0bdd6.jpg","cdn/shop/files/07A9886.jpg","cdn/shop/files/Captura_de_pantalla_2025-12-24_a_la_s_11.31.38_a.m._1398x1680.png","cdn/shop/files/IMG_0153.jpg"]
+    }
+    ,
+    {
+      "path": "/ubicacion",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 5, "qa": 5, "match": true},
+      "images": {"prod_unique": 9, "qa_unique": 1, "matched": 1, "missing_in_qa": 8, "extra_in_qa": 0},
+      "missing_image_files": ["cdn/shop/files/Captura_de_pantalla_2025-12-24_a_la_s_11.31.38_a.m._1398x1680.png","cdn/shop/files/iconos-04.svg","cdn/shop/files/iconos-14.svg","cdn/shop/files/iconos-15.svg","cdn/shop/files/iconos-16.svg","cdn/shop/files/iconos-17.svg","cdn/shop/files/iconos-heli.svg","cdn/shop/files/montana.svg"]
+    }
+    ,
+    {
+      "path": "/la-casita",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 1, "qa": 6, "match": false},
+      "images": {"prod_unique": 1, "qa_unique": 7, "matched": 0, "missing_in_qa": 1, "extra_in_qa": 7},
+      "missing_image_files": ["cdn/shop/files/Captura_de_pantalla_2025-12-24_a_la_s_11.31.38_a.m._1398x1680.png"]
+    }
+    ,
+    {
+      "path": "/contacto",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 1, "qa": 3, "match": false},
+      "images": {"prod_unique": 1, "qa_unique": 0
+0, "matched": 0, "missing_in_qa": 1, "extra_in_qa": 0},
+      "missing_image_files": ["cdn/shop/files/Captura_de_pantalla_2025-12-24_a_la_s_11.31.38_a.m._1398x1680.png"]
+    }
+  ],
+  "footer": {"prod_email": "contacto@puebloladehesa.cl", "qa_email": "contacto@puebloladehesa.com", "match": false},
+  "total_issues": 51,
+  "status": "FAIL"
+}

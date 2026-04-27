@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-04-27T04:43:52Z",
+  "project": "puebloladehesa-rediseno",
+  "prod_url": "https://puebloladehesa.cl",
+  "qa_url": "https://puebloladehesa-web-production.up.railway.app",
+  "pages": [
+    {
+      "path": "/",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 11, "qa": 11, "match": true},
+      "images": {"prod_unique": 16, "qa_unique": 15, "matched": 15, "missing_in_qa": 1, "extra_in_qa": 0},
+      "skip_reason": "",
+      "missing_image_files": ["cdn/shop/files/Masterplan.IMG"]
+    }
+    ,
+    {
+      "path": "/nosotros",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 10, "qa": 11, "match": false},
+      "images": {"prod_unique": 5, "qa_unique": 5, "matched": 5, "missing_in_qa": 0, "extra_in_qa": 0},
+      "skip_reason": "",
+      "missing_image_files": []
+    }
+    ,
+    {
+      "path": "/experiencias",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 6, "qa": 7, "match": false},
+      "images": {"prod_unique": 14, "qa_unique": 16, "matched": 14, "missing_in_qa": 0, "extra_in_qa": 2},
+      "skip_reason": "",
+      "missing_image_files": []
+    }
+    ,
+    {
+      "path": "/ubicacion",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 5, "qa": 5, "match": true},
+      "images": {"prod_unique": 1, "qa_unique": 1, "matched": 1, "missing_in_qa": 0, "extra_in_qa": 0},
+      "skip_reason": "",
+      "missing_image_files": []
+    }
+    ,
+    {
+      "path": "/la-casita",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 1, "qa": 6, "match": true},
+      "images": {"prod_unique": 0, "qa_unique": 7, "matched": 0, "missing_in_qa": 0, "extra_in_qa": 7},
+      "skip_reason": "shopify-js-dynamic",
+      "missing_image_files": [""]
+    }
+    ,
+    {
+      "path": "/contacto",
+      "prod_status": "ok",
+      "qa_status": "ok",
+      "sections": {"prod": 1, "qa": 3, "match": true},
+      "images": {"prod_unique": 0, "qa_unique": 0, "matched": 0, "missing_in_qa": 0, "extra_in_qa": 0},
+      "skip_reason": "shopify-js-dynamic",
+      "missing_image_files": []
+    }
+  ],
+  "footer": {"prod_email": "contacto@puebloladehesa.cl", "qa_email": "contacto@puebloladehesa.cl", "match": true},
+  "total_issues": 3,
+  "status": "FAIL"
+}
