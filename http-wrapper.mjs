@@ -12,7 +12,7 @@ import { createServer } from "http";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync } from "fs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -137,6 +137,40 @@ const server = createServer(async (req, res) => {
       }
     });
     return;
+  }
+
+  // Onboarding — recibe perfil del cuestionario y lo guarda en contracts/roles/
+  if (req.method === "POST" && url.pathname === "/onboarding") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const profile = JSON.parse(body);
+        const rolesDir = join(__dirname, "contracts/roles");
+        mkdirSync(rolesDir, { recursive: true });
+        const fileName = join(rolesDir, `${profile.token}.json`);
+        writeFileSync(fileName, JSON.stringify(profile, null, 2), "utf8");
+        console.log(`[onboarding] Profile saved: ${profile.token}`);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true, token: profile.token, saved: fileName }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Onboarding landing — sirve el HTML del cuestionario
+  if (req.method === "GET" && url.pathname === "/onboarding") {
+    try {
+      const html = readFileSync(join(__dirname, "onboarding/index.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch {
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      return res.end("Onboarding page not found");
+    }
   }
 
   res.writeHead(404, { "Content-Type": "application/json" });

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retarget MCP — Tu Agente Personal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #FF6B35;
+      --blue:   #004E89;
+      --dark:   #0f1117;
+      --card:   #1a1d27;
+      --border: #2a2d3a;
+      --text:   #e8eaf0;
+      --muted:  #8b8fa8;
+      --green:  #22c55e;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0f1117 0%, #0d1a2e 60%, #1a0d0d 100%);
+      padding: 80px 24px 60px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,107,53,0.12);
+      border: 1px solid rgba(255,107,53,0.3);
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      max-width: 700px;
+      margin: 0 auto 20px;
+    }
+    .hero h1 span { color: var(--orange); }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── STEP INDICATOR ── */
+    .steps-nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 32px 24px 0;
+      flex-wrap: wrap;
+    }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+    .step-dot.active { background: var(--orange); transform: scale(1.4); }
+    .step-dot.done   { background: var(--green); }
+
+    /* ── FORM CONTAINER ── */
+    .form-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .step { display: none; }
+    .step.active { display: block; animation: fadeUp 0.4s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-header { margin-bottom: 32px; }
+    .step-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--orange);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .step-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .step-header p { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+
+    /* ── FIELDS ── */
+    .field { margin-bottom: 24px; }
+    .field label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .field label .required { color: var(--orange); margin-left: 2px; }
+
+    input[type="text"], input[type="email"], textarea, select {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.95rem;
+      padding: 14px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--orange);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    select option { background: var(--card); }
+
+    /* ── CHIPS (multi-select) ── */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--orange); color: var(--text); }
+    .chip.selected {
+      border-color: var(--orange);
+      background: rgba(255,107,53,0.12);
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    /* ── SCALE ── */
+    .scale { display: flex; gap: 8px; align-items: center; }
+    .scale-btn {
+      flex: 1;
+      padding: 10px 4px;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .scale-btn:hover { border-color: var(--orange); color: var(--text); }
+    .scale-btn.selected {
+      border-color: var(--orange);
+      background: rgba(255,107,53,0.15);
+      color: var(--orange);
+      font-weight: 700;
+    }
+    .scale-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    /* ── ADD MORE ── */
+    .add-more-wrap { margin-top: 12px; }
+    .add-more-input {
+      display: flex; gap: 8px;
+    }
+    .add-more-input input { flex: 1; }
+    .btn-add {
+      background: rgba(255,107,53,0.15);
+      border: 1px solid rgba(255,107,53,0.3);
+      color: var(--orange);
+      border-radius: 8px;
+      padding: 0 16px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: rgba(255,107,53,0.25); }
+    .added-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .added-tag {
+      background: rgba(255,107,53,0.1);
+      border: 1px solid rgba(255,107,53,0.2);
+      color: var(--orange);
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 100px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .added-tag button {
+      background: none; border: none; color: var(--orange);
+      cursor: pointer; font-size: 0.9rem; line-height: 1;
+    }
+
+    /* ── NAVIGATION ── */
+    .nav-btns {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 40px;
+      gap: 12px;
+    }
+    .btn {
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      font-family: inherit;
+    }
+    .btn-back {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-back:hover { border-color: var(--text); color: var(--text); }
+    .btn-next {
+      background: var(--orange);
+      color: white;
+      flex: 1;
+      text-align: center;
+    }
+    .btn-next:hover { background: #e85a20; transform: translateY(-1px); }
+    .btn-submit {
+      background: var(--green);
+      color: white;
+      flex: 1;
+    }
+    .btn-submit:hover { background: #16a34a; }
+
+    /* ── SUCCESS ── */
+    .success { display: none; text-align: center; padding: 60px 24px; }
+    .success.active { display: block; animation: fadeUp 0.5s ease; }
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: 24px;
+    }
+    .success h2 { font-size: 2rem; margin-bottom: 12px; }
+    .success p { color: var(--muted); font-size: 1.05rem; line-height: 1.6; max-width: 480px; margin: 0 auto 32px; }
+    .token-box {
+      background: var(--card);
+      border: 1px solid var(--orange);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin: 0 auto 24px;
+      max-width: 400px;
+      text-align: left;
+    }
+    .token-box .token-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .token-box .token-value {
+      font-family: 'Courier New', monospace;
+      font-size: 1.1rem;
+      color: var(--orange);
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-copy {
+      background: rgba(255,107,53,0.15);
+      border: 1px solid rgba(255,107,53,0.3);
+      color: var(--orange);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .json-preview {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: left;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      color: #7dd3fc;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-bar-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 24px 24px 0;
+    }
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 100px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 6px;
+    }
+
+    /* ── ROLE CARDS ── */
+    .role-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .role-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .role-card:hover { border-color: var(--orange); }
+    .role-card.selected {
+      border-color: var(--orange);
+      background: rgba(255,107,53,0.1);
+    }
+    .role-card .role-emoji { font-size: 1.8rem; margin-bottom: 6px; }
+    .role-card .role-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .role-card .role-title { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+    @media (max-width: 480px) {
+      .role-cards { grid-template-columns: repeat(2, 1fr); }
+      .scale { gap: 4px; }
+      .scale-btn { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Retarget MCP · Onboarding</div>
+  <h1>Tu agente personal<br><span>te necesita conocer</span></h1>
+  <p>Responde estas preguntas para que tu agente Claude entienda exactamente cómo trabajas y pueda ayudarte mejor desde el primer día.</p>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="progress-text" id="progressText">Paso 1 de 6</div>
+</div>
+
+<!-- STEPS NAV -->
+<div class="steps-nav" id="stepsNav"></div>
+
+<!-- FORM -->
+<div class="form-wrap">
+
+  <!-- STEP 1: Quién eres -->
+  <div class="step active" id="step-1">
+    <div class="step-header">
+      <div class="step-num">Paso 1 · Identificación</div>
+      <h2>¿Quién eres?</h2>
+      <p>Esto es para que tu agente sepa cómo llamarte y qué rol tiene en el equipo.</p>
+    </div>
+
+    <div class="field">
+      <label>Tu nombre <span class="required">*</span></label>
+      <input type="text" id="q-name" placeholder="Ej: Andrea" />
+    </div>
+
+    <div class="field">
+      <label>Tu rol en Retarget <span class="required">*</span></label>
+      <div class="role-cards">
+        <div class="role-card" data-role="ceo" onclick="selectRole(this)">
+          <div class="role-emoji">👔</div>
+          <div class="role-name">Mauricio</div>
+          <div class="role-title">CEO / Estrategia</div>
+        </div>
+        <div class="role-card" data-role="coo" onclick="selectRole(this)">
+          <div class="role-emoji">👩‍💼</div>
+          <div class="role-name">Barbara</div>
+          <div class="role-title">COO / Operaciones</div>
+        </div>
+        <div class="role-card" data-role="cm" onclick="selectRole(this)">
+          <div class="role-emoji">💬</div>
+          <div class="role-name">Leig</div>
+          <div class="role-title">Community Manager</div>
+        </div>
+        <div class="role-card" data-role="media_buyer" onclick="selectRole(this)">
+          <div class="role-emoji">📊</div>
+          <div class="role-name">Andrea</div>
+          <div class="role-title">Media Buyer</div>
+        </div>
+        <div class="role-card" data-role="designer" onclick="selectRole(this)">
+          <div class="role-emoji">🎨</div>
+          <div class="role-name">Alejandra</div>
+          <div class="role-title">Diseñadora</div>
+        </div>
+        <div class="role-card" data-role="journalist" onclick="selectRole(this)">
+          <div class="role-emoji">✍️</div>
+          <div class="role-name">Cota</div>
+          <div class="role-title">Periodista / Editor</div>
+        </div>
+        <div class="role-card" data-role="seo" onclick="selectRole(this)">
+          <div class="role-emoji">🔍</div>
+          <div class="role-name">Daniel</div>
+          <div class="role-title">SEO Specialist</div>
+        </div>
+        <div class="role-card" data-role="dev" onclick="selectRole(this)">
+          <div class="role-emoji">💻</div>
+          <div class="role-name">Luis</div>
+          <div class="role-title">Dev Fullstack</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Tienes un rol diferente o adicional? (opcional)</label>
+      <input type="text" id="q-role-custom" placeholder="Ej: Coordinadora de cuentas + diseño" />
+    </div>
+  </div>
+
+  <!-- STEP 2: Tu día a día -->
+  <div class="step" id="step-2">
+    <div class="step-header">
+      <div class="step-num">Paso 2 · Tu día a día</div>
+      <h2>¿Cómo es tu trabajo diario?</h2>
+      <p>Queremos entender cómo fluye tu trabajo para que el agente se adapte a tu ritmo, no al revés.</p>
+    </div>
+
+    <div class="field">
+      <label>¿Cuáles son las 3 tareas que haces MÁS seguido? <span class="required">*</span></label>
+      <textarea id="q-top-tasks" placeholder="Ej: Responder mensajes de clientes en Instagram, crear reportes de campaña, revisar copies antes de publicar..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Qué parte de tu trabajo consume más tiempo sin necesariamente ser lo más importante?</label>
+      <textarea id="q-time-sink" placeholder="Ej: Buscar imágenes aprobadas, formatear reportes en Excel, reenviar mensajes entre personas..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿A qué hora empiezas a trabajar generalmente?</label>
+      <div class="chips" id="chips-hora">
+        <div class="chip" onclick="toggleChip(this,'chips-hora')">Antes de las 8</div>
+        <div class="chip" onclick="toggleChip(this,'chips-hora')">8:00 - 9:00</div>
+        <div class="chip" onclick="toggleChip(this,'chips-hora')">9:00 - 10:00</div>
+        <div class="chip" onclick="toggleChip(this,'chips-hora')">10:00 en adelante</div>
+        <div class="chip" onclick="toggleChip(this,'chips-hora')">Varía mucho</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Trabajas más concentrado o con interrupciones frecuentes?</label>
+      <div class="scale" id="scale-focus">
+        <div class="scale-btn" onclick="selectScale(this,'scale-focus','1')">1</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-focus','2')">2</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-focus','3')">3</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-focus','4')">4</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-focus','5')">5</div>
+      </div>
+      <div class="scale-label"><span>Muy concentrado</span><span>Muchas interrupciones</span></div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Herramientas -->
+  <div class="step" id="step-3">
+    <div class="step-header">
+      <div class="step-num">Paso 3 · Herramientas</div>
+      <h2>¿Con qué trabajas?</h2>
+      <p>Selecciona todo lo que usas. Tu agente sabrá dónde buscar y cómo ayudarte en cada plataforma.</p>
+    </div>
+
+    <div class="field">
+      <label>Comunicación y colaboración</label>
+      <div class="chips" id="chips-comms">
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">WhatsApp</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Google Chat</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Slack</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Email Gmail</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Google Meet</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Zoom</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Notion</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Trello</div>
+        <div class="chip" onclick="toggleChip(this,'chips-comms')">Asana</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Marketing y redes sociales</label>
+      <div class="chips" id="chips-marketing">
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Meta Ads</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Google Ads</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">TikTok Ads</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Meta Business Suite</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Instagram</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Facebook</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">LinkedIn</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Google Analytics</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Search Console</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">SEMrush</div>
+        <div class="chip" onclick="toggleChip(this,'chips-marketing')">Hotjar</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Diseño y contenido</label>
+      <div class="chips" id="chips-design">
+        <div class="chip" onclick="toggleChip(this,'chips-design')">Canva</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">Figma</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">Adobe Photoshop</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">Adobe Illustrator</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">Premiere</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">CapCut</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">Google Docs</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">Google Sheets</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">WordPress</div>
+        <div class="chip" onclick="toggleChip(this,'chips-design')">ChatGPT / Claude</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Alguna herramienta que usas y no está en la lista?</label>
+      <div class="add-more-wrap">
+        <div class="add-more-input">
+          <input type="text" id="tool-custom-input" placeholder="Ej: Basecamp, Hootsuite, Notion..." />
+          <button class="btn-add" onclick="addCustomItem('tool-custom-input','tool-custom-tags')">+</button>
+        </div>
+        <div class="added-tags" id="tool-custom-tags"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Clientes y proyectos -->
+  <div class="step" id="step-4">
+    <div class="step-header">
+      <div class="step-num">Paso 4 · Clientes y proyectos</div>
+      <h2>¿Con quién y en qué trabajas?</h2>
+      <p>Cuéntanos sobre los clientes o proyectos que manejas. Tu agente los conocerá y tendrá el contexto listo.</p>
+    </div>
+
+    <div class="field">
+      <label>¿Cuántos clientes activos manejas actualmente?</label>
+      <div class="chips" id="chips-clientes">
+        <div class="chip" onclick="toggleChip(this,'chips-clientes')">1 - 2</div>
+        <div class="chip" onclick="toggleChip(this,'chips-clientes')">3 - 5</div>
+        <div class="chip" onclick="toggleChip(this,'chips-clientes')">6 - 10</div>
+        <div class="chip" onclick="toggleChip(this,'chips-clientes')">Más de 10</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Nombra tus clientes o proyectos principales (uno por línea)</label>
+      <textarea id="q-clients" placeholder="Ej:&#10;Hotel Cordillera&#10;Pueblo La Dehesa&#10;Tienda Moda&#10;..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Qué tipo de entregables produces con más frecuencia?</label>
+      <div class="chips" id="chips-entregables">
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Reportes</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Diseños / creativos</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Textos / copy</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Campañas publicitarias</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Código / web</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Estrategia / propuestas</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Notas de prensa</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Contenido RRSS</div>
+        <div class="chip" onclick="toggleChip(this,'chips-entregables')">Análisis de datos</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Hay algún proyecto que esté generando más fricción o trabajo de lo esperado ahora mismo?</label>
+      <textarea id="q-friction" placeholder="Cuéntanos sin filtro. Esto es solo para que tu agente entienda el contexto real."></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 5: Forma de trabajar -->
+  <div class="step" id="step-5">
+    <div class="step-header">
+      <div class="step-num">Paso 5 · Cómo quieres trabajar con tu agente</div>
+      <h2>¿Cómo te gusta que te ayuden?</h2>
+      <p>Esto define la personalidad y el estilo de tu agente. Sé honesto, es para que funcione bien.</p>
+    </div>
+
+    <div class="field">
+      <label>¿Cómo prefieres que tu agente te dé información?</label>
+      <div class="chips" id="chips-style">
+        <div class="chip" onclick="toggleChip(this,'chips-style')">Directo y corto</div>
+        <div class="chip" onclick="toggleChip(this,'chips-style')">Con contexto y explicación</div>
+        <div class="chip" onclick="toggleChip(this,'chips-style')">En listas ordenadas</div>
+        <div class="chip" onclick="toggleChip(this,'chips-style')">Con ejemplos concretos</div>
+        <div class="chip" onclick="toggleChip(this,'chips-style')">Paso a paso</div>
+        <div class="chip" onclick="toggleChip(this,'chips-style')">Solo lo urgente</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Qué tan seguido quieres que el agente te interrumpa para sugerir cosas?</label>
+      <div class="scale" id="scale-proactive">
+        <div class="scale-btn" onclick="selectScale(this,'scale-proactive','1')">1</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-proactive','2')">2</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-proactive','3')">3</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-proactive','4')">4</div>
+        <div class="scale-btn" onclick="selectScale(this,'scale-proactive','5')">5</div>
+      </div>
+      <div class="scale-label"><span>Solo cuando le pregunto</span><span>Muy proactivo</span></div>
+    </div>
+
+    <div class="field">
+      <label>¿Cuál es el mayor desafío que enfrentas hoy en tu trabajo? <span class="required">*</span></label>
+      <textarea id="q-challenge" placeholder="Ej: Me cuesta encontrar tiempo para analizar los datos de las campañas, siempre estoy apagando incendios..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Qué es lo que MÁS te gustaría que el agente hiciera por ti?</label>
+      <textarea id="q-dream" placeholder="Ej: Que prepare el reporte del cliente automáticamente antes de cada reunión, que me avise cuando una campaña está bajando rendimiento..."></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 6: Cierre -->
+  <div class="step" id="step-6">
+    <div class="step-header">
+      <div class="step-num">Paso 6 · Último paso</div>
+      <h2>Casi listo 🎉</h2>
+      <p>Solo necesitamos esto para enviarte tu token y activar tu agente.</p>
+    </div>
+
+    <div class="field">
+      <label>Tu email de trabajo <span class="required">*</span></label>
+      <input type="email" id="q-email" placeholder="nombre@retarget.cl" />
+    </div>
+
+    <div class="field">
+      <label>¿Hay algo más que tu agente debería saber sobre ti o tu trabajo?</label>
+      <textarea id="q-extra" placeholder="Cualquier cosa que no encajó en las preguntas anteriores. Contexto, preferencias, limitaciones, etc."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Cómo te enteraste de este sistema?</label>
+      <div class="chips" id="chips-source">
+        <div class="chip" onclick="toggleChip(this,'chips-source')">Mauricio me lo dijo</div>
+        <div class="chip" onclick="toggleChip(this,'chips-source')">Barbara me lo compartió</div>
+        <div class="chip" onclick="toggleChip(this,'chips-source')">Luis me explicó</div>
+        <div class="chip" onclick="toggleChip(this,'chips-source')">Reunión de equipo</div>
+        <div class="chip" onclick="toggleChip(this,'chips-source')">Otro canal</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BUTTONS -->
+  <div class="nav-btns" id="navBtns">
+    <button class="btn btn-back" id="btnBack" onclick="prevStep()" style="display:none">← Atrás</button>
+    <button class="btn btn-next" id="btnNext" onclick="nextStep()">Continuar →</button>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success" id="success">
+  <div class="success-icon">🚀</div>
+  <h2>¡Bienvenido/a al sistema!</h2>
+  <p id="success-msg">Tu perfil fue creado. Aquí está tu token personal para activar tu agente Claude.</p>
+
+  <div class="token-box">
+    <div class="token-label">Tu token personal</div>
+    <div class="token-value">
+      <span id="token-display"></span>
+      <button class="btn-copy" onclick="copyToken()">Copiar</button>
+    </div>
+  </div>
+
+  <p style="color:var(--muted); font-size:0.9rem; margin-bottom:24px;">
+    Guarda este token. Lo necesitarás para activar tu agente escribiendo<br>
+    <code style="color:var(--orange);">/who-am-i [tu-token]</code> en Claude.
+  </p>
+
+  <details style="max-width:640px; margin:0 auto; text-align:left;">
+    <summary style="cursor:pointer; color:var(--muted); font-size:0.85rem; margin-bottom:12px;">Ver perfil generado (JSON)</summary>
+    <div class="json-preview" id="json-output"></div>
+  </details>
+</div>
+
+<script>
+  const TOTAL_STEPS = 6;
+  let currentStep = 1;
+  let selectedRole = null;
+  const scales = {};
+  const chips = {};
+  const customItems = {};
+
+  // Init dots
+  const nav = document.getElementById('stepsNav');
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i === 1 ? ' active' : '');
+    d.id = 'dot-' + i;
+    nav.appendChild(d);
+  }
+
+  function updateProgress() {
+    const pct = ((currentStep - 1) / (TOTAL_STEPS - 1)) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      const dot = document.getElementById('dot-' + i);
+      dot.className = 'step-dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+    }
+    document.getElementById('btnBack').style.display = currentStep > 1 ? 'block' : 'none';
+    const btnNext = document.getElementById('btnNext');
+    if (currentStep === TOTAL_STEPS) {
+      btnNext.textContent = 'Activar mi agente ✓';
+      btnNext.className = 'btn btn-submit';
+      btnNext.onclick = submitForm;
+    } else {
+      btnNext.textContent = 'Continuar →';
+      btnNext.className = 'btn btn-next';
+      btnNext.onclick = nextStep;
+    }
+  }
+
+  function nextStep() {
+    if (!validateStep()) return;
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    currentStep++;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prevStep() {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    currentStep--;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validateStep() {
+    if (currentStep === 1) {
+      const name = document.getElementById('q-name').value.trim();
+      if (!name) { alert('Por favor ingresa tu nombre.'); return false; }
+      if (!selectedRole) { alert('Por favor selecciona tu rol.'); return false; }
+    }
+    if (currentStep === 2) {
+      const tasks = document.getElementById('q-top-tasks').value.trim();
+      if (!tasks) { alert('Cuéntanos tus tareas más frecuentes.'); return false; }
+    }
+    if (currentStep === 5) {
+      const challenge = document.getElementById('q-challenge').value.trim();
+      if (!challenge) { alert('Comparte tu mayor desafío actual.'); return false; }
+    }
+    if (currentStep === 6) {
+      const email = document.getElementById('q-email').value.trim();
+      if (!email || !email.includes('@')) { alert('Ingresa un email válido.'); return false; }
+    }
+    return true;
+  }
+
+  function selectRole(el) {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedRole = el.dataset.role;
+  }
+
+  function toggleChip(el, groupId) {
+    el.classList.toggle('selected');
+    if (!chips[groupId]) chips[groupId] = new Set();
+    const label = el.textContent.trim();
+    if (el.classList.contains('selected')) chips[groupId].add(label);
+    else chips[groupId].delete(label);
+  }
+
+  function selectScale(el, groupId, value) {
+    el.closest('.scale').querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    scales[groupId] = value;
+  }
+
+  function addCustomItem(inputId, tagsId) {
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if (!val) return;
+    if (!customItems[tagsId]) customItems[tagsId] = [];
+    customItems[tagsId].push(val);
+
+    const wrap = document.getElementById(tagsId);
+    const tag = document.createElement('div');
+    tag.className = 'added-tag';
+    tag.innerHTML = `${val} <button onclick="removeTag(this,'${tagsId}','${val}')">×</button>`;
+    wrap.appendChild(tag);
+    input.value = '';
+  }
+
+  function removeTag(btn, tagsId, val) {
+    btn.closest('.added-tag').remove();
+    if (customItems[tagsId]) {
+      customItems[tagsId] = customItems[tagsId].filter(v => v !== val);
+    }
+  }
+
+  function getSelectedChips(groupId) {
+    return chips[groupId] ? Array.from(chips[groupId]) : [];
+  }
+
+  function generateToken(role, name) {
+    const roleMap = {
+      ceo: 'mauricio-ceo',
+      coo: 'barbara-coo',
+      cm: 'leig-cm',
+      media_buyer: 'andrea-media',
+      designer: 'alejandra-design',
+      journalist: 'cota-editor',
+      seo: 'daniel-seo',
+      dev: 'luis-dev'
+    };
+    const base = roleMap[role] || name.toLowerCase().replace(/\s+/g, '-') + '-' + role;
+    return 'retarget-' + base;
+  }
+
+  function submitForm() {
+    if (!validateStep()) return;
+
+    const name = document.getElementById('q-name').value.trim();
+    const token = generateToken(selectedRole, name);
+
+    // Collect all tools
+    const toolsSelected = [
+      ...getSelectedChips('chips-comms'),
+      ...getSelectedChips('chips-marketing'),
+      ...getSelectedChips('chips-design'),
+      ...(customItems['tool-custom-tags'] || [])
+    ];
+
+    const profile = {
+      user: name,
+      role: selectedRole,
+      token: token,
+      email: document.getElementById('q-email').value.trim(),
+      generated_at: new Date().toISOString(),
+
+      work_style: {
+        top_tasks: document.getElementById('q-top-tasks').value.trim().split('\n').filter(Boolean),
+        time_sink: document.getElementById('q-time-sink').value.trim(),
+        start_hour: getSelectedChips('chips-hora')[0] || null,
+        focus_level: scales['scale-focus'] || null,
+        proactivity_preference: scales['scale-proactive'] || null,
+        prefers_format: getSelectedChips('chips-style'),
+        challenge: document.getElementById('q-challenge').value.trim(),
+        dream_use_case: document.getElementById('q-dream').value.trim(),
+      },
+
+      tools_used: toolsSelected,
+      tools_custom: customItems['tool-custom-tags'] || [],
+
+      clients: {
+        count: getSelectedChips('chips-clientes')[0] || null,
+        names: document.getElementById('q-clients').value.trim().split('\n').filter(Boolean),
+        deliverables: getSelectedChips('chips-entregables'),
+        friction_project: document.getElementById('q-friction').value.trim(),
+      },
+
+      extra_context: document.getElementById('q-extra').value.trim(),
+      custom_role: document.getElementById('q-role-custom').value.trim(),
+    };
+
+    // Show success
+    document.getElementById('navBtns').style.display = 'none';
+    document.querySelector('.form-wrap').querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressText').textContent = '¡Completado!';
+    document.querySelectorAll('.step-dot').forEach(d => d.className = 'step-dot done');
+
+    document.getElementById('success-msg').textContent =
+      `¡Listo, ${name}! Tu perfil fue creado. Comparte tu token con Luis para activar tu agente Claude.`;
+    document.getElementById('token-display').textContent = token;
+    document.getElementById('json-output').textContent = JSON.stringify(profile, null, 2);
+    document.getElementById('success').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Copy to clipboard for easy sharing
+    sendToMCP(profile, token);
+  }
+
+  function sendToMCP(profile, token) {
+    // Enviar al endpoint del MCP para guardar el perfil
+    fetch('https://retarget-mcp-v1-270024878418.europe-west1.run.app/onboarding', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profile)
+    }).catch(() => {
+      // Silencioso — el JSON se puede copiar manualmente si falla
+    });
+  }
+
+  function copyToken() {
+    const token = document.getElementById('token-display').textContent;
+    navigator.clipboard.writeText(token).then(() => {
+      const btn = document.querySelector('.btn-copy');
+      btn.textContent = '✓ Copiado';
+      setTimeout(() => btn.textContent = 'Copiar', 2000);
+    });
+  }
+
+  // Enter key en inputs de herramientas
+  document.getElementById('tool-custom-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addCustomItem('tool-custom-input','tool-custom-tags'); }
+  });
+
+  updateProgress();
+</script>
+
+</body>
+</html>
