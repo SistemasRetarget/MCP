@@ -25,6 +25,7 @@ COPY tools ./tools
 COPY mcp-config.json ./
 COPY mcp-subagents-config.json ./
 COPY http-wrapper.mjs ./
+COPY onboarding ./onboarding
 
 ENV NODE_ENV=production
 ENV PORT=8080
