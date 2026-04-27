@@ -1,0 +1,15 @@
+{
+  "name": "instagram-playwright-scraper",
+  "version": "1.0.0",
+  "description": "Instagram comments scraper using Playwright",
+  "main": "scraper.js",
+  "scripts": {
+    "install-deps": "npx playwright install chromium",
+    "scrape": "node scraper.js",
+    "test": "node scraper.js --test"
+  },
+  "dependencies": {
+    "playwright": "^1.42.0",
+    "commander": "^12.0.0"
+  }
+}

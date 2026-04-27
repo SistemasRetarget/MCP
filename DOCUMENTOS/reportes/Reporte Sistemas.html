@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte Técnico – Pueblo La Dehesa (Shopify)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  body{font-family:'Inter',system-ui,sans-serif}
+  .gauge{position:relative;width:140px;height:140px}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.9rem}
+  .bar-wrap{background:#e5e7eb;border-radius:9999px;height:10px;overflow:hidden}
+  .bar{height:100%;border-radius:9999px;transition:width 1.2s ease}
+  @media print{.no-print{display:none}.page-break{page-break-before:always}}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- HEADER -->
+<header class="bg-gradient-to-r from-emerald-700 to-teal-600 text-white">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <p class="uppercase tracking-widest text-emerald-100 text-xs">Reporte de Sistemas · Shopify Audit</p>
+    <h1 class="text-4xl font-bold mt-2">Pueblo La Dehesa</h1>
+    <p class="text-emerald-50 mt-1">puebloladehesa.cl · Seguimiento técnico del proyecto</p>
+    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div class="bg-white/10 rounded-lg px-4 py-3"><div class="text-emerald-100">Responsable</div><div class="font-semibold">Luis Alberto Maldonado</div></div>
+      <div class="bg-white/10 rounded-lg px-4 py-3"><div class="text-emerald-100">Área</div><div class="font-semibold">Sistemas / TI</div></div>
+      <div class="bg-white/10 rounded-lg px-4 py-3"><div class="text-emerald-100">Plataforma</div><div class="font-semibold">Shopify</div></div>
+      <div class="bg-white/10 rounded-lg px-4 py-3"><div class="text-emerald-100">Fecha</div><div class="font-semibold" id="fecha"></div></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-10 space-y-12">
+
+<!-- SCORES -->
+<section>
+  <h2 class="text-2xl font-bold mb-6">1. Puntajes Lighthouse (datos reales)</h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">📱 Móvil</h3>
+      <div class="grid grid-cols-4 gap-3 text-center" id="mobile-scores"></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">🖥️ Desktop</h3>
+      <div class="grid grid-cols-4 gap-3 text-center" id="desktop-scores"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CORE WEB VITALS -->
+<section>
+  <h2 class="text-2xl font-bold mb-2">2. Core Web Vitals – ¿A cuánto estamos?</h2>
+  <p class="text-slate-600 mb-6">Google exige <b>LCP &lt;2.5s</b>, <b>INP/TBT &lt;200ms</b> y <b>CLS &lt;0.1</b> para aprobar.</p>
+  <div class="overflow-x-auto bg-white rounded-2xl shadow">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr><th class="p-3 text-left">Métrica</th><th class="p-3">Móvil</th><th class="p-3">Desktop</th><th class="p-3">Meta Google</th><th class="p-3">Estado móvil</th></tr>
+      </thead>
+      <tbody id="cwv-table"></tbody>
+    </table>
+  </div>
+
+  <!-- GAP progress -->
+  <div class="mt-8 grid md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl shadow p-5">
+      <div class="flex justify-between mb-2"><span class="font-semibold">LCP móvil</span><span class="text-rose-600 font-bold">16.2s / meta 2.5s</span></div>
+      <div class="bar-wrap"><div class="bar bg-rose-500" style="width:15%"></div></div>
+      <p class="text-xs text-slate-500 mt-2">Estamos al <b>~15%</b> de la meta. Falta recortar ~13.7s.</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-5">
+      <div class="flex justify-between mb-2"><span class="font-semibold">TBT móvil</span><span class="text-amber-600 font-bold">770ms / meta 200ms</span></div>
+      <div class="bar-wrap"><div class="bar bg-amber-500" style="width:26%"></div></div>
+      <p class="text-xs text-slate-500 mt-2">Al <b>~26%</b>. Bloqueo por JS de terceros (GTM/Pixel).</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-5">
+      <div class="flex justify-between mb-2"><span class="font-semibold">CLS móvil</span><span class="text-emerald-600 font-bold">0.121 / meta 0.10</span></div>
+      <div class="bar-wrap"><div class="bar bg-emerald-500" style="width:83%"></div></div>
+      <p class="text-xs text-slate-500 mt-2">Al <b>~83%</b>. Muy cerca, ajustar reserva de espacio de imágenes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TECNOLOGÍAS -->
+<section>
+  <h2 class="text-2xl font-bold mb-6">3. Tecnologías detectadas en el sitio</h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="font-semibold mb-3">✅ Stack base</h3>
+      <ul class="space-y-2 text-sm">
+        <li>🛍️ <b>Shopify</b> (tema propio, CDN <code>cdn.shopify.com</code>)</li>
+        <li>📹 App <b>Shopify Plyr</b> (player de video)</li>
+        <li>📝 App <b>Form Builder by HulkApps</b></li>
+        <li>🎬 <b>YouTube iframe API</b> (embed de videos)</li>
+        <li>🌐 Multi-idioma ES/EN</li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="font-semibold mb-3">📊 Marketing / Analytics</h3>
+      <ul class="space-y-2 text-sm">
+        <li>🏷️ <b>Google Tag Manager</b> — <code>GTM-WJHDSTT2</code></li>
+        <li>📈 <b>GA4</b> — <code>G-75EZVLGP9V</code></li>
+        <li>🏷️ GTM Shopify nativo — <code>GT-MK98MHQH</code></li>
+        <li>📘 <b>Facebook/Meta Pixel</b> (<code>fbevents.js</code>)</li>
+        <li>💬 <b>WhatsApp</b> — <code>wa.me/56912345678</code> + <code>api.whatsapp.com/send</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMAS -->
+<section>
+  <h2 class="text-2xl font-bold mb-6">4. Recursos que están frenando el sitio</h2>
+  <div class="bg-white rounded-2xl shadow overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr><th class="p-3 text-left">Recurso</th><th class="p-3">Tipo</th><th class="p-3">Desperdicio</th><th class="p-3">Acción sugerida</th></tr>
+      </thead>
+      <tbody class="[&>tr]:border-t [&>tr]:border-slate-100">
+        <tr><td class="p-3"><code>googletagmanager.com/gtag/js?id=GT-MK98MHQH</code></td><td class="p-3">JS ext.</td><td class="p-3 text-rose-600 font-bold">114 KB</td><td class="p-3">Diferir / Consent Mode v2</td></tr>
+        <tr><td class="p-3"><code>googletagmanager.com/gtag/js?id=G-75EZVLGP9V</code></td><td class="p-3">JS ext.</td><td class="p-3 text-rose-600 font-bold">114 KB</td><td class="p-3">Cargar vía GTM único + async</td></tr>
+        <tr><td class="p-3"><code>connect.facebook.net/en_US/fbevents.js</code></td><td class="p-3">JS ext.</td><td class="p-3 text-rose-600 font-bold">90 KB</td><td class="p-3">Disparar post-interacción</td></tr>
+        <tr><td class="p-3"><code>googletagmanager.com/gtag/js (2da instancia)</code></td><td class="p-3">JS ext.</td><td class="p-3 text-amber-600 font-bold">67 KB</td><td class="p-3"><b>Duplicado</b> – consolidar</td></tr>
+        <tr><td class="p-3"><code>googletagmanager.com/gtm.js?id=GTM-WJHDSTT2</code></td><td class="p-3">JS ext.</td><td class="p-3 text-amber-600 font-bold">61 KB</td><td class="p-3">Unificar contenedores GTM</td></tr>
+        <tr><td class="p-3"><code>cdn/shop/t/11/assets/theme.min.js</code></td><td class="p-3">JS tema</td><td class="p-3">36 KB</td><td class="p-3">Tree-shaking del tema</td></tr>
+        <tr><td class="p-3"><code>youtube.com/iframe_api</code></td><td class="p-3">Iframe</td><td class="p-3">—</td><td class="p-3">Lazy-load (lite-youtube-embed)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-6 grid md:grid-cols-3 gap-4">
+    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4"><div class="text-rose-700 font-bold text-2xl">3.292 KB</div><div class="text-sm text-rose-900">Peso total página móvil</div></div>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4"><div class="text-amber-700 font-bold text-2xl">604 KB</div><div class="text-sm text-amber-900">JavaScript sin usar</div></div>
+    <div class="bg-sky-50 border border-sky-200 rounded-xl p-4"><div class="text-sky-700 font-bold text-2xl">860 ms</div><div class="text-sm text-sky-900">Perdidos en redirects</div></div>
+  </div>
+</section>
+
+<!-- ANALYTICS WHATSAPP -->
+<section class="page-break">
+  <h2 class="text-2xl font-bold mb-2">5. Medición de WhatsApp (hito clave del proyecto)</h2>
+  <p class="text-slate-600 mb-6">Necesito confirmar si podemos medir cuando el cliente efectivamente envía el mensaje por WhatsApp. No basta con medir el clic del botón del sitio, porque varios clientes rebotan y no completan el envío. La realidad técnica: <b>no es medible al 100%</b> porque WhatsApp es una app externa que no expone ese evento, pero sí podemos construir un embudo que se acerca mucho y nos entrega datos accionables.</p>
+
+  <div class="bg-white rounded-2xl shadow p-6">
+    <h3 class="font-semibold mb-4">Embudo recomendado en GA4 (vía GTM)</h3>
+    <div class="space-y-3">
+      <div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">1</div><div class="flex-1"><b>click_whatsapp_flotante</b> – botón flotante del sitio<br><span class="text-xs text-slate-500">Dispara al hacer clic en el ícono de WhatsApp del sitio</span></div><div class="bar-wrap w-40"><div class="bar bg-emerald-500" style="width:100%"></div></div></div>
+      <div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">2</div><div class="flex-1"><b>click_whatsapp_contacto</b> – link en sección contacto<br><span class="text-xs text-slate-500">Dispara en cualquier link wa.me o api.whatsapp.com</span></div><div class="bar-wrap w-40"><div class="bar bg-emerald-500" style="width:80%"></div></div></div>
+      <div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold">3</div><div class="flex-1"><b>open_whatsapp_app</b> – <i>page leave</i> hacia dominio WhatsApp<br><span class="text-xs text-slate-500">Usamos el evento <code>beforeunload</code> + outbound link click con destino wa.me/api.whatsapp</span></div><div class="bar-wrap w-40"><div class="bar bg-amber-500" style="width:55%"></div></div></div>
+      <div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-slate-400 text-white flex items-center justify-center font-bold">4</div><div class="flex-1"><b>whatsapp_message_sent</b> – <span class="text-rose-600">NO medible directo</span><br><span class="text-xs text-slate-500">Workaround: usar WhatsApp Business API + webhook on-received, o pedir al cliente responder una palabra clave</span></div><div class="bar-wrap w-40"><div class="bar bg-slate-400" style="width:15%"></div></div></div>
+    </div>
+  </div>
+
+  <!-- OPCIONES PARA MEDIR ENVÍO REAL -->
+  <div class="mt-8">
+    <h3 class="text-xl font-bold mb-4">Opciones concretas para medir el envío del mensaje</h3>
+    <div class="grid md:grid-cols-3 gap-5">
+
+      <div class="bg-white rounded-2xl shadow p-5 border-t-4 border-sky-500">
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="font-bold">Opción A · Proxy por tiempo</h4>
+          <span class="text-xs bg-sky-100 text-sky-700 px-2 py-1 rounded">Gratis · 10 min</span>
+        </div>
+        <p class="text-sm text-slate-600 mb-3">Medimos cuánto tiempo pasa el usuario fuera del sitio cuando hace clic en WhatsApp. Si vuelve después de <b>15 s</b>, clasificamos como <i>envío probable</i>; si vuelve tras <b>60 s</b>, como <i>envío confirmado</i>.</p>
+        <ul class="text-xs text-slate-500 space-y-1 list-disc pl-4">
+          <li>Implementación: script único en el tema</li>
+          <li>Reporta a GA4 como evento <code>whatsapp_retorno</code></li>
+          <li>Precisión estimada: <b>~80%</b></li>
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-5 border-t-4 border-emerald-500">
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="font-bold">Opción B · Token único</h4>
+          <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">Gratis · 15 min</span>
+        </div>
+        <p class="text-sm text-slate-600 mb-3">Cada link de WhatsApp genera un código tipo <code>Ref: PLD-A3K9F2</code> dentro del mensaje pre-llenado. El asesor ve el código al recibir y se cruza semanalmente con los clics registrados en GA4.</p>
+        <ul class="text-xs text-slate-500 space-y-1 list-disc pl-4">
+          <li>Requiere proceso manual de cruce (planilla)</li>
+          <li>Funciona con WhatsApp Business normal</li>
+          <li>Precisión: <b>100% de los que sí envían</b></li>
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-5 border-t-4 border-purple-500">
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="font-bold">Opción C · Cloud API + Webhook ⭐</h4>
+          <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">~USD 0-20/mes · 2-3 h</span>
+        </div>
+        <p class="text-sm text-slate-600 mb-3">Migrar el número a <b>WhatsApp Business Cloud API</b> (Meta). Un webhook recibe cada mensaje entrante y envía automáticamente el evento <code>whatsapp_message_sent</code> a GA4 vía Measurement Protocol.</p>
+        <ul class="text-xs text-slate-500 space-y-1 list-disc pl-4">
+          <li>Cierra el loop end-to-end automático</li>
+          <li>Gratis hasta 1.000 conversaciones/mes</li>
+          <li>Precisión: <b>100% automática</b></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="mt-5 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm">
+      <b>Recomendación:</b> implementar <b>Opción A + Opción B en paralelo</b> esta semana (bajo costo y alta señal), y evaluar migración a <b>Opción C</b> en el Sprint 2 si el volumen de consultas por WhatsApp justifica la inversión.
+    </div>
+
+    <div class="mt-6 overflow-x-auto bg-white rounded-2xl shadow">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-100">
+          <tr><th class="p-3 text-left">Nivel</th><th class="p-3 text-left">Qué mide</th><th class="p-3">Costo</th><th class="p-3">Precisión</th><th class="p-3">Quien implementa</th></tr>
+        </thead>
+        <tbody class="[&>tr]:border-t [&>tr]:border-slate-100">
+          <tr><td class="p-3">Clic del botón del sitio</td><td class="p-3">Intención de contacto</td><td class="p-3 text-center">$0</td><td class="p-3 text-center text-emerald-600 font-bold">100%</td><td class="p-3">GTM (ya configurado)</td></tr>
+          <tr><td class="p-3">Opción A · Proxy tiempo</td><td class="p-3">Envío probable</td><td class="p-3 text-center">$0</td><td class="p-3 text-center text-sky-600 font-bold">~80%</td><td class="p-3">Proveedor (tema Shopify)</td></tr>
+          <tr><td class="p-3">Opción B · Token único</td><td class="p-3">Envío real (manual)</td><td class="p-3 text-center">$0</td><td class="p-3 text-center text-emerald-600 font-bold">100%</td><td class="p-3">Proveedor + asesor ventas</td></tr>
+          <tr class="bg-purple-50"><td class="p-3 font-semibold">Opción C · Cloud API</td><td class="p-3 font-semibold">Envío real automático</td><td class="p-3 text-center">~USD 0-20/mes</td><td class="p-3 text-center text-purple-700 font-bold">100%</td><td class="p-3">Sistemas + proveedor</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-8 grid md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="font-semibold mb-3">🎯 Tag GTM sugerido (pseudo)</h3>
+<pre class="text-xs bg-slate-900 text-emerald-300 rounded-lg p-4 overflow-x-auto">// Trigger: Click Element matches CSS
+a[href*="wa.me"], a[href*="api.whatsapp.com"]
+
+// Tag GA4 Event
+event_name: click_whatsapp
+params:
+  link_url: {{Click URL}}
+  origen: {{Click Classes}}
+  page_path: {{Page Path}}
+  device: {{Device Type}}</pre>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="font-semibold mb-3">✅ Medición real end-to-end</h3>
+      <ol class="text-sm space-y-2 list-decimal pl-5">
+        <li>Migrar a <b>WhatsApp Business Platform</b> (Cloud API).</li>
+        <li>Generar link con parámetro único: <code>wa.me/...?text=ref-{{session_id}}</code></li>
+        <li>Webhook recibe mensaje → postea evento <code>whatsapp_message_received</code> a GA4 Measurement Protocol con el mismo <code>session_id</code>.</li>
+        <li>Así cierras el loop: click → apertura → <b>mensaje efectivamente enviado</b>.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- PLAN PROVEEDOR -->
+<section>
+  <h2 class="text-2xl font-bold mb-6">6. Plan de trabajo para el proveedor</h2>
+  <div class="space-y-4">
+    <div class="bg-white rounded-2xl shadow p-5 border-l-4 border-rose-500">
+      <div class="flex justify-between items-start"><h3 class="font-bold">Sprint 1 · Performance móvil (prioridad alta)</h3><span class="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded">1-2 semanas</span></div>
+      <ul class="text-sm mt-3 space-y-1 list-disc pl-5 text-slate-700">
+        <li>Consolidar <b>GTM</b>: hoy hay 2 contenedores (<code>GTM-WJHDSTT2</code> y <code>GT-MK98MHQH</code>). Dejar uno.</li>
+        <li>Implementar <b>Consent Mode v2</b>: GA4 y Pixel solo disparan tras interacción.</li>
+        <li>Convertir YouTube a <b>lite-youtube-embed</b> (ahorro ~500ms TBT).</li>
+        <li>Optimizar imagen hero (LCP element) → <code>fetchpriority="high"</code>, WebP/AVIF, width/height fijos.</li>
+        <li>Eliminar redirect <code>http://</code>→<code>https://</code>→<code>puebloladehesa.cl</code> (ahorro 860ms).</li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-5 border-l-4 border-amber-500">
+      <div class="flex justify-between items-start"><h3 class="font-bold">Sprint 2 · Analytics y medición</h3><span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">1 semana</span></div>
+      <ul class="text-sm mt-3 space-y-1 list-disc pl-5 text-slate-700">
+        <li>Crear eventos GA4: <code>click_whatsapp_flotante</code>, <code>click_whatsapp_contacto</code>, <code>click_formulario_enviar</code>, <code>form_submit_success</code>.</li>
+        <li>Marcar como <b>conversiones</b> en GA4 los 3 eventos.</li>
+        <li>Configurar <b>Enhanced Conversions</b> + <b>Server-side GTM</b> (recomendado para Shopify).</li>
+        <li>Instalar pixel de conversión offline → WhatsApp Business Cloud API (medición real de mensaje enviado).</li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-5 border-l-4 border-emerald-500">
+      <div class="flex justify-between items-start"><h3 class="font-bold">Sprint 3 · Tema Shopify</h3><span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">1-2 semanas</span></div>
+      <ul class="text-sm mt-3 space-y-1 list-disc pl-5 text-slate-700">
+        <li>Auditar <code>theme.min.js</code>: 36KB sin uso.</li>
+        <li>Agregar <code>loading="lazy"</code> a imágenes below-the-fold.</li>
+        <li>Precargar fuentes críticas (<code>preload</code> + <code>font-display:swap</code>).</li>
+        <li>Revisar app <b>Form Builder HulkApps</b> — evaluar si se puede reemplazar por forms nativos Shopify.</li>
+        <li>Reservar dimensiones en slider hero → baja CLS de 0.121 a &lt;0.05.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- VISUAL BUILDER -->
+<section>
+  <h2 class="text-2xl font-bold mb-4">7. ¿Qué constructor visual Node→HTML usar?</h2>
+  <p class="text-slate-600 mb-6">Opciones recomendadas, ordenadas por fit con reportes / landing estáticos:</p>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="bg-white rounded-2xl shadow p-5"><h3 class="font-bold">🥇 GrapesJS</h3><p class="text-sm text-slate-600 mt-1">Open source, Node, editor drag&drop, exporta HTML+CSS puro. Ideal para reportes y landings.</p><code class="text-xs">npm i grapesjs</code></div>
+    <div class="bg-white rounded-2xl shadow p-5"><h3 class="font-bold">🥈 Plasmic</h3><p class="text-sm text-slate-600 mt-1">Visual builder cloud, exporta a Next.js/React/HTML. Excelente para equipos no técnicos.</p></div>
+    <div class="bg-white rounded-2xl shadow p-5"><h3 class="font-bold">🥉 Builder.io</h3><p class="text-sm text-slate-600 mt-1">Headless visual CMS con integración nativa a Shopify Hydrogen.</p></div>
+    <div class="bg-white rounded-2xl shadow p-5"><h3 class="font-bold">Pagedraw / Framer Export</h3><p class="text-sm text-slate-600 mt-1">Para diseño más acabado y exportación pixel-perfect a HTML.</p></div>
+  </div>
+  <p class="text-sm text-slate-500 mt-4"><b>Recomendación para este reporte:</b> este HTML ya es autocontenido (Tailwind + Chart.js por CDN). Para editarlo visualmente cargándolo en GrapesJS basta con <code>editor.setComponents(htmlString)</code>.</p>
+</section>
+
+<!-- FOOTER -->
+<footer class="text-center text-xs text-slate-500 pt-8 border-t border-slate-200">
+  <p>Reporte generado con Lighthouse 11 + análisis de HTML en vivo · Datos reales de <code>https://puebloladehesa.cl</code></p>
+  <p class="mt-1">Responsable: <b>Luis Alberto Maldonado</b> – Sistemas</p>
+</footer>
+
+</main>
+
+<script>
+document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-CL', {year:'numeric',month:'long',day:'numeric'});
+
+const scores = {
+  mobile:   {performance:47, accessibility:94, 'best-practices':54, seo:100},
+  desktop:  {performance:76, accessibility:94, 'best-practices':54, seo:100}
+};
+const labels = {performance:'Rendimiento', accessibility:'Accesibilidad','best-practices':'Buenas práct.', seo:'SEO'};
+function color(v){ return v>=90?'#10b981':v>=50?'#f59e0b':'#ef4444'; }
+function gauge(v){
+  const r=54,c=2*Math.PI*r,off=c*(1-v/100);
+  return `<div class="gauge mx-auto">
+    <svg width="140" height="140">
+      <circle cx="70" cy="70" r="${r}" stroke="#e5e7eb" stroke-width="12" fill="none"/>
+      <circle cx="70" cy="70" r="${r}" stroke="${color(v)}" stroke-width="12" fill="none"
+        stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/>
+    </svg>
+    <div class="val" style="color:${color(v)}">${v}</div>
+  </div>`;
+}
+for (const [device, el] of [['mobile','mobile-scores'],['desktop','desktop-scores']]){
+  const c=document.getElementById(el);
+  c.innerHTML = Object.entries(scores[device]).map(([k,v])=>`<div>${gauge(v)}<div class="mt-2 text-xs text-slate-600">${labels[k]}</div></div>`).join('');
+}
+
+const cwv = [
+  ['FCP (First Contentful Paint)', '1.6 s', '0.5 s', '< 1.8 s', 'OK', 'emerald'],
+  ['LCP (Largest Contentful Paint)', '16.2 s', '3.7 s', '< 2.5 s', 'CRÍTICO', 'rose'],
+  ['TBT (Total Blocking Time)', '770 ms', '0 ms', '< 200 ms', 'MALO', 'amber'],
+  ['CLS (Cumulative Layout Shift)', '0.121', '0', '< 0.1', 'CERCA', 'amber'],
+  ['Speed Index', '5.8 s', '2.0 s', '< 3.4 s', 'MALO', 'amber'],
+  ['TTI (Time to Interactive)', '16.4 s', '3.7 s', '< 3.8 s', 'CRÍTICO', 'rose'],
+  ['Server response', '70 ms', '50 ms', '< 200 ms', 'OK', 'emerald'],
+];
+document.getElementById('cwv-table').innerHTML = cwv.map(r=>`
+  <tr class="border-t border-slate-100">
+    <td class="p-3 font-medium">${r[0]}</td>
+    <td class="p-3 text-center">${r[1]}</td>
+    <td class="p-3 text-center">${r[2]}</td>
+    <td class="p-3 text-center text-slate-500">${r[3]}</td>
+    <td class="p-3 text-center"><span class="text-xs font-bold px-2 py-1 rounded bg-${r[5]}-100 text-${r[5]}-700">${r[4]}</span></td>
+  </tr>`).join('');
+</script>
+</body>
+</html>

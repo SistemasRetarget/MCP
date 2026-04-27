@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retarget News - Presentación Completa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #e53e3e;
+            --accent-hover: #c53030;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --info: #3182ce;
+            --text: #1a202c;
+            --text-light: #718096;
+            --bg: #f7fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .presentation-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+        }
+        
+        /* Slide Styles */
+        .slide {
+            min-height: 100vh;
+            display: none;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            background: var(--white);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .slide-counter {
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        
+        /* Slide 1 - Title */
+        .title-slide {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .title-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .title-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-title {
+            font-size: 4em;
+            font-weight: 900;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            box-shadow: 0 10px 30px rgba(229, 62, 62, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.8em;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        
+        .presenter-info {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-top: 60px;
+        }
+        
+        /* Slide 2 - Context */
+        .context-slide {
+            background: var(--white);
+        }
+        
+        .slide-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .slide-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .slide-subtitle {
+            font-size: 1.2em;
+            color: var(--text-light);
+        }
+        
+        .context-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .context-box {
+            background: var(--bg);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .context-box h3 {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .context-box p {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+        
+        /* Slide 3 - Demo Comparison */
+        .demo-comparison-slide {
+            background: var(--bg);
+            padding: 40px;
+        }
+        
+        .demo-comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: 70vh;
+        }
+        
+        .demo-box {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+        }
+        
+        .demo-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .demo-header.basic {
+            background: var(--primary);
+        }
+        
+        .demo-header.pro {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+        }
+        
+        .demo-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        
+        .demo-iframe {
+            width: 100%;
+            height: calc(100% - 60px);
+            border: none;
+        }
+        
+        /* Slide 4 - Features Comparison */
+        .features-slide {
+            background: var(--white);
+        }
+        
+        .features-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .feature-column {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .feature-column.basic {
+            border: 2px solid var(--primary);
+        }
+        
+        .feature-column.pro {
+            border: 2px solid var(--accent);
+        }
+        
+        .feature-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .feature-title {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        
+        .feature-column.basic .feature-title {
+            color: var(--primary);
+        }
+        
+        .feature-column.pro .feature-title {
+            color: var(--accent);
+        }
+        
+        .feature-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .feature-badge.basic {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .feature-badge.pro {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .feature-column.basic .feature-icon {
+            background: var(--primary);
+        }
+        
+        .feature-column.pro .feature-icon {
+            background: var(--accent);
+        }
+        
+        .feature-text {
+            flex: 1;
+        }
+        
+        .feature-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .feature-desc {
+            font-size: 0.85em;
+            color: var(--text-light);
+        }
+        
+        /* Slide 5 - Integration */
+        .integration-slide {
+            background: var(--white);
+        }
+        
+        .integration-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .integration-flow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        
+        .integration-step {
+            background: var(--white);
+            border: 3px solid var(--primary);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            width: 200px;
+            z-index: 1;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .integration-step h4 {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .integration-step p {
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+        
+        /* Slide 6 - Benefits */
+        .benefits-slide {
+            background: var(--white);
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .benefit-card {
+            background: var(--bg);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .benefit-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        
+        .benefit-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .benefit-description {
+            color: var(--text-light);
+            font-size: 0.95em;
+        }
+        
+        /* Slide 7 - Recommendation */
+        .recommendation-slide {
+            background: linear-gradient(135deg, var(--success) 0%, var(--primary) 100%);
+            color: white;
+        }
+        
+        .recommendation-content {
+            text-align: center;
+        }
+        
+        .recommendation-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+        
+        .recommendation-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+        
+        .recommendation-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .recommendation-card h3 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .recommendation-card p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .recommendation-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .recommendation-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        /* Slide 8 - Next Steps */
+        .next-steps-slide {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+        }
+        
+        .next-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .step-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .step-number {
+            font-size: 2em;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+        
+        .step-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .step-description {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px;
+            }
+            
+            .main-title {
+                font-size: 2.5em;
+            }
+            
+            .context-grid,
+            .features-comparison,
+            .recommendation-options,
+            .next-steps-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-comparison-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .demo-box {
+                height: 400px;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .integration-flow {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .integration-flow::before {
+                display: none;
+            }
+        }
+        
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: slideInUp 0.8s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active">
+            <div class="title-content">
+                <div class="main-title">
+                    <div class="logo-icon">R</div>
+                    Retarget News
+                </div>
+                <h2 class="subtitle">Portal de Noticias Moderno - Dos Opciones de Implementación</h2>
+                <div class="presenter-info">
+                    <p>Presentación de Opciones Básica y Premium</p>
+                    <p>Integración con Plugin News Converter</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2: Context -->
+        <div class="slide context-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">📋 Contexto del Proyecto</h2>
+                <p class="slide-subtitle">Conectando el backend con el frontend</p>
+            </div>
+            
+            <div class="context-grid">
+                <div class="context-box">
+                    <h3>🔧 Backend - News Converter</h3>
+                    <p>Sistema editorial completo con:</p>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Fuentes RSS e Instagram</li>
+                        <li>Cola editorial con aprobación</li>
+                        <li>Procesamiento automático</li>
+                        <li>Dashboard administrativo</li>
+                    </ul>
+                </div>
+                
+                <div class="context-box">
+                    <h3>🎨 Frontend - Retarget News</h3>
+                    <p>Dos versiones del portal visual:</p>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li><strong>Opción Básica:</strong> Funcionalidad esencial</li>
+                        <li><strong>Opción Premium:</strong> Features avanzados</li>
+                        <li>Ambas 100% responsive</li>
+                        <li>Integración directa con plugin</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Demo Comparison -->
+        <div class="slide demo-comparison-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">🚀 Comparación Visual de Demos</h2>
+                <p class="slide-subtitle">Opción Básica vs Opción Premium</p>
+            </div>
+            
+            <div class="demo-comparison-container">
+                <div class="demo-box">
+                    <div class="demo-header basic">
+                        <span>📱 Opción Básica</span>
+                        <span class="demo-badge">5 noticias</span>
+                    </div>
+                    <iframe src="retarget-blog-demo.html" class="demo-iframe"></iframe>
+                </div>
+                
+                <div class="demo-box">
+                    <div class="demo-header pro">
+                        <span>⭐ Opción Premium</span>
+                        <span class="demo-badge">8 noticias + widgets</span>
+                    </div>
+                    <iframe src="retarget-blog-demo-v2.html" class="demo-iframe"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Features Comparison -->
+        <div class="slide features-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">⚡ Comparación de Características</h2>
+                <p class="slide-subtitle">Diferencias clave entre versiones</p>
+            </div>
+            
+            <div class="features-comparison">
+                <div class="feature-column basic">
+                    <div class="feature-header">
+                        <h3 class="feature-title">Opción Básica</h3>
+                        <span class="feature-badge basic">Rápido</span>
+                    </div>
+                    
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">5</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Carrusel</div>
+                                <div class="feature-desc">5 noticias con auto-play</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">📱</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Responsive</div>
+                                <div class="feature-desc">100% adaptable</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🎨</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Diseño</div>
+                                <div class="feature-desc">Moderno y limpio</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">⚡</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Performance</div>
+                                <div class="feature-desc">Ultra ligero (~1.2MB)</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🔧</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Instalación</div>
+                                <div class="feature-desc">1 click en WordPress</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="feature-column pro">
+                    <div class="feature-header">
+                        <h3 class="feature-title">Opción Premium</h3>
+                        <span class="feature-badge pro">Completo</span>
+                    </div>
+                    
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">8</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Carrusel Pro</div>
+                                <div class="feature-desc">8 noticias + Swiper.js</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🔴</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Widgets Live</div>
+                                <div class="feature-desc">Noticias en vivo, clima, trending</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">✨</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Animaciones</div>
+                                <div class="feature-desc">GSAP-ready, scroll effects</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🎯</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Interactividad</div>
+                                <div class="feature-desc">Filtros, tabs, hover avanzados</div>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🌙</div>
+                            <div class="feature-text">
+                                <div class="feature-name">Features Extra</div>
+                                <div class="feature-desc">Dark mode, badges, avatares</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Integration -->
+        <div class="slide integration-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">🔗 Integración Plugin ↔ Tema</h2>
+                <p class="slide-subtitle">Flujo completo de noticias (ambas versiones)</p>
+            </div>
+            
+            <div class="integration-flow">
+                <div class="integration-step">
+                    <h4>📡 Fuentes</h4>
+                    <p>RSS, Instagram, APIs externas</p>
+                </div>
+                
+                <div class="integration-step">
+                    <h4>⚙️ Procesamiento</h4>
+                    <p>AI, extracción, clasificación</p>
+                </div>
+                
+                <div class="integration-step">
+                    <h4>✅ Aprobación</h4>
+                    <p>Cola editorial, revisión</p>
+                </div>
+                
+                <div class="integration-step">
+                    <h4>🌐 Publicación</h4>
+                    <p>Portal Retarget News</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Benefits -->
+        <div class="slide benefits-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">✨ Beneficios Compartidos</h2>
+                <p class="slide-subtitle">Ventajas para ambas opciones</p>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h3 class="benefit-title">Performance</h3>
+                    <p class="benefit-description">Optimizado para velocidad máxima, carga instantánea</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔧</div>
+                    <h3 class="benefit-title">Fácil Instalación</h3>
+                    <p class="benefit-description">WordPress nativo, sin dependencias complejas</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">📱</div>
+                    <h3 class="benefit-title">100% Responsive</h3>
+                    <p class="benefit-description">Perfecto en desktop, tablet y móvil</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3 class="benefit-title">Personalizable</h3>
+                    <p class="benefit-description">Colores, logo, widgets sin código</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🚀</div>
+                    <h3 class="benefit-title">Producción Lista</h3>
+                    <p class="benefit-description">Deploy inmediato, escalable</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔗</div>
+                    <h3 class="benefit-title">Integración Total</h3>
+                    <p class="benefit-description">Conexión directa con News Converter</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Recommendation -->
+        <div class="slide recommendation-slide">
+            <div class="recommendation-content">
+                <h2 class="recommendation-title">🎯 Recomendación de Implementación</h2>
+                <p style="font-size: 1.2em; opacity: 0.9; margin-bottom: 20px;">Basado en necesidades y timeline del proyecto</p>
+                
+                <div class="recommendation-options">
+                    <div class="recommendation-card">
+                        <h3>🚀 Opción Básica</h3>
+                        <p>Para lanzamiento rápido y MVP</p>
+                        <div class="recommendation-badges">
+                            <span class="recommendation-badge">⚡ Rápido deploy</span>
+                            <span class="recommendation-badge">💰 Menor complejidad</span>
+                            <span class="recommendation-badge">📱 Funcionalidad esencial</span>
+                            <span class="recommendation-badge">🎯 MVP perfecto</span>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendation-card">
+                        <h3>⭐ Opción Premium</h3>
+                        <p>Para experiencia completa y diferenciación</p>
+                        <div class="recommendation-badges">
+                            <span class="recommendation-badge">✨ Impacto visual</span>
+                            <span class="recommendation-badge">🔴 Features live</span>
+                            <span class="recommendation-badge">🎨 Diseño premium</span>
+                            <span class="recommendation-badge">🚀 Escalable</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="font-size: 1.1em; margin-top: 30px; opacity: 0.8;">
+                    💡 <strong>Recomendación:</strong> Iniciar con Opción Básica para MVP, evolucionar a Premium según feedback
+                </p>
+            </div>
+        </div>
+        
+        <!-- Slide 8: Next Steps -->
+        <div class="slide next-steps-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">🎯 Próximos Pasos</h2>
+                <p class="slide-subtitle">Implementación y lanzamiento</p>
+            </div>
+            
+            <div class="next-steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <h3 class="step-title">Elegir Versión</h3>
+                    <p class="step-description">Definir entre Opción Básica o Premium según timeline y presupuesto</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <h3 class="step-title">Instalación Producción</h3>
+                    <p class="step-description">Subir tema a WordPress, configurar menús, personalizar colores</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <h3 class="step-title">Conectar Fuentes</h3>
+                    <p class="step-description">Configurar RSS, Instagram, APIs en plugin News Converter</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <h3 class="step-title">Lanzamiento</h3>
+                    <p class="step-description">Publicar portal, monitorear performance, ajustar según feedback</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="previousSlide()" id="prevBtn">← Anterior</button>
+        <span class="slide-counter" id="slideCounter">1 / 8</span>
+        <button class="nav-btn" onclick="nextSlide()" id="nextBtn">Siguiente →</button>
+    </div>
+    
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            
+            // Update navigation
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === totalSlides - 1;
+            document.getElementById('slideCounter').textContent = `${index + 1} / ${totalSlides}`;
+            
+            // Animate elements
+            const activeSlide = slides[index];
+            const elements = activeSlide.querySelectorAll('.context-box, .integration-step, .benefit-card, .step-card, .feature-column, .recommendation-card');
+            elements.forEach((el, i) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, i * 100);
+            });
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+        
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>

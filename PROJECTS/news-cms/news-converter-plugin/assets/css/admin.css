@@ -1,0 +1,380 @@
+.nc-wrap {
+    max-width: 1400px;
+}
+
+.nc-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.nc-header h1 {
+    color: #fff;
+    font-size: 2em;
+    margin: 0 0 8px 0;
+}
+
+.nc-header h1 .dashicons {
+    font-size: 1em;
+    margin-right: 8px;
+}
+
+.nc-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1em;
+}
+
+.nc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .nc-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.nc-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+}
+
+.nc-card h2 {
+    font-size: 1.4em;
+    color: #1d2327;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #667eea;
+}
+
+.nc-field {
+    margin-bottom: 20px;
+}
+
+.nc-field label {
+    display: block;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nc-input-full {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.nc-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.nc-textarea-large {
+    min-height: 200px;
+}
+
+.nc-textarea:focus,
+.nc-input-full:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+    outline: none;
+}
+
+.nc-btn-full {
+    width: 100%;
+    text-align: center;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 15px !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+}
+
+.nc-loading {
+    display: none;
+    text-align: center;
+    padding: 15px;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.nc-loading.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.nc-loading .spinner {
+    float: none;
+    margin: 0;
+}
+
+.nc-message {
+    display: none;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.nc-message.active {
+    display: block;
+}
+
+.nc-error {
+    background: #fef0f0;
+    color: #cc3333;
+    border: 1px solid #f5c6c6;
+}
+
+.nc-success {
+    background: #f0fef0;
+    color: #2e7d32;
+    border: 1px solid #c6f5c6;
+}
+
+.nc-preview-section {
+    display: none;
+}
+
+.nc-preview-section.active {
+    display: block;
+}
+
+.nc-preview-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: none;
+}
+
+.nc-preview-image.active {
+    display: block;
+}
+
+.nc-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.nc-tag {
+    background: #667eea;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nc-tag button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    line-height: 1;
+}
+
+.nc-tag button:hover {
+    color: #ffcdd2;
+}
+
+.nc-confidence {
+    display: inline-block;
+    background: #667eea;
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.nc-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.nc-actions .button {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px !important;
+    height: auto !important;
+    border-radius: 6px !important;
+}
+
+.nc-btn-publish {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.nc-btn-publish:hover {
+    opacity: 0.9;
+}
+
+.nc-hidden {
+    display: none !important;
+}
+
+#ncCategory {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.nc-field-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.nc-field-row-top {
+    align-items: flex-start;
+}
+
+.nc-input-grow {
+    flex: 1;
+    min-width: 0;
+}
+
+.nc-regen-btn {
+    white-space: nowrap;
+    padding: 6px 12px !important;
+    height: auto !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    background: #f0f0ff !important;
+    border: 1px solid #667eea !important;
+    color: #667eea !important;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nc-regen-btn:hover {
+    background: #667eea !important;
+    color: #fff !important;
+}
+
+.nc-regen-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.nc-regen-btn.loading {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.nc-image-edit-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8f8ff;
+    border-radius: 8px;
+    border: 1px dashed #667eea;
+}
+
+.nc-image-edit-section label {
+    font-size: 0.8em !important;
+}
+
+.nc-btn-edit-image {
+    background: #fff3e0 !important;
+    border-color: #ff9800 !important;
+    color: #e65100 !important;
+}
+
+.nc-btn-edit-image:hover {
+    background: #ff9800 !important;
+    color: #fff !important;
+}
+
+.nc-image-loading {
+    display: none;
+    text-align: center;
+    padding: 10px;
+    color: #667eea;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.nc-image-loading.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.nc-image-loading .spinner {
+    float: none;
+    margin: 0;
+}
+
+.nc-filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.nc-filter-btn {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+    border-radius: 4px !important;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nc-filter-btn:hover {
+    background: #667eea !important;
+    color: #fff !important;
+    border-color: #667eea !important;
+}
+
+.nc-filter-btn.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.nc-restore-btn {
+    margin-top: 10px;
+    font-size: 12px !important;
+    color: #666 !important;
+    border-color: #ccc !important;
+}
+
+.nc-restore-btn:hover {
+    color: #d32f2f !important;
+    border-color: #d32f2f !important;
+}

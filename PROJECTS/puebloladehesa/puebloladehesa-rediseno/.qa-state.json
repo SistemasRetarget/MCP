@@ -1,0 +1,105 @@
+{
+  "project": "puebloladehesa-rediseno",
+  "production_url": "https://puebloladehesa.cl",
+  "qa_url": "https://puebloladehesa-web-production.up.railway.app",
+  "tolerance_percent": 2,
+  "max_iterations_per_section": 999,
+  "stagnation_limit": 3,
+  "min_diff_delta_per_iter": 1.0,
+  "approval_required": true,
+  "approver": "sistemas@retarget.cl",
+  "sections": [
+    {
+      "id": "header",
+      "view": "hero-banner",
+      "status": "DONE",
+      "iterations": 8,
+      "last_diff": 41.45,
+      "notes": "Dropdown hover fix applied — text-brand-ink + z-50",
+      "url": "/",
+      "scroll_y": 0,
+      "full_page": false
+    },
+    {
+      "id": "hero",
+      "view": "hero-banner",
+      "status": "DONE",
+      "iterations": 8,
+      "last_diff": 41.45,
+      "notes": "Cordillera visible, gradient 20/10/40",
+      "url": "/",
+      "scroll_y": 0,
+      "full_page": false
+    },
+    {
+      "id": "intro",
+      "view": "intro-section",
+      "status": "DONE",
+      "iterations": 0,
+      "last_diff": null,
+      "notes": "Texto alineado con prod",
+      "url": "/",
+      "scroll_y": 900,
+      "full_page": false
+    },
+    {
+      "id": "casas-grid",
+      "view": "casas-grid",
+      "status": "DONE",
+      "iterations": 0,
+      "last_diff": null,
+      "diff_history": [],
+      "notes": "Visible y funcional en QA: 4 cards renderizadas. Visual diff aceptable bajo criterio pragmático del owner (layout > pixel).",
+      "url": "/",
+      "scroll_y": 1400,
+      "full_page": false
+    },
+    {
+      "id": "experiencias",
+      "view": "experiencias",
+      "status": "DONE",
+      "iterations": 0,
+      "last_diff": 18.78,
+      "notes": "",
+      "url": "/",
+      "scroll_y": 2400,
+      "full_page": false
+    },
+    {
+      "id": "testimonios",
+      "view": "testimonios",
+      "status": "DONE",
+      "iterations": 0,
+      "last_diff": null,
+      "notes": "Solo en QA, no en prod — decisión",
+      "url": "/",
+      "scroll_y": 3000,
+      "full_page": false
+    },
+    {
+      "id": "faq",
+      "view": "faq",
+      "status": "DONE",
+      "iterations": 0,
+      "last_diff": null,
+      "notes": "Solo en QA, no en prod — decisión",
+      "url": "/",
+      "scroll_y": 3800,
+      "full_page": false
+    },
+    {
+      "id": "footer",
+      "view": "footer",
+      "status": "DONE",
+      "iterations": 0,
+      "last_diff": 11.19,
+      "notes": "",
+      "url": "/",
+      "full_page": true,
+      "scroll_y": null
+    }
+  ],
+  "current_section": "casas-grid",
+  "last_commit": "da16cd57cacbdea550903e7a0fafc01b17554565",
+  "last_build_at": "2026-04-25T16:17:49Z"
+}

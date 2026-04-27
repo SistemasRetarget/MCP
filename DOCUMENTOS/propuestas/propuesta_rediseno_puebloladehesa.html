@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta de Rediseño – Pueblo La Dehesa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  body{font-family:'Inter',system-ui,sans-serif}
+  .gauge{position:relative;width:150px;height:150px}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:2.1rem}
+  .bar-wrap{background:#e5e7eb;border-radius:9999px;height:10px;overflow:hidden}
+  .bar{height:100%;border-radius:9999px;transition:width 1.2s ease}
+  .glow{box-shadow:0 10px 40px -10px rgba(16,185,129,.4)}
+  @media print{.no-print{display:none}.page-break{page-break-before:always}}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-slate-900 via-emerald-900 to-teal-800 text-white relative overflow-hidden">
+  <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle at 20% 50%, #10b981 0%, transparent 50%), radial-gradient(circle at 80% 80%, #14b8a6 0%, transparent 50%)"></div>
+  <div class="max-w-6xl mx-auto px-6 py-16 relative">
+    <p class="uppercase tracking-widest text-emerald-300 text-xs font-bold">Propuesta Técnica · Rediseño Web</p>
+    <h1 class="text-5xl md:text-6xl font-bold mt-3">Pueblo La Dehesa</h1>
+    <p class="text-emerald-100 mt-3 text-lg max-w-2xl">Rediseño desde cero con tecnología moderna para resolver de raíz los problemas de performance, SEO y mantenimiento del sitio actual.</p>
+    <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+      <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3"><div class="text-emerald-200 text-xs">Stack principal</div><div class="font-semibold">Next.js + Payload</div></div>
+      <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3"><div class="text-emerald-200 text-xs">Responsable</div><div class="font-semibold">Luis A. Maldonado</div></div>
+      <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3"><div class="text-emerald-200 text-xs">Área</div><div class="font-semibold">Sistemas / TI</div></div>
+      <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3"><div class="text-emerald-200 text-xs">Fecha</div><div class="font-semibold" id="fecha"></div></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-12 space-y-14">
+
+<!-- OBJETIVOS -->
+<section>
+  <h2 class="text-3xl font-bold mb-2">Lo que necesito del nuevo sitio</h2>
+  <p class="text-slate-600 mb-8">Cinco condiciones no negociables que el sitio actual no cumple y que el rediseño debe resolver por diseño.</p>
+  <div class="grid md:grid-cols-5 gap-4">
+    <div class="bg-white rounded-2xl shadow-sm p-5 border-t-4 border-emerald-500"><div class="text-3xl mb-2">🎯</div><h3 class="font-bold">SEO sostenible</h3><p class="text-xs text-slate-500 mt-1">Rankea por arquitectura, no por plugins.</p></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 border-t-4 border-sky-500"><div class="text-3xl mb-2">⚡</div><h3 class="font-bold">PageSpeed élite</h3><p class="text-xs text-slate-500 mt-1">Móvil y desktop de forma consistente.</p></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 border-t-4 border-purple-500"><div class="text-3xl mb-2">🔒</div><h3 class="font-bold">Sin ruido externo</h3><p class="text-xs text-slate-500 mt-1">Control total de los recursos que carga.</p></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 border-t-4 border-amber-500"><div class="text-3xl mb-2">✏️</div><h3 class="font-bold">Autoadministrable</h3><p class="text-xs text-slate-500 mt-1">El equipo edita sin depender del dev.</p></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 border-t-4 border-rose-500"><div class="text-3xl mb-2">🏛️</div><h3 class="font-bold">Sólido en el tiempo</h3><p class="text-xs text-slate-500 mt-1">Sin rediseños de emergencia en 2 años.</p></div>
+  </div>
+</section>
+
+<!-- DIAGNÓSTICO ACTUAL -->
+<section>
+  <h2 class="text-3xl font-bold mb-2">Punto de partida</h2>
+  <p class="text-slate-600 mb-6">Mediciones reales del sitio actual con Lighthouse.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-semibold">📱 Móvil (hoy)</h3><span class="text-xs bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded">CRÍTICO</span></div>
+      <div class="grid grid-cols-4 gap-2 text-center" id="mob"></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-semibold">🖥️ Desktop (hoy)</h3><span class="text-xs bg-amber-100 text-amber-700 font-bold px-2 py-1 rounded">MEJORABLE</span></div>
+      <div class="grid grid-cols-4 gap-2 text-center" id="dsk"></div>
+    </div>
+  </div>
+  <div class="mt-6 grid md:grid-cols-4 gap-4">
+    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4"><div class="text-rose-700 font-bold text-3xl">16.2 s</div><div class="text-xs text-rose-900 mt-1">LCP móvil (meta &lt;2.5 s)</div></div>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4"><div class="text-amber-700 font-bold text-3xl">770 ms</div><div class="text-xs text-amber-900 mt-1">Bloqueo móvil (meta &lt;200)</div></div>
+    <div class="bg-sky-50 border border-sky-200 rounded-xl p-4"><div class="text-sky-700 font-bold text-3xl">604 KB</div><div class="text-xs text-sky-900 mt-1">JavaScript sin usar</div></div>
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4"><div class="text-purple-700 font-bold text-3xl">3.3 MB</div><div class="text-xs text-purple-900 mt-1">Peso total por página</div></div>
+  </div>
+</section>
+
+<!-- COMPARATIVA -->
+<section>
+  <h2 class="text-3xl font-bold mb-2">Dónde queremos llegar</h2>
+  <p class="text-slate-600 mb-6">Proyección del rediseño con Next.js + Payload frente al sitio actual.</p>
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <canvas id="chart" height="110"></canvas>
+  </div>
+  <div class="mt-6 grid md:grid-cols-3 gap-4">
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div class="text-emerald-700 font-bold text-2xl">≥ 90</div><div class="text-sm text-emerald-900">Lighthouse móvil objetivo</div></div>
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div class="text-emerald-700 font-bold text-2xl">≥ 95</div><div class="text-sm text-emerald-900">Lighthouse desktop objetivo</div></div>
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div class="text-emerald-700 font-bold text-2xl">&lt; 2.5 s</div><div class="text-sm text-emerald-900">LCP móvil garantizado</div></div>
+  </div>
+</section>
+
+<!-- VENTAJAS CORE -->
+<section class="page-break">
+  <h2 class="text-3xl font-bold mb-2">Ventajas del stack propuesto</h2>
+  <p class="text-slate-600 mb-8">Por qué <b>Next.js + Payload CMS</b> es la combinación correcta para este proyecto.</p>
+
+  <div class="space-y-5">
+
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-emerald-500">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🎯</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">1. SEO de primer nivel por diseño</h3>
+          <p class="text-slate-600 mt-2">Next.js entrega las páginas <b>ya renderizadas</b> antes de que el usuario las pida. Google recibe HTML limpio con el contenido completo desde el primer milisegundo. No depende de plugins: el SEO viene resuelto desde la arquitectura.</p>
+          <div class="mt-3 flex flex-wrap gap-2 text-xs">
+            <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">Meta tags por página</span>
+            <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">Open Graph + Twitter Cards</span>
+            <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">Sitemap automático</span>
+            <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">Schema.org incrustado</span>
+            <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">Multi-idioma con hreflang</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-sky-500">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">⚡</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">2. PageSpeed excelente sin optimizaciones posteriores</h3>
+          <p class="text-slate-600 mt-2">Cada página se entrega pre-construida, servida desde CDN global, con imágenes optimizadas en AVIF/WebP y lazy loading inteligente. <b>Puntajes de 90-100 en Lighthouse por defecto</b>, no como esfuerzo adicional.</p>
+          <div class="mt-4 grid grid-cols-3 gap-3 text-center">
+            <div class="bg-sky-50 rounded-lg p-3"><div class="text-2xl font-bold text-sky-700">CDN</div><div class="text-xs text-sky-900">Global edge</div></div>
+            <div class="bg-sky-50 rounded-lg p-3"><div class="text-2xl font-bold text-sky-700">AVIF</div><div class="text-xs text-sky-900">Imágenes modernas</div></div>
+            <div class="bg-sky-50 rounded-lg p-3"><div class="text-2xl font-bold text-sky-700">SSG</div><div class="text-xs text-sky-900">Pre-renderizado</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-purple-500">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🔒</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">3. Control absoluto sobre recursos externos</h3>
+          <p class="text-slate-600 mt-2">Todo lo que vive en el sitio pasa por nuestra configuración. Analytics, píxeles y chat se cargan con estrategia diferida y <b>Consent Mode v2</b>, sin bloquear la pintura inicial. No hay "apps" que se autoinstalen y traigan su propio JavaScript.</p>
+          <div class="mt-3 bg-slate-50 rounded-lg p-4 text-sm">
+            <div class="flex justify-between items-center"><span>Scripts externos (hoy)</span><span class="font-bold text-rose-600">6+ descontrolados</span></div>
+            <div class="flex justify-between items-center mt-2"><span>Scripts externos (nuevo)</span><span class="font-bold text-emerald-600">solo los necesarios, diferidos</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-amber-500">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">✏️</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">4. Autoadministración visual y guiada</h3>
+          <p class="text-slate-600 mt-2">El equipo administra el sitio desde un <b>panel web en español, moderno y visual</b>. La diferencia con otros gestores está en <i>cómo</i> es visual, no en si lo es.</p>
+
+          <div class="grid md:grid-cols-2 gap-4 mt-4">
+            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+              <h4 class="font-bold text-emerald-800 mb-2">✅ Lo que sí se puede editar</h4>
+              <ul class="text-sm space-y-1 text-emerald-900">
+                <li>• <b>Vista previa en vivo</b> mientras se edita</li>
+                <li>• Textos con formato (tipo Notion / Google Docs)</li>
+                <li>• Subir, recortar y reemplazar imágenes</li>
+                <li>• Reordenar secciones arrastrando con el mouse</li>
+                <li>• Duplicar contenido para crear variaciones</li>
+                <li>• Historial de versiones (volver atrás con un clic)</li>
+                <li>• Publicar, despublicar o programar a futuro</li>
+              </ul>
+            </div>
+            <div class="bg-rose-50 rounded-xl p-4 border border-rose-200">
+              <h4 class="font-bold text-rose-800 mb-2">🚫 Lo que no se puede romper</h4>
+              <ul class="text-sm space-y-1 text-rose-900">
+                <li>• Cambiar colores o tipografías del sitio</li>
+                <li>• Mover elementos fuera del diseño aprobado</li>
+                <li>• Insertar HTML o widgets externos</li>
+                <li>• Borrar campos críticos por accidente</li>
+                <li>• Afectar el rendimiento o el SEO</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="text-slate-600 mt-4 text-sm"><b>Es edición con estructura</b>: cada página tiene campos definidos ("Título de la casa", "Galería", "Precio base") que el equipo completa. El diseño queda protegido, pero todo el contenido es 100% autogestionable. Es el modelo que usan Airbnb, Netflix y Notion internamente.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-rose-500">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🏛️</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">5. Solidez a largo plazo</h3>
+          <p class="text-slate-600 mt-2">Stack estándar de la industria. El código queda en un repositorio de nuestra propiedad, mantenible por cualquier desarrollador de Next.js. Sin licencias anuales ni apps de suscripción que encarezcan la operación.</p>
+          <div class="mt-4 flex flex-wrap gap-3 items-center">
+            <span class="text-xs text-slate-500 font-semibold mr-2">USAN ESTE STACK:</span>
+            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-sm font-semibold">Nike</span>
+            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-sm font-semibold">Notion</span>
+            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-sm font-semibold">TikTok</span>
+            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-sm font-semibold">Hulu</span>
+            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-sm font-semibold">OpenAI</span>
+            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-sm font-semibold">Washington Post</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-indigo-500">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🛡️</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">6. Seguridad reducida a lo mínimo</h3>
+          <p class="text-slate-600 mt-2">Al no depender de un ecosistema de plugins externos, la superficie de ataque es muy pequeña. Payload obliga a buenas prácticas por defecto: autenticación robusta, control de acceso por rol, validación de campos y auditoría de cambios.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-teal-500">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🖼️</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">7. Optimización de imágenes resuelta de raíz</h3>
+          <p class="text-slate-600 mt-2">Las fotos son el corazón visual del sitio y el mayor desafío de performance. Next.js genera variantes responsive en tiempo de build, entrega AVIF o WebP según el navegador, aplica lazy loading y muestra blur placeholder mientras cargan.</p>
+          <div class="mt-3 bg-teal-50 rounded-lg p-4 grid grid-cols-4 gap-2 text-center text-xs">
+            <div><div class="font-bold text-teal-700 text-lg">AVIF</div><div class="text-teal-900">-50% peso</div></div>
+            <div><div class="font-bold text-teal-700 text-lg">WebP</div><div class="text-teal-900">Fallback</div></div>
+            <div><div class="font-bold text-teal-700 text-lg">Lazy</div><div class="text-teal-900">Bajo demanda</div></div>
+            <div><div class="font-bold text-teal-700 text-lg">Blur</div><div class="text-teal-900">Sin saltos</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TABLA COMPARATIVA -->
+<section>
+  <h2 class="text-3xl font-bold mb-2">Comparación directa</h2>
+  <p class="text-slate-600 mb-6">Sitio actual versus lo que entregará el rediseño.</p>
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-900 text-white">
+        <tr>
+          <th class="p-4 text-left">Criterio</th>
+          <th class="p-4 text-center">Sitio actual</th>
+          <th class="p-4 text-center bg-emerald-700">Rediseño propuesto</th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr]:border-t [&>tr]:border-slate-100">
+        <tr><td class="p-4 font-medium">Lighthouse móvil</td><td class="p-4 text-center"><span class="bg-rose-100 text-rose-700 px-2 py-1 rounded font-bold">47</span></td><td class="p-4 text-center bg-emerald-50"><span class="bg-emerald-600 text-white px-2 py-1 rounded font-bold">≥ 90</span></td></tr>
+        <tr><td class="p-4 font-medium">Lighthouse desktop</td><td class="p-4 text-center"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold">76</span></td><td class="p-4 text-center bg-emerald-50"><span class="bg-emerald-600 text-white px-2 py-1 rounded font-bold">≥ 95</span></td></tr>
+        <tr><td class="p-4 font-medium">LCP móvil</td><td class="p-4 text-center text-rose-600 font-bold">16.2 s</td><td class="p-4 text-center bg-emerald-50 text-emerald-700 font-bold">&lt; 2.5 s</td></tr>
+        <tr><td class="p-4 font-medium">Recursos externos</td><td class="p-4 text-center text-rose-600">Múltiples, descontrolados</td><td class="p-4 text-center bg-emerald-50 text-emerald-700">Mínimos y diferidos</td></tr>
+        <tr><td class="p-4 font-medium">SEO técnico</td><td class="p-4 text-center text-amber-600">Limitado por tema</td><td class="p-4 text-center bg-emerald-50 text-emerald-700">Integrado por diseño</td></tr>
+        <tr><td class="p-4 font-medium">Autoadministración</td><td class="p-4 text-center text-amber-600">Campos del tema</td><td class="p-4 text-center bg-emerald-50 text-emerald-700">Panel visual con live preview</td></tr>
+        <tr><td class="p-4 font-medium">Dependencia de plugins</td><td class="p-4 text-center text-rose-600">Alta</td><td class="p-4 text-center bg-emerald-50 text-emerald-700">Ninguna</td></tr>
+        <tr><td class="p-4 font-medium">Propiedad del código</td><td class="p-4 text-center text-rose-600">Plataforma</td><td class="p-4 text-center bg-emerald-50 text-emerald-700">Nuestra</td></tr>
+        <tr><td class="p-4 font-medium">Seguridad</td><td class="p-4 text-center text-amber-600">Depende del proveedor</td><td class="p-4 text-center bg-emerald-50 text-emerald-700">Superficie mínima</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- STACK TÉCNICO -->
+<section>
+  <h2 class="text-3xl font-bold mb-2">Stack técnico</h2>
+  <p class="text-slate-600 mb-6">Cada pieza elegida por una razón concreta.</p>
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 glow"><div class="text-3xl mb-2">▲</div><h3 class="font-bold text-lg">Next.js 15</h3><p class="text-xs text-slate-300 mt-2">Framework frontend. SSG + SSR, imágenes, rutas, i18n.</p></div>
+    <div class="bg-gradient-to-br from-emerald-700 to-teal-600 text-white rounded-2xl p-6 glow"><div class="text-3xl mb-2">📦</div><h3 class="font-bold text-lg">Payload CMS 3</h3><p class="text-xs text-emerald-100 mt-2">Panel de administración autohospedado, integrado con Next.js.</p></div>
+    <div class="bg-gradient-to-br from-sky-700 to-blue-600 text-white rounded-2xl p-6"><div class="text-3xl mb-2">🐘</div><h3 class="font-bold text-lg">PostgreSQL</h3><p class="text-xs text-sky-100 mt-2">Base de datos relacional confiable para contenido y reservas.</p></div>
+    <div class="bg-gradient-to-br from-purple-700 to-indigo-600 text-white rounded-2xl p-6"><div class="text-3xl mb-2">🌐</div><h3 class="font-bold text-lg">CDN + Edge</h3><p class="text-xs text-purple-100 mt-2">Vercel o Cloudflare. Latencia baja desde cualquier ubicación.</p></div>
+    <div class="bg-gradient-to-br from-amber-600 to-orange-500 text-white rounded-2xl p-6"><div class="text-3xl mb-2">📊</div><h3 class="font-bold text-lg">GA4 + GTM + Consent</h3><p class="text-xs text-amber-100 mt-2">Analytics moderno con carga diferida y consentimiento del usuario.</p></div>
+    <div class="bg-gradient-to-br from-rose-600 to-pink-500 text-white rounded-2xl p-6"><div class="text-3xl mb-2">🎨</div><h3 class="font-bold text-lg">Tailwind + Design System</h3><p class="text-xs text-rose-100 mt-2">Estilo consistente, componentes reutilizables, mantenible.</p></div>
+  </div>
+</section>
+
+<!-- COMPROMISOS DEL PROVEEDOR -->
+<section>
+  <h2 class="text-3xl font-bold mb-2">Lo que pido al proveedor</h2>
+  <p class="text-slate-600 mb-6">Condiciones de aceptación medibles y verificables.</p>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="bg-white rounded-2xl shadow-sm p-5 flex gap-4"><div class="text-3xl">📈</div><div><h3 class="font-bold">PageSpeed garantizado</h3><p class="text-sm text-slate-600 mt-1">≥ 90 en móvil y ≥ 95 en desktop como condición de entrega.</p></div></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 flex gap-4"><div class="text-3xl">💚</div><div><h3 class="font-bold">Core Web Vitals en verde</h3><p class="text-sm text-slate-600 mt-1">LCP, INP y CLS dentro del rango "bueno" de Google.</p></div></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 flex gap-4"><div class="text-3xl">🗂️</div><div><h3 class="font-bold">Panel en español documentado</h3><p class="text-sm text-slate-600 mt-1">Manual de uso del CMS para el equipo no técnico.</p></div></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 flex gap-4"><div class="text-3xl">💻</div><div><h3 class="font-bold">Código en repositorio propio</h3><p class="text-sm text-slate-600 mt-1">Entregado desde la primera semana de trabajo.</p></div></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 flex gap-4"><div class="text-3xl">🧩</div><div><h3 class="font-bold">Integraciones diferidas</h3><p class="text-sm text-slate-600 mt-1">Analytics, píxeles, chat y reservas con Consent Mode y lazy load.</p></div></div>
+    <div class="bg-white rounded-2xl shadow-sm p-5 flex gap-4"><div class="text-3xl">🔀</div><div><h3 class="font-bold">Migración SEO mapeada</h3><p class="text-sm text-slate-600 mt-1">Redirects 301 de todas las URLs actuales para no perder ranking.</p></div></div>
+  </div>
+</section>
+
+<!-- CIERRE -->
+<section>
+  <div class="bg-gradient-to-br from-emerald-700 to-teal-600 text-white rounded-3xl p-10 text-center">
+    <h2 class="text-3xl font-bold">En resumen</h2>
+    <p class="text-emerald-50 mt-4 max-w-3xl mx-auto text-lg">Quiero un sitio hecho a medida con tecnología moderna, que sea rápido desde el día uno, que se mantenga rápido con el tiempo, que el equipo pueda administrar sin depender del desarrollador, y cuyo código me pertenezca.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <span class="bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold">⚡ Performance</span>
+      <span class="bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold">🎯 SEO nativo</span>
+      <span class="bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold">✏️ Autoadministrable</span>
+      <span class="bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold">🏛️ Sólido</span>
+      <span class="bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold">🔒 Seguro</span>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-xs text-slate-500 pt-8 border-t border-slate-200">
+  <p>Propuesta técnica · Datos de diagnóstico medidos con Lighthouse sobre <code>puebloladehesa.cl</code></p>
+  <p class="mt-1">Responsable: <b>Luis Alberto Maldonado</b> — Sistemas</p>
+</footer>
+
+</main>
+
+<script>
+document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+const labels={performance:'Rendimiento',accessibility:'Accesibilidad','best-practices':'Buenas práct.',seo:'SEO'};
+const mobile={performance:47,accessibility:94,'best-practices':54,seo:100};
+const desktop={performance:76,accessibility:94,'best-practices':54,seo:100};
+function color(v){return v>=90?'#10b981':v>=50?'#f59e0b':'#ef4444'}
+function gauge(v){const r=56,c=2*Math.PI*r,off=c*(1-v/100);return `<div class="gauge mx-auto"><svg width="150" height="150"><circle cx="75" cy="75" r="${r}" stroke="#e5e7eb" stroke-width="14" fill="none"/><circle cx="75" cy="75" r="${r}" stroke="${color(v)}" stroke-width="14" fill="none" stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/></svg><div class="val" style="color:${color(v)}">${v}</div></div>`}
+for(const[data,id] of [[mobile,'mob'],[desktop,'dsk']]){document.getElementById(id).innerHTML=Object.entries(data).map(([k,v])=>`<div>${gauge(v)}<div class="mt-2 text-xs text-slate-600">${labels[k]}</div></div>`).join('')}
+new Chart(document.getElementById('chart'),{type:'bar',data:{labels:['Rendimiento móvil','Rendimiento desktop','LCP móvil (s)','Peso página (MB)'],datasets:[{label:'Hoy',data:[47,76,16.2,3.3],backgroundColor:'#f43f5e',borderRadius:8},{label:'Objetivo rediseño',data:[92,97,2.2,1.1],backgroundColor:'#10b981',borderRadius:8}]},options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
+</script>
+</body>
+</html>

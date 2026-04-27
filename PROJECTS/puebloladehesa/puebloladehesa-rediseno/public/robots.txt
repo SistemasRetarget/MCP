@@ -1,0 +1,23 @@
+# Robots.txt for Pueblo La Dehesa
+# Allow all web crawlers to index the site
+
+User-agent: *
+Allow: /
+
+# Specific rules for important paths
+Allow: /casas
+Allow: /experiencias
+Allow: /contacto
+Allow: /nosotros
+
+# Disallow admin and private paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /admin
+Disallow: /*.json$
+
+# Sitemaps
+Sitemap: https://puebloladehesa.cl/sitemap.xml
+
+# Crawl delay (optional - be nice to servers)
+Crawl-delay: 1

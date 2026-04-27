@@ -1,0 +1,27 @@
+/*
+Theme Name: Retarget Modern (Vite)
+Theme URI: https://thesolve.cl
+Author: The Solve
+Author URI: https://thesolve.cl
+Description: Tema de noticias moderno con Vite + Tailwind + Alpine + GSAP. Performance máxima.
+Version: 2.0.0
+Requires at least: 5.8
+Tested up to: 6.4
+Requires PHP: 7.4
+License: GPL v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: retarget
+Tags: news, blog, vite, tailwind, alpine, gsap, performance, modern
+
+Este tema usa un build process moderno con Vite.
+
+Instrucciones de desarrollo:
+1. npm install
+2. npm run dev (desarrollo con HMR)
+3. npm run build (producción)
+
+El CSS y JS se generan automáticamente en /dist/
+*/
+
+/* Este archivo solo contiene el header del tema. 
+El CSS real se genera desde src/css/main.css */

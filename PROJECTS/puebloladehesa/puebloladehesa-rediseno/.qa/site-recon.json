@@ -1,0 +1,82 @@
+{
+  "phase": 1,
+  "ran_at": "2026-04-26T00:54:00-04:00",
+  "origin_url": "https://puebloladehesa.cl",
+  "platform": "shopify",
+  "language_versions": ["es", "en"],
+  "sitemap_root": "https://puebloladehesa.cl/sitemap.xml",
+  "sub_sitemaps": [
+    "sitemap_products_1.xml",
+    "sitemap_pages_1.xml",
+    "sitemap_collections_1.xml",
+    "sitemap_blogs_1.xml"
+  ],
+
+  "landings_origin": {
+    "home": "/",
+    "pages": [
+      { "slug": "contact",                            "qa_equivalent": "/contacto",     "status": "BUILT_DIFFERENT_URL" },
+      { "slug": "tu-lugar",                           "qa_equivalent": null,            "status": "MISSING" },
+      { "slug": "nosotros",                           "qa_equivalent": "/nosotros",     "status": "BUILT" },
+      { "slug": "experiencias",                       "qa_equivalent": "/experiencias", "status": "BUILT" },
+      { "slug": "la-casita",                          "qa_equivalent": "/la-casita",    "status": "BUILT" },
+      { "slug": "ubicacion",                          "qa_equivalent": "/ubicacion",    "status": "BUILT" },
+      { "slug": "espacio-panoramica",                 "qa_equivalent": null,            "status": "MISSING" },
+      { "slug": "pueblito",                           "qa_equivalent": null,            "status": "MISSING" },
+      { "slug": "guia-huespedes",                     "qa_equivalent": null,            "status": "MISSING" },
+      { "slug": "terminos-y-condiciones",             "qa_equivalent": null,            "status": "MISSING_LEGAL" },
+      { "slug": "politicas-de-privacidad",            "qa_equivalent": null,            "status": "MISSING_LEGAL" },
+      { "slug": "arriendo-departamento-amoblado",     "qa_equivalent": null,            "status": "MISSING_SEO_LANDING" },
+      { "slug": "arriendo-por-temporada",             "qa_equivalent": null,            "status": "MISSING_SEO_LANDING" },
+      { "slug": "arriendo-mensual",                   "qa_equivalent": null,            "status": "MISSING_SEO_LANDING" }
+    ],
+    "products": [
+      { "slug": "casa-doble-altura",  "qa_equivalent": null, "status": "MISSING_PRODUCT_PAGE" },
+      { "slug": "casa-parque",        "qa_equivalent": null, "status": "MISSING_PRODUCT_PAGE" },
+      { "slug": "casa-panoramica",    "qa_equivalent": null, "status": "MISSING_PRODUCT_PAGE" },
+      { "slug": "casa-suite",         "qa_equivalent": null, "status": "MISSING_PRODUCT_PAGE" }
+    ]
+  },
+
+  "qa_only_landings": [
+    { "slug": "/casas",    "type": "listing aggregator", "note": "QA usa /casas como hub; prod usa /products/<casa> individual" },
+    { "slug": "/estadias", "type": "marketing landing",  "note": "no existe en prod sitemap" }
+  ],
+
+  "url_structure_diff": {
+    "prod_pattern": "/pages/<slug> for content, /products/<slug> for casas",
+    "qa_pattern": "/<slug> for content, /casas for hub",
+    "verdict": "QA url structure is cleaner (SEO-friendlier per GOOGLE_POLICIES.md §3) but breaks parity. Decision required from owner: keep clean URLs and add 301 redirects from /pages/<slug>, or mirror prod structure."
+  },
+
+  "gap_summary": {
+    "built_with_parity": 4,
+    "built_different_url": 1,
+    "missing_content_pages": 3,
+    "missing_legal_pages": 2,
+    "missing_seo_landings": 3,
+    "missing_product_pages": 4,
+    "qa_only_landings": 2,
+    "total_gap_landings": 12
+  },
+
+  "next_phase": {
+    "phase": 2,
+    "name": "asset_harvest",
+    "input": "list of CDN URLs from each landing",
+    "owner_decision_required_first": [
+      "Should missing legal pages (terms, privacy) be created? (recommend YES — Google AdSense/Analytics requires them)",
+      "Should the 4 individual casa pages be created? (recommend YES — they are products, deep links from listing)",
+      "Should the 3 SEO landings (arriendo-*) be created? (recommend YES — they capture long-tail traffic)",
+      "Keep clean URLs and add 301 redirects, or mirror prod /pages/* /products/*?"
+    ]
+  },
+
+  "tools_used": ["curl", "sitemap parsing"],
+  "policies_check": {
+    "ref": "policies/GOOGLE_POLICIES.md",
+    "url_friendliness": "QA passes (lowercase, kebab-case, no query-string IDs)",
+    "sitemap_xml": "QA has /sitemap.xml HTTP 200",
+    "robots_txt": "QA has /robots.txt HTTP 200"
+  }
+}

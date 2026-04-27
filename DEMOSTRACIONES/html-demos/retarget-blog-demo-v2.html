@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retarget News Pro - Portal Avanzado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #e53e3e;
+            --accent-hover: #c53030;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --info: #3182ce;
+            --text: #1a202c;
+            --text-light: #718096;
+            --bg: #f7fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Breaking News con más animación */
+        .breaking-bar {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 12px 0;
+            font-size: 0.9em;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .breaking-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .breaking-badge {
+            background: var(--accent);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .breaking-text {
+            animation: scroll 30s linear infinite;
+            white-space: nowrap;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* Header mejorado */
+        .site-header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .site-header.scrolled {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .header-main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            font-weight: 800;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover .logo-icon {
+            transform: rotate(5deg) scale(1.1);
+        }
+        
+        .logo-text {
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .logo-subtitle {
+            font-size: 0.8em;
+            color: var(--text-light);
+            margin-top: -2px;
+        }
+        
+        .main-nav {
+            display: flex;
+            gap: 35px;
+        }
+        
+        .main-nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .main-nav a:hover {
+            color: var(--primary);
+        }
+        
+        .main-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .main-nav a:hover::after {
+            width: 100%;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .header-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            color: var(--text);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-btn:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+        
+        .theme-toggle {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        /* Hero Carousel con Swiper - 8 noticias */
+        .hero-section {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .hero-carousel {
+            position: relative;
+            height: 550px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .swiper-slide {
+            position: relative;
+        }
+        
+        .carousel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .carousel-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+        }
+        
+        .carousel-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 60px;
+            color: white;
+        }
+        
+        .carousel-category {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+        
+        .carousel-title {
+            font-size: 3em;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            max-width: 800px;
+        }
+        
+        .carousel-excerpt {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 700px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .carousel-meta {
+            display: flex;
+            gap: 25px;
+            font-size: 1em;
+            opacity: 0.8;
+        }
+        
+        .carousel-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            cursor: pointer;
+            font-size: 1.8em;
+            color: var(--primary);
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .carousel-nav:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .swiper-button-prev { left: 30px; }
+        .swiper-button-next { right: 30px; }
+        
+        .swiper-pagination {
+            bottom: 30px !important;
+        }
+        
+        .swiper-pagination-bullet {
+            width: 12px !important;
+            height: 12px !important;
+            background: rgba(255,255,255,0.5) !important;
+            opacity: 1 !important;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background: white !important;
+            transform: scale(1.3) !important;
+        }
+        
+        /* Hide navigation arrows */
+        .swiper-button-next,
+        .swiper-button-prev {
+            display: none !important;
+        }
+        
+        /* Live Indicator */
+        .live-indicator {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: livePulse 2s infinite;
+        }
+        
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Main Content Layout */
+        .site-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 50px;
+        }
+        
+        /* Trending Bar */
+        .trending-bar {
+            background: linear-gradient(135deg, var(--info) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .trending-icon {
+            font-size: 2em;
+        }
+        
+        .trending-text {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .trending-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .trending-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .trending-tag:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Enhanced News Sections */
+        .news-section {
+            margin-bottom: 50px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 5px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .section-link {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .section-link:hover {
+            color: var(--accent);
+            transform: translateX(3px);
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            background: var(--bg);
+            padding: 5px;
+            border-radius: 10px;
+        }
+        
+        .filter-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-tab.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+        
+        /* Enhanced News Grid */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .news-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .news-card.featured {
+            grid-column: span 2;
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .news-card-breaking {
+            border: 2px solid var(--accent);
+        }
+        
+        .news-card-breaking::before {
+            content: 'URGENTE';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 700;
+            z-index: 5;
+        }
+        
+        .news-card-image {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+        
+        .news-card.featured .news-card-image {
+            height: 100%;
+        }
+        
+        .news-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .news-card:hover .news-card-image img {
+            transform: scale(1.08);
+        }
+        
+        .news-card-category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            z-index: 5;
+        }
+        
+        .news-card-content {
+            padding: 25px;
+        }
+        
+        .news-card.featured .news-card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .news-card-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        
+        .news-card.featured .news-card-title {
+            font-size: 1.6em;
+        }
+        
+        .news-card-excerpt {
+            color: var(--text-light);
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .news-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+            color: var(--text-light);
+        }
+        
+        .news-card-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .author-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+        
+        .badge-breaking { background: var(--accent); color: white; }
+        .badge-trending { background: var(--warning); color: white; }
+        .badge-exclusive { background: var(--success); color: white; }
+        
+        /* Enhanced Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .widget {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .widget:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .widget-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .widget-action {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        /* Live News Widget */
+        .live-news-widget {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+        }
+        
+        .live-news-widget .widget-title {
+            color: white;
+        }
+        
+        .live-news-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .live-news-item:hover {
+            opacity: 0.8;
+            transform: translateX(5px);
+        }
+        
+        .live-news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .live-news-time {
+            font-size: 0.8em;
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+        
+        .live-news-content h4 {
+            font-size: 0.95em;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+        
+        .live-news-meta {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+        
+        /* Weather Widget */
+        .weather-widget {
+            background: linear-gradient(135deg, var(--info) 0%, var(--primary-light) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .weather-widget .widget-title {
+            color: white;
+        }
+        
+        .weather-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .weather-icon {
+            font-size: 3em;
+        }
+        
+        .weather-temp {
+            font-size: 2.5em;
+            font-weight: 800;
+        }
+        
+        .weather-details {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        /* Enhanced Footer */
+        .site-footer {
+            background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+            color: white;
+            padding: 80px 0 40px;
+            margin-top: 80px;
+        }
+        
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 50px;
+        }
+        
+        .footer-brand .logo {
+            margin-bottom: 25px;
+        }
+        
+        .footer-brand .logo-icon {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .footer-brand .logo-text {
+            color: white;
+        }
+        
+        .footer-text {
+            opacity: 0.9;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .footer-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 30px;
+            height: 3px;
+            background: var(--accent);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.7;
+            font-size: 0.95em;
+        }
+        
+        /* Mobile Menu Enhanced */
+        .mobile-menu {
+            display: none;
+            background: var(--white);
+            padding: 25px;
+            border-top: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        .mobile-menu a {
+            display: block;
+            padding: 15px 0;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu a:hover {
+            color: var(--primary);
+            padding-left: 10px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .site-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+            
+            .widget {
+                margin-bottom: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+            }
+            
+            .menu-btn {
+                display: block !important;
+            }
+            
+            .hero-carousel {
+                height: 400px;
+            }
+            
+            .carousel-content {
+                padding: 40px;
+            }
+            
+            .carousel-title {
+                font-size: 1.8em;
+            }
+            
+            .carousel-excerpt {
+                display: none;
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .news-card.featured {
+                grid-column: span 1;
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .footer-brand .logo {
+                justify-content: center;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+            
+            .trending-bar {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .trending-tags {
+                justify-content: center;
+            }
+        }
+        
+        /* Enhanced Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .animate-in-left {
+            animation: slideInLeft 0.8s ease forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        
+        /* Loading Animation */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breaking News Enhanced -->
+    <div class="breaking-bar">
+        <div class="breaking-content">
+            <span class="breaking-badge">Última hora</span>
+            <span class="breaking-text">URGENTE: Congreso aprueba reforma tributaria en general • Bolsas europeas cierran con alza del 2.3% • Selección chilena anuncia convocados para partido crucial vs Argentina • Nuevo récord de temperatura en Santiago • Alerta sanitaria por virus estacional • Mercado del cobre supera los $4.50 la libra</span>
+        </div>
+    </div>
+
+    <!-- Enhanced Header -->
+    <header class="site-header" id="siteHeader">
+        <div class="header-main">
+            <div class="logo">
+                <div class="logo-icon">R</div>
+                <div>
+                    <span class="logo-text">Retarget</span>
+                    <div class="logo-subtitle">Noticias que importan</div>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="#politica">Política</a>
+                <a href="#economia">Economía</a>
+                <a href="#deportes">Deportes</a>
+                <a href="#tecnologia">Tecnología</a>
+                <a href="#cultura">Cultura</a>
+                <a href="#mundo">Mundo</a>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="header-btn search-btn" title="Buscar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+                <button class="header-btn theme-toggle" title="Tema">
+                    🌙
+                </button>
+                <button class="header-btn menu-btn" onclick="toggleMenu()" title="Menú" style="display: none;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#politica">Política</a>
+            <a href="#economia">Economía</a>
+            <a href="#deportes">Deportes</a>
+            <a href="#tecnologia">Tecnología</a>
+            <a href="#cultura">Cultura</a>
+            <a href="#mundo">Mundo</a>
+        </div>
+    </header>
+
+    <!-- Enhanced Hero Carousel con 8 Noticias -->
+    <section class="hero-section">
+        <div class="hero-carousel swiper" id="heroCarousel">
+            <!-- Slide 1 -->
+            <div class="swiper-slide">
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    EN VIVO
+                </div>
+                <img src="https://picsum.photos/seed/politics1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Política</span>
+                    <h2 class="carousel-title">Paz Charpentier: Unboxing invitaciones cambio de mando genera controversia nacional</h2>
+                    <p class="carousel-excerpt">La diputada electa muestra las invitaciones para el juramento del miércoles 11. Los comentarios en redes destacan el lujo excesivo y el costo de los detalles dorados...</p>
+                    <div class="carousel-meta">
+                        <span>📝 María González</span>
+                        <span>•</span>
+                        <span>⏰ Hace 2 horas</span>
+                        <span>•</span>
+                        <span>📖 5 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 2 -->
+            <div class="swiper-slide">
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    EN VIVO
+                </div>
+                <img src="https://picsum.photos/seed/economy1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Economía</span>
+                    <h2 class="carousel-title">Reforma tributaria: Congreso aprueba en general tras intensa negociación</h2>
+                    <p class="carousel-excerpt">El proyecto busca aumentar la recaudación en un 2% del PIB. Expertos advierten impacto en la inversión pero celebran progresividad del sistema...</p>
+                    <div class="carousel-meta">
+                        <span>📝 Carlos Rodríguez</span>
+                        <span>•</span>
+                        <span>⏰ Hace 4 horas</span>
+                        <span>•</span>
+                        <span>📖 4 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="swiper-slide">
+                <img src="https://picsum.photos/seed/tech1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Tecnología</span>
+                    <h2 class="carousel-title">Startup chilena revoluciona industria minera con tecnología de extracción limpia</h2>
+                    <p class="carousel-excerpt">Innovación nacional reduce consumo de agua en un 40% y elimina químicos tóxicos. Ya recibió inversión de US$50 millones...</p>
+                    <div class="carousel-meta">
+                        <span>📝 Ana Silva</span>
+                        <span>•</span>
+                        <span>⏰ Hace 5 horas</span>
+                        <span>•</span>
+                        <span>📖 6 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 4 -->
+            <div class="swiper-slide">
+                <img src="https://picsum.photos/seed/sports1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Deportes</span>
+                    <h2 class="carousel-title">Chile vs Argentina: Bielsa confirma sorpresiva alineación para partido clave</h2>
+                    <p class="carousel-excerpt">La Roja busca recuperarse tras derrota ante Uruguay. DT incluye a tres jugadores jóvenes y deja fuera a figuras establecidas...</p>
+                    <div class="carousel-meta">
+                        <span>📝 Diego Martínez</span>
+                        <span>•</span>
+                        <span>⏰ Hace 6 horas</span>
+                        <span>•</span>
+                        <span>📖 3 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 5 -->
+            <div class="swiper-slide">
+                <img src="https://picsum.photos/seed/culture1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Cultura</span>
+                    <h2 class="carousel-title">Festival de Viña 2025: Anuncian artistas internacionales y precios récord</h2>
+                    <p class="carousel-excerpt">La Quinta Vergara recibirá a estrellas de talla mundial. Entradas para "La L" y Bad Bunny agotadas en minutos...</p>
+                    <div class="carousel-meta">
+                        <span>📝 Sofía López</span>
+                        <span>•</span>
+                        <span>⏰ Hace 8 horas</span>
+                        <span>•</span>
+                        <span>📖 4 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 6 -->
+            <div class="swiper-slide">
+                <img src="https://picsum.photos/seed/national1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Nacional</span>
+                    <h2 class="carousel-title">Alerta meteorológica: Sistema frontal afectará a zona centro-sur del país</h2>
+                    <p class="carousel-excerpt">Se esperan lluvias intensas y posibles aluviones. Autoridades evacúan zonas de riesgo en Biobío y La Araucanía...</p>
+                    <div class="carousel-meta">
+                        <span>📝 Roberto Fuentes</span>
+                        <span>•</span>
+                        <span>⏰ Hace 10 horas</span>
+                        <span>•</span>
+                        <span>📖 2 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 7 -->
+            <div class="swiper-slide">
+                <img src="https://picsum.photos/seed/world1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Mundo</span>
+                    <h2 class="carousel-title">UE anuncia sanciones económicas sin precedentes contra Rusia</h2>
+                    <p class="carousel-excerpt">Bruselas impone medidas que afectan al sector energético y tecnológico. Moscú responde con amenazas de cortar suministros...</p>
+                    <div class="carousel-meta">
+                        <span>📝 Laura Pérez</span>
+                        <span>•</span>
+                        <span>⏰ Hace 12 horas</span>
+                        <span>•</span>
+                        <span>📖 5 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 8 -->
+            <div class="swiper-slide">
+                <img src="https://picsum.photos/seed/health1/1600/900.jpg" alt="" class="carousel-image">
+                <div class="carousel-overlay"></div>
+                <div class="carousel-content">
+                    <span class="carousel-category">Salud</span>
+                    <h2 class="carousel-title">Descubren tratamiento revolucionario contra Alzheimer en fase clínica</h2>
+                    <p class="carousel-excerpt">Medicamento chileno muestra resultados prometedores en revertir deterioro cognitivo. Esperan aprobación para 2026...</p>
+                    <div class="carousel-meta">
+                        <span>📝 Dr. Marcos Vargas</span>
+                        <span>•</span>
+                        <span>⏰ Hace 14 horas</span>
+                        <span>•</span>
+                        <span>📖 7 min lectura</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="site-content">
+        <main class="main-content">
+            <!-- Trending Bar -->
+            <div class="trending-bar animate-in">
+                <div class="trending-icon">🔥</div>
+                <div>
+                    <div class="trending-text">Trending ahora</div>
+                    <div class="trending-tags">
+                        <span class="trending-tag">#ReformaTributaria</span>
+                        <span class="trending-tag">#PazCharpentier</span>
+                        <span class="trending-tag">#ChileArgentina</span>
+                        <span class="trending-tag">#FestivalViña</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Política Section Enhanced -->
+            <section class="news-section" id="politica">
+                <div class="section-header">
+                    <h2 class="section-title">Política</h2>
+                    <div class="section-actions">
+                        <div class="filter-tabs">
+                            <span class="filter-tab active">Todos</span>
+                            <span class="filter-tab">Congreso</span>
+                            <span class="filter-tab">Gobierno</span>
+                        </div>
+                        <a href="#" class="section-link">Ver todas →</a>
+                    </div>
+                </div>
+                
+                <div class="news-grid">
+                    <article class="news-card featured animate-in">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/politics2/800/600.jpg" alt="">
+                            <span class="news-card-category">Política</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Paz Charpentier: Unboxing invitaciones cambio de mando</h3>
+                            <p class="news-card-excerpt">La diputada electa muestra las invitaciones para el juramento del miércoles 11. Los comentarios en redes destacan la controversia sobre el financiamiento y el lujo excesivo de los detalles dorados...</p>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">MG</div>
+                                    <span>María González</span>
+                                </div>
+                                <span class="badge badge-breaking">URGENTE</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-1">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/congress1/800/600.jpg" alt="">
+                            <span class="news-card-category">Congreso</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Senado aprueba proyecto de ley de protección ambiental</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">CR</div>
+                                    <span>Carlos Rodríguez</span>
+                                </div>
+                                <span>Hace 3 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-2">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/government1/800/600.jpg" alt="">
+                            <span class="news-card-category">Gobierno</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Nuevo alcalde de Santiago asume con polémico discurso</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">AS</div>
+                                    <span>Ana Silva</span>
+                                </div>
+                                <span class="badge badge-trending">TRENDING</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Economía Section -->
+            <section class="news-section" id="economia">
+                <div class="section-header">
+                    <h2 class="section-title">Economía</h2>
+                    <div class="section-actions">
+                        <div class="filter-tabs">
+                            <span class="filter-tab active">Todos</span>
+                            <span class="filter-tab">Mercados</span>
+                            <span class="filter-tab">Empresas</span>
+                        </div>
+                        <a href="#" class="section-link">Ver todas →</a>
+                    </div>
+                </div>
+                
+                <div class="news-grid">
+                    <article class="news-card animate-in">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/economy2/800/600.jpg" alt="">
+                            <span class="news-card-category">Mercados</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Reforma tributaria: Congreso debate nueva propuesta</h3>
+                            <p class="news-card-excerpt">El proyecto busca aumentar la recaudación en un 2% del PIB...</p>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">CR</div>
+                                    <span>Carlos Rodríguez</span>
+                                </div>
+                                <span>Hace 4 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-1">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/markets1/800/600.jpg" alt="">
+                            <span class="news-card-category">Mercados</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Dólar cierra al alza ante incertidumbre internacional</h3>
+                            <p class="news-card-excerpt">La moneda estadounidense registró un aumento del 1.2%...</p>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">LP</div>
+                                    <span>Laura Pérez</span>
+                                </div>
+                                <span>Hace 6 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-2">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/mining1/800/600.jpg" alt="">
+                            <span class="news-card-category">Empresas</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Codelco anuncia nuevo plan de expansión para 2025</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">RF</div>
+                                    <span>Roberto Fuentes</span>
+                                </div>
+                                <span class="badge badge-exclusive">EXCLUSIVO</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Más Noticias Grid -->
+            <section class="news-section">
+                <div class="section-header">
+                    <h2 class="section-title">Más Noticias</h2>
+                    <div class="section-actions">
+                        <a href="#" class="section-link">Ver archivo →</a>
+                    </div>
+                </div>
+                
+                <div class="news-grid">
+                    <article class="news-card animate-in">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/tech2/800/600.jpg" alt="">
+                            <span class="news-card-category">Tecnología</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Nueva tecnología chilena revoluciona industria minera</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">AS</div>
+                                    <span>Ana Silva</span>
+                                </div>
+                                <span>Hace 5 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-1">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/football1/800/600.jpg" alt="">
+                            <span class="news-card-category">Deportes</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Partido de Chile vs Argentina por eliminatorias</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">DM</div>
+                                    <span>Diego Martínez</span>
+                                </div>
+                                <span>Hace 6 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-2">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/festival1/800/600.jpg" alt="">
+                            <span class="news-card-category">Cultura</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Festival de Viña 2025 anuncia primeros artistas</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">SL</div>
+                                    <span>Sofía López</span>
+                                </div>
+                                <span>Hace 8 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-3">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/weather1/800/600.jpg" alt="">
+                            <span class="news-card-category">Nacional</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Alerta por sistema frontal en zona centro-sur</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">RF</div>
+                                    <span>Roberto Fuentes</span>
+                                </div>
+                                <span>Hace 10 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-4">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/world2/800/600.jpg" alt="">
+                            <span class="news-card-category">Mundo</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">UE anuncia sanciones económicas contra Rusia</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">LP</div>
+                                    <span>Laura Pérez</span>
+                                </div>
+                                <span>Hace 12 horas</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="news-card animate-in delay-5">
+                        <div class="news-card-image">
+                            <img src="https://picsum.photos/seed/medical1/800/600.jpg" alt="">
+                            <span class="news-card-category">Salud</span>
+                        </div>
+                        <div class="news-card-content">
+                            <h3 class="news-card-title">Descubren tratamiento revolucionario contra Alzheimer</h3>
+                            <div class="news-card-meta">
+                                <div class="news-card-author">
+                                    <div class="author-avatar">MV</div>
+                                    <span>Dr. Marcos Vargas</span>
+                                </div>
+                                <span class="badge badge-exclusive">EXCLUSIVO</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <!-- Enhanced Sidebar -->
+        <aside class="sidebar">
+            <!-- Live News Widget -->
+            <div class="widget live-news-widget animate-in-left">
+                <div class="widget-header">
+                    <h3 class="widget-title">🔴 Noticias en Vivo</h3>
+                    <a href="#" class="widget-action">Ver más</a>
+                </div>
+                <div class="live-news-list">
+                    <div class="live-news-item">
+                        <div class="live-news-time">14:32</div>
+                        <div class="live-news-content">
+                            <h4>Congreso aprueba reforma tributaria</h4>
+                            <div class="live-news-meta">Votación en curso</div>
+                        </div>
+                    </div>
+                    
+                    <div class="live-news-item">
+                        <div class="live-news-time">14:15</div>
+                        <div class="live-news-content">
+                            <h4>Dólar supera los $950</h4>
+                            <div class="live-news-meta">Mercado activo</div>
+                        </div>
+                    </div>
+                    
+                    <div class="live-news-item">
+                        <div class="live-news-time">13:45</div>
+                        <div class="live-news-content">
+                            <h4>Selección chilena concentra</h4>
+                            <div class="live-news-meta">Entrenamiento</div>
+                        </div>
+                    </div>
+                    
+                    <div class="live-news-item">
+                        <div class="live-news-time">13:20</div>
+                        <div class="live-news-content">
+                            <h4>Alerta amarilla en Biobío</h4>
+                            <div class="live-news-meta">Sernageomin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Widget -->
+            <div class="widget weather-widget animate-in-left delay-1">
+                <h3 class="widget-title">🌤️ Clima Santiago</h3>
+                <div class="weather-display">
+                    <div class="weather-icon">☀️</div>
+                    <div class="weather-temp">24°</div>
+                </div>
+                <div class="weather-details">
+                    <div>Soleado • Sensación 22°</div>
+                    <div>Humedad 45% • Viento 12 km/h</div>
+                    <div>UV: Alto • Calidad Aire: Buena</div>
+                </div>
+            </div>
+
+            <!-- Últimas Noticias -->
+            <div class="widget animate-in-left delay-2">
+                <div class="widget-header">
+                    <h3 class="widget-title">🔥 Últimas Noticias</h3>
+                    <a href="#" class="widget-action">Ver más</a>
+                </div>
+                <div class="news-list">
+                    <div class="news-list-item">
+                        <div class="news-list-thumb">
+                            <img src="https://picsum.photos/seed/politics3/200/150.jpg" alt="">
+                        </div>
+                        <div class="news-list-content">
+                            <div class="news-list-category">Política</div>
+                            <h4 class="news-list-title">Paz Charpentier: Unboxing invitaciones...</h4>
+                            <div class="news-list-date">Hace 2 horas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="news-list-item">
+                        <div class="news-list-thumb">
+                            <img src="https://picsum.photos/seed/economy3/200/150.jpg" alt="">
+                        </div>
+                        <div class="news-list-content">
+                            <div class="news-list-category">Economía</div>
+                            <h4 class="news-list-title">Reforma tributaria: Congreso debate...</h4>
+                            <div class="news-list-date">Hace 4 horas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="news-list-item">
+                        <div class="news-list-thumb">
+                            <img src="https://picsum.photos/seed/tech3/200/150.jpg" alt="">
+                        </div>
+                        <div class="news-list-content">
+                            <div class="news-list-category">Tecnología</div>
+                            <h4 class="news-list-title">Nueva tecnología chilena revoluciona...</h4>
+                            <div class="news-list-date">Hace 5 horas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="news-list-item">
+                        <div class="news-list-thumb">
+                            <img src="https://picsum.photos/seed/football2/200/150.jpg" alt="">
+                        </div>
+                        <div class="news-list-content">
+                            <div class="news-list-category">Deportes</div>
+                            <h4 class="news-list-title">Partido de Chile vs Argentina...</h4>
+                            <div class="news-list-date">Hace 6 horas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="news-list-item">
+                        <div class="news-list-thumb">
+                            <img src="https://picsum.photos/seed/festival2/200/150.jpg" alt="">
+                        </div>
+                        <div class="news-list-content">
+                            <div class="news-list-category">Cultura</div>
+                            <h4 class="news-list-title">Festival de Viña 2025 anuncia...</h4>
+                            <div class="news-list-date">Hace 8 horas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner -->
+            <div class="widget animate-in-left delay-3" style="padding: 0; overflow: hidden;">
+                <img src="https://via.placeholder.com/380x250/1a365d/ffffff?text=TU+PUBLICIDAD+AQUI" alt="Publicidad" style="width: 100%; display: block;">
+            </div>
+
+            <!-- Categorías -->
+            <div class="widget animate-in-left delay-4">
+                <div class="widget-header">
+                    <h3 class="widget-title">📂 Categorías</h3>
+                    <a href="#" class="widget-action">Todas</a>
+                </div>
+                <div class="category-list">
+                    <a href="#" class="category-pill">Política <span style="opacity: 0.6;">(12)</span></a>
+                    <a href="#" class="category-pill">Economía <span style="opacity: 0.6;">(8)</span></a>
+                    <a href="#" class="category-pill">Deportes <span style="opacity: 0.6;">(15)</span></a>
+                    <a href="#" class="category-pill">Tecnología <span style="opacity: 0.6;">(6)</span></a>
+                    <a href="#" class="category-pill">Cultura <span style="opacity: 0.6;">(10)</span></a>
+                    <a href="#" class="category-pill">Nacional <span style="opacity: 0.6;">(9)</span></a>
+                    <a href="#" class="category-pill">Mundo <span style="opacity: 0.6;">(7)</span></a>
+                    <a href="#" class="category-pill">Salud <span style="opacity: 0.6;">(5)</span></a>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="widget animate-in-left delay-5" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white;">
+                <h3 class="widget-title" style="color: white;">📧 Newsletter</h3>
+                <p style="margin-bottom: 20px; opacity: 0.9;">Recibe las noticias más importantes cada mañana en tu correo.</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('¡Gracias por suscribirte!');" style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="email" placeholder="tu@email.com" required style="padding: 12px 16px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1em;">
+                    <input type="email" placeholder="background: rgba(255,255,255,0.1); color: white;" required style="padding: 12px 16px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1em;">
+                    <button type="submit" style="padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.3s;">Suscribirme</button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon">R</div>
+                    <span class="logo-text">Retarget</span>
+                </div>
+                <p class="footer-text">Tu portal de noticias actualizado 24/7 con información relevante de política, economía, deportes y cultura. Cobertura nacional e internacional con el más alto estándar periodístico.</p>
+                <div class="social-links">
+                    <a href="#">f</a>
+                    <a href="#">t</a>
+                    <a href="#">i</a>
+                    <a href="#">y</a>
+                    <a href="#">in</a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">Secciones</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Política</a></li>
+                    <li><a href="#">Economía</a></li>
+                    <li><a href="#">Deportes</a></li>
+                    <li><a href="#">Tecnología</a></li>
+                    <li><a href="#">Cultura</a></li>
+                    <li><a href="#">Mundo</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Términos de uso</a></li>
+                    <li><a href="#">Política de privacidad</a></li>
+                    <li><a href="#">Política de cookies</a></li>
+                    <li><a href="#">Contacto</a></li>
+                    <li><a href="#">Trabaja con nosotros</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">Contacto</h4>
+                <ul class="footer-links">
+                    <li><a href="mailto:hola@retarget.cl">hola@retarget.cl</a></li>
+                    <li><a href="tel:+56223456789">+56 2 2345 6789</a></li>
+                    <li><a href="tel:+56987654321">+56 9 8765 4321</a></li>
+                    <li style="opacity: 0.7; margin-top: 10px; line-height: 1.6;">
+                        Av. Providencia 1234<br>
+                        Oficina 501, Santiago<br>
+                        Chile
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Retarget News. Todos los derechos reservados. | Desarrollado con ❤️ en Chile</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        // Initialize Swiper
+        const swiper = new Swiper('.hero-carousel', {
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            }
+        });
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Header scroll effect
+        const header = document.getElementById('siteHeader');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        // Filter Tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Scroll Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = entry.target.classList.contains('animate-in-left') 
+                        ? 'translateX(0)' 
+                        : 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-in, .animate-in-left').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = el.classList.contains('animate-in-left') 
+                ? 'translateX(-30px)' 
+                : 'translateY(30px)';
+            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            observer.observe(el);
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Theme Toggle (simple demo)
+        document.querySelector('.theme-toggle').addEventListener('click', function() {
+            this.textContent = this.textContent === '🌙' ? '☀️' : '🌙';
+            document.body.style.filter = this.textContent === '☀️' ? 'invert(1)' : 'none';
+        });
+
+        // Live News Updates Simulation
+        setInterval(() => {
+            const times = document.querySelectorAll('.live-news-time');
+            const now = new Date();
+            times.forEach(time => {
+                const currentMinutes = parseInt(time.textContent.split(':')[1]);
+                if (currentMinutes > 0) {
+                    time.textContent = `14:${String(currentMinutes - 1).padStart(2, '0')}`;
+                }
+            });
+        }, 60000); // Update every minute
+    </script>
+</body>
+</html>

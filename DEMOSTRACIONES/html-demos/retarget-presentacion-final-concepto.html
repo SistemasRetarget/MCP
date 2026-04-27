@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retarget News - Presentación de Concepto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #e53e3e;
+            --accent-hover: #c53030;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --info: #3182ce;
+            --purple: #7c3aed;
+            --text: #1a202c;
+            --text-light: #718096;
+            --bg: #f7fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .presentation-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+        }
+        
+        /* Slide Styles */
+        .slide {
+            min-height: 100vh;
+            display: none;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            background: var(--white);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .slide-counter {
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        
+        /* Slide 1 - Title */
+        .title-slide {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .title-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .title-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-title {
+            font-size: 4em;
+            font-weight: 900;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            box-shadow: 0 10px 30px rgba(229, 62, 62, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.8em;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        
+        .presenter-info {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-top: 60px;
+        }
+        
+        /* Slide 2 - Concept */
+        .concept-slide {
+            background: var(--white);
+        }
+        
+        .slide-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .slide-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .slide-subtitle {
+            font-size: 1.2em;
+            color: var(--text-light);
+        }
+        
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .concept-box {
+            background: var(--bg);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .concept-box h3 {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .concept-box p {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, var(--success) 0%, #2f855a 100%);
+            color: white !important;
+            border: none;
+            margin-top: 20px;
+        }
+        
+        .highlight-box h3 {
+            color: white !important;
+        }
+        
+        .highlight-box p {
+            color: white !important;
+            opacity: 1;
+        }
+        
+        /* Slide 3 - Demo Purpose */
+        .demo-purpose-slide {
+            background: var(--bg);
+            padding: 40px;
+        }
+        
+        .purpose-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            height: 85vh;
+            align-items: center;
+        }
+        
+        .purpose-box {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .purpose-header {
+            padding: 20px;
+            font-weight: 600;
+            text-align: center;
+            color: white;
+        }
+        
+        .purpose-header.demo1 {
+            background: var(--primary);
+        }
+        
+        .purpose-header.demo2 {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+        }
+        
+        .purpose-header.demo3 {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--info) 100%);
+        }
+        
+        .purpose-content {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .purpose-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .purpose-iframe {
+            flex: 1;
+            border: none;
+            border-radius: 10px;
+            margin-top: auto;
+            background: white;
+        }
+        
+        /* Slide 4 - Real System Flow */
+        .system-flow-slide {
+            background: var(--white);
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding: 30px;
+            background: var(--bg);
+            border-radius: 20px;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .flow-step.active {
+            border-left-color: var(--success);
+            background: linear-gradient(90deg, rgba(56, 161, 105, 0.1) 0%, var(--bg) 100%);
+        }
+        
+        .flow-number {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .flow-step.active .flow-number {
+            background: var(--success);
+        }
+        
+        .flow-content {
+            flex: 1;
+        }
+        
+        .flow-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .flow-description {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        .flow-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        
+        /* Slide 5 - Approval Dashboard */
+        .approval-slide {
+            background: var(--bg);
+            padding: 40px;
+        }
+        
+        .approval-container {
+            display: flex;
+            gap: 30px;
+            height: 70vh;
+        }
+        
+        .approval-preview {
+            flex: 1;
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+        }
+        
+        .approval-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .approval-iframe {
+            width: 100%;
+            height: calc(100% - 60px);
+            border: none;
+        }
+        
+        .approval-controls {
+            width: 350px;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .approval-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .approval-item {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--warning);
+        }
+        
+        .approval-item h4 {
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .approval-meta {
+            font-size: 0.8em;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+        
+        .approval-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .approval-btn {
+            flex: 1;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .approval-btn.approve {
+            background: var(--success);
+            color: white;
+        }
+        
+        .approval-btn.approve:hover {
+            background: #2f855a;
+        }
+        
+        .approval-btn.reject {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .approval-btn.reject:hover {
+            background: #c53030;
+        }
+        
+        /* Slide 6 - Customization */
+        .customization-slide {
+            background: var(--white);
+        }
+        
+        .customization-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .customization-card {
+            background: var(--bg);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .customization-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .customization-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .customization-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .customization-description {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        /* Slide 7 - Benefits */
+        .benefits-slide {
+            background: var(--white);
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .benefit-card {
+            background: var(--bg);
+            padding: 30px;
+            border-radius: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .benefit-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .benefit-content {
+            flex: 1;
+        }
+        
+        .benefit-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .benefit-description {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        /* Slide 8 - Next Steps */
+        .next-steps-slide {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+        }
+        
+        .next-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .step-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .step-number {
+            font-size: 2em;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+        
+        .step-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .step-description {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .purpose-container,
+            .customization-grid,
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .approval-container {
+                flex-direction: column;
+            }
+            
+            .approval-controls {
+                width: 100%;
+            }
+            
+            .concept-grid,
+            .next-steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px;
+            }
+            
+            .main-title {
+                font-size: 2.5em;
+            }
+            
+            .flow-step {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: slideInUp 0.8s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active">
+            <div class="title-content">
+                <div class="main-title">
+                    <div class="logo-icon">R</div>
+                    Retarget News
+                </div>
+                <h2 class="subtitle">Blog Personalizado con Noticias Automáticas</h2>
+                <div class="presenter-info">
+                    <p>Concepto: Sistema editorial automatizado con aprobación personal</p>
+                    <p>Integración Plugin News Converter + Portal Personalizado</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2: Concept Explanation -->
+        <div class="slide concept-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">💡 Concepto del Sistema</h2>
+                <p class="slide-subtitle">No es un blog tradicional, es un portal inteligente</p>
+            </div>
+            
+            <div class="concept-grid">
+                <div class="concept-box">
+                    <h3>🤖 ¿Qué es realmente?</h3>
+                    <p><strong>Un blog personalizado</strong> que recopila noticias automáticamente de múltiples fuentes (RSS, Instagram, APIs) y las publica previa aprobación de Cota.</p>
+                    <p style="margin-top: 15px;"><strong>Características clave:</strong></p>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Noticias 100% automáticas</li>
+                        <li>Aprobación manual obligatoria</li>
+                        <li>Branding personalizado</li>
+                        <li>Control editorial total</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-box">
+                    <h3>🎯 ¿Cómo funciona?</h3>
+                    <p><strong>Flujo automatizado:</strong></p>
+                    <ol style="margin-top: 10px; margin-left: 20px;">
+                        <li>Sistema busca noticias automáticamente</li>
+                        <li>Noticias llegan a cola editorial</li>
+                        <li>Cota revisa y aprueba/rechaza</li>
+                        <li>Noticias aprobadas se publican</li>
+                        <li>Portal se actualiza solo</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="concept-box highlight-box">
+                <h3>🌟 Ventaja Principal</h3>
+                <p><strong>Contenido fresco sin esfuerzo manual:</strong> Tendrás noticias actualizadas 24/7 sin tener que buscarlas manualmente, pero con control total sobre qué se publica.</p>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Demo Purpose -->
+        <div class="slide demo-purpose-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">🎨 Propósito de los Demos</h2>
+                <p class="slide-subtitle">Los 3 demos muestran capacidad visual, no el sistema real</p>
+            </div>
+            
+            <div class="purpose-container">
+                <div class="purpose-box">
+                    <div class="purpose-header demo1">
+                        <span>Demo 1</span>
+                    </div>
+                    <div class="purpose-content">
+                        <h3 class="purpose-title">Funcionalidad Básica</h3>
+                        <iframe src="retarget-blog-demo.html" class="purpose-iframe"></iframe>
+                    </div>
+                </div>
+                
+                <div class="purpose-box">
+                    <div class="purpose-header demo2">
+                        <span>Demo 2</span>
+                    </div>
+                    <div class="purpose-content">
+                        <h3 class="purpose-title">Features Adicionales</h3>
+                        <iframe src="retarget-blog-demo-v2.html" class="purpose-iframe"></iframe>
+                    </div>
+                </div>
+                
+                <div class="purpose-box">
+                    <div class="purpose-header demo3">
+                        <span>Demo 3</span>
+                    </div>
+                    <div class="purpose-content">
+                        <h3 class="purpose-title">Experiencia Premium</h3>
+                        <iframe src="retarget-blog-demo-v3.html" class="purpose-iframe"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Real System Flow -->
+        <div class="slide system-flow-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">🔄 Flujo del Sistema Real</h2>
+                <p class="slide-subtitle">Así funcionará tu blog personalizado</p>
+            </div>
+            
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-number">1</div>
+                    <div class="flow-content">
+                        <h3 class="flow-title">Recolección Automática</h3>
+                        <p class="flow-description">El sistema busca noticias automáticamente de RSS, Instagram y APIs configuradas. Procesa el contenido con IA para clasificar y extraer información relevante.</p>
+                    </div>
+                    <div class="flow-icon">📡</div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="flow-number">2</div>
+                    <div class="flow-content">
+                        <h3 class="flow-title">Cola Editorial</h3>
+                        <p class="flow-description">Las noticias llegan a un dashboard privado donde Cota puede revisarlas, editarlas si es necesario, y decidir si publicarlas o rechazarlas.</p>
+                    </div>
+                    <div class="flow-icon">📋</div>
+                </div>
+                
+                <div class="flow-step active">
+                    <div class="flow-number">3</div>
+                    <div class="flow-content">
+                        <h3 class="flow-title">Aprobación Personal</h3>
+                        <p class="flow-description">Cota tiene control total: puede aprobar, rechazar, editar o programar noticias. Solo las aprobadas se publican en el portal.</p>
+                    </div>
+                    <div class="flow-icon">✅</div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="flow-number">4</div>
+                    <div class="flow-content">
+                        <h3 class="flow-title">Publicación Automática</h3>
+                        <p class="flow-description">Una vez aprobadas, las noticias se publican automáticamente en el portal con el diseño seleccionado (Demo 1, 2 o 3).</p>
+                    </div>
+                    <div class="flow-icon">🌐</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Approval Dashboard -->
+        <div class="slide approval-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">👤 Dashboard de Aprobación</h2>
+                <p class="slide-subtitle">Tu centro de control editorial</p>
+            </div>
+            
+            <div class="approval-container">
+                <div class="approval-preview">
+                    <div class="approval-header">
+                        <span>Dashboard Editorial - Vista Real</span>
+                    </div>
+                    <iframe src="flujo-aprobacion-cota-realista.html" class="approval-iframe"></iframe>
+                </div>
+                
+                <div class="approval-controls">
+                    <h3 class="approval-title">📝 Noticias Pendientes</h3>
+                    
+                    <div class="approval-item">
+                        <h4>Paz Charpentier: Unboxing invitaciones cambio de mando</h4>
+                        <div class="approval-meta">
+                            <span>📡 RSS Emol</span> • <span>⏰ Hace 2 horas</span> • <span>🔴 Alta prioridad</span>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="approval-btn approve">✅ Aprobar</button>
+                            <button class="approval-btn reject">❌ Rechazar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="approval-item">
+                        <h4>Reforma tributaria: Congreso aprueba en general</h4>
+                        <div class="approval-meta">
+                            <span>📡 RSS La Tercera</span> • <span>⏰ Hace 4 horas</span> • <span>🔴 Alta prioridad</span>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="approval-btn approve">✅ Aprobar</button>
+                            <button class="approval-btn reject">❌ Rechazar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="approval-item">
+                        <h4>Startup chilena revoluciona industria minera</h4>
+                        <div class="approval-meta">
+                            <span>📷 Instagram @techchile</span> • <span>⏰ Hace 5 horas</span> • <span>🟡 Media prioridad</span>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="approval-btn approve">✅ Aprobar</button>
+                            <button class="approval-btn reject">❌ Rechazar</button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(56, 161, 105, 0.1); border-radius: 10px; text-align: center;">
+                        <strong>📊 Estadísticas del día:</strong><br>
+                        <span style="color: var(--success);">✅ 12 aprobadas</span> • 
+                        <span style="color: var(--warning);">⏳ 5 pendientes</span> • 
+                        <span style="color: var(--danger);">❌ 2 rechazadas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Customization -->
+        <div class="slide customization-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">🎨 Personalización Total</h2>
+                <p class="slide-subtitle">Tu blog, tu marca, tu estilo</p>
+            </div>
+            
+            <div class="customization-grid">
+                <div class="customization-card">
+                    <div class="customization-icon">🎨</div>
+                    <h3 class="customization-title">Branding Personalizado</h3>
+                    <p class="customization-description">Logo, colores, tipografía y estilo adaptados completamente a tu marca. El portal se verá 100% profesional y coherente con tu imagen.</p>
+                </div>
+                
+                <div class="customization-card">
+                    <div class="customization-icon">⚙️</div>
+                    <h3 class="customization-title">Configuración de Fuentes</h3>
+                    <p class="customization-description">Elige qué RSS, cuentas de Instagram y APIs quieres monitorear. Configura palabras clave, categorías y filtros automáticos.</p>
+                </div>
+                
+                <div class="customization-card">
+                    <div class="customization-icon">📱</div>
+                    <h3 class="customization-title">Diseño Responsive</h3>
+                    <p class="customization-description">Funciona perfecto en desktop, tablet y móvil. Los usuarios podrán acceder a tus noticias desde cualquier dispositivo.</p>
+                </div>
+                
+                <div class="customization-card">
+                    <div class="customization-icon">🔧</div>
+                    <h3 class="customization-title">Control Editorial</h3>
+                    <p class="customization-description">Dashboard intuitivo para aprobar, editar, programar o rechazar noticias. Estadísticas en tiempo real del rendimiento.</p>
+                </div>
+                
+                <div class="customization-card">
+                    <div class="customization-icon">📊</div>
+                    <h3 class="customization-title">Análisis y Métricas</h3>
+                    <p class="customization-description">Visitas, engagement, noticias más populares, fuentes más efectivas. Todo lo necesario para optimizar tu contenido.</p>
+                </div>
+                
+                <div class="customization-card">
+                    <div class="customization-icon">🚀</div>
+                    <h3 class="customization-title">SEO Optimizado</h3>
+                    <p class="customization-description">Estructura optimizada para motores de búsqueda. URLs amigables, meta tags automáticos y sitemaps dinámicos.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Benefits -->
+        <div class="slide benefits-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">✨ Beneficios del Sistema</h2>
+                <p class="slide-subtitle">Ventajas clave sobre un blog tradicional</p>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <div class="benefit-content">
+                        <h3 class="benefit-title">Ahorro de Tiempo</h3>
+                        <p class="benefit-description">Cero tiempo buscando noticias. El sistema trabaja 24/7 mientras tú te concentras en aprobar solo el contenido relevante.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <div class="benefit-content">
+                        <h3 class="benefit-title">Contenido Siempre Fresco</h3>
+                        <p class="benefit-description">Tu portal siempre tendrá noticias actualizadas sin esfuerzo manual. Los visitantes volverán por contenido nuevo constantemente.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🛡️</div>
+                    <div class="benefit-content">
+                        <h3 class="benefit-title">Control Total</h3>
+                        <p class="benefit-description">Tú decides qué se publica. Nada automático sin tu aprobación. Mantienes la calidad y coherencia editorial.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">📈</div>
+                    <div class="benefit-content">
+                        <h3 class="benefit-title">Crecimiento Orgánico</h3>
+                        <p class="benefit-description">Más contenido = más tráfico = mejor SEO. Posicionamiento automático con contenido relevante y actualizado.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <div class="benefit-content">
+                        <h3 class="benefit-title">Rentabilidad</h3>
+                        <p class="benefit-description">Más tráfico = más oportunidades de monetización. Publicidad, afiliados, contenido patrocinado con audiencia creciente.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔮</div>
+                    <div class="benefit-content">
+                        <h3 class="benefit-title">Escalable</h3>
+                        <p class="benefit-description">Agrega más fuentes, categorías o incluso múltiples sitios. El sistema crece contigo sin límites técnicos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 8: Next Steps -->
+        <div class="slide next-steps-slide">
+            <div class="slide-header">
+                <h2 class="slide-title">🚀 Próximos Pasos</h2>
+                <p class="slide-subtitle">Implementación y lanzamiento</p>
+            </div>
+            
+            <div class="next-steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <h3 class="step-title">Elegir Diseño</h3>
+                    <p class="step-description">Seleccionar entre Demo 1, 2 o 3 como base visual para el portal. Personalizar colores, logo y branding.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <h3 class="step-title">Configurar Fuentes</h3>
+                    <p class="step-description">Definir RSS, Instagram y APIs a monitorear. Establecer palabras clave, categorías y filtros automáticos.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <h3 class="step-title">Instalación Técnica</h3>
+                    <p class="step-description">Instalar plugin News Converter, configurar tema personalizado y probar integración completa del sistema.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <h3 class="step-title">Capacitación y Lanzamiento</h3>
+                    <p class="step-description">Capacitar en uso del dashboard editorial, probar flujo completo y lanzar portal con noticias automáticas.</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="previousSlide()" id="prevBtn">← Anterior</button>
+        <span class="slide-counter" id="slideCounter">1 / 8</span>
+        <button class="nav-btn" onclick="nextSlide()" id="nextBtn">Siguiente →</button>
+    </div>
+    
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            
+            // Update navigation
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === totalSlides - 1;
+            document.getElementById('slideCounter').textContent = `${index + 1} / ${totalSlides}`;
+            
+            // Animate elements
+            const activeSlide = slides[index];
+            const elements = activeSlide.querySelectorAll('.concept-box, .flow-step, .purpose-box, .customization-card, .benefit-card, .step-card, .approval-preview, .approval-controls');
+            elements.forEach((el, i) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, i * 100);
+            });
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+        
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>

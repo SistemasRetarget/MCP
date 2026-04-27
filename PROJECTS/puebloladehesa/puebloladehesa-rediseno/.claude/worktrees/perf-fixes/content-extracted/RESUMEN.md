@@ -1,0 +1,185 @@
+# Resumen de extracción
+
+**Fecha:** 2026-04-20 21:37:12
+**Sitio:** https://puebloladehesa.cl
+
+## Páginas descargadas
+
+- **es_** (es) · Pueblo La Dehesa | Tu refugio en la ciudad
+  - URL: https://puebloladehesa.cl/
+  - Textos extraídos: 135
+  - Imágenes: 540
+- **es_products_casa-doble-altura** (es) · Casa Doble Altura
+  - URL: https://puebloladehesa.cl/products/casa-doble-altura
+  - Textos extraídos: 119
+  - Imágenes: 729
+- **es_products_casa-parque** (es) · Casa Parque
+  - URL: https://puebloladehesa.cl/products/casa-parque
+  - Textos extraídos: 120
+  - Imágenes: 638
+- **es_products_casa-panoramica** (es) · Casa Panorámica
+  - URL: https://puebloladehesa.cl/products/casa-panoramica
+  - Textos extraídos: 120
+  - Imágenes: 670
+- **es_products_casa-suite** (es) · Casa Suite
+  - URL: https://puebloladehesa.cl/products/casa-suite
+  - Textos extraídos: 119
+  - Imágenes: 633
+- **es_pages_contact** (es) · Contacto
+  - URL: https://puebloladehesa.cl/pages/contact
+  - Textos extraídos: 90
+  - Imágenes: 15
+- **es_pages_tu-lugar** (es) · Estadias
+  - URL: https://puebloladehesa.cl/pages/tu-lugar
+  - Textos extraídos: 125
+  - Imágenes: 324
+- **es_pages_nosotros** (es) · Nosotros
+  - URL: https://puebloladehesa.cl/pages/nosotros
+  - Textos extraídos: 107
+  - Imágenes: 128
+- **es_pages_experiencias** (es) · Experiencias
+  - URL: https://puebloladehesa.cl/pages/experiencias
+  - Textos extraídos: 88
+  - Imágenes: 426
+- **es_pages_la-casita** (es) · La Casita Salón Gourmet
+  - URL: https://puebloladehesa.cl/pages/la-casita
+  - Textos extraídos: 90
+  - Imágenes: 196
+- **es_pages_ubicacion** (es) · Ubicación
+  - URL: https://puebloladehesa.cl/pages/ubicacion
+  - Textos extraídos: 102
+  - Imágenes: 121
+- **es_pages_espacio-panoramica** (es) · Espacio Panorámica
+  - URL: https://puebloladehesa.cl/pages/espacio-panoramica
+  - Textos extraídos: 75
+  - Imágenes: 13
+- **es_pages_terminos-y-condiciones** (es) · Términos y condiciones
+  - URL: https://puebloladehesa.cl/pages/terminos-y-condiciones
+  - Textos extraídos: 249
+  - Imágenes: 13
+- **es_pages_politicas-de-privacidad** (es) · Politicas de privacidad
+  - URL: https://puebloladehesa.cl/pages/politicas-de-privacidad
+  - Textos extraídos: 349
+  - Imágenes: 13
+- **es_pages_arriendo-departamento-amoblado** (es) · Departamentos
+  - URL: https://puebloladehesa.cl/pages/arriendo-departamento-amoblado
+  - Textos extraídos: 107
+  - Imágenes: 403
+- **es_pages_arriendo-por-temporada** (es) · Arriendo por Temporada
+  - URL: https://puebloladehesa.cl/pages/arriendo-por-temporada
+  - Textos extraídos: 116
+  - Imágenes: 449
+- **es_pages_arriendo-mensual** (es) · Arriendo Mensual
+  - URL: https://puebloladehesa.cl/pages/arriendo-mensual
+  - Textos extraídos: 112
+  - Imágenes: 333
+- **es_pages_pueblito** (es) · Pueblito
+  - URL: https://puebloladehesa.cl/pages/pueblito
+  - Textos extraídos: 146
+  - Imágenes: 114
+- **es_pages_guia-huespedes** (es) · Guía Huéspedes
+  - URL: https://puebloladehesa.cl/pages/guia-huespedes
+  - Textos extraídos: 88
+  - Imágenes: 144
+- **es_collections_tipologias** (es) · Tipologías
+  - URL: https://puebloladehesa.cl/collections/tipologias
+  - Textos extraídos: 145
+  - Imágenes: 205
+- **es_blogs_noticias** (es) · Noticias
+  - URL: https://puebloladehesa.cl/blogs/noticias
+  - Textos extraídos: 75
+  - Imágenes: 13
+- **en_en** (en) · La Dehesa Village | Your refuge in the city
+  - URL: https://puebloladehesa.cl/en
+  - Textos extraídos: 134
+  - Imágenes: 540
+- **en_en_products_casa-doble-altura** (en) · Double Height House
+  - URL: https://puebloladehesa.cl/en/products/casa-doble-altura
+  - Textos extraídos: 115
+  - Imágenes: 729
+- **en_en_products_casa-parque** (en) · Park House
+  - URL: https://puebloladehesa.cl/en/products/casa-parque
+  - Textos extraídos: 116
+  - Imágenes: 638
+- **en_en_products_casa-panoramica** (en) · Panoramic House
+  - URL: https://puebloladehesa.cl/en/products/casa-panoramica
+  - Textos extraídos: 116
+  - Imágenes: 670
+- **en_en_products_casa-suite** (en) · Studio House
+  - URL: https://puebloladehesa.cl/en/products/casa-suite
+  - Textos extraídos: 115
+  - Imágenes: 633
+- **en_en_pages_contact** (en) · Contact
+  - URL: https://puebloladehesa.cl/en/pages/contact
+  - Textos extraídos: 88
+  - Imágenes: 15
+- **en_en_pages_tu-lugar** (en) · Your Place
+  - URL: https://puebloladehesa.cl/en/pages/tu-lugar
+  - Textos extraídos: 121
+  - Imágenes: 324
+- **en_en_pages_nosotros** (en) · (sin título)
+  - URL: https://puebloladehesa.cl/en/pages/nosotros
+  - Textos extraídos: 102
+  - Imágenes: 128
+- **en_en_pages_experiencias** (en) · Experiences
+  - URL: https://puebloladehesa.cl/en/pages/experiencias
+  - Textos extraídos: 84
+  - Imágenes: 426
+- **en_en_pages_la-casita** (en) · La Casita Gourmet Salon
+  - URL: https://puebloladehesa.cl/en/pages/la-casita
+  - Textos extraídos: 86
+  - Imágenes: 196
+- **en_en_pages_ubicacion** (en) · Location
+  - URL: https://puebloladehesa.cl/en/pages/ubicacion
+  - Textos extraídos: 98
+  - Imágenes: 121
+- **en_en_pages_espacio-panoramica** (en) · Panoramic Space
+  - URL: https://puebloladehesa.cl/en/pages/espacio-panoramica
+  - Textos extraídos: 71
+  - Imágenes: 13
+- **en_en_pages_terminos-y-condiciones** (en) · Terms and conditions
+  - URL: https://puebloladehesa.cl/en/pages/terminos-y-condiciones
+  - Textos extraídos: 150
+  - Imágenes: 13
+- **en_en_pages_politicas-de-privacidad** (en) · Privacy policies
+  - URL: https://puebloladehesa.cl/en/pages/politicas-de-privacidad
+  - Textos extraídos: 128
+  - Imágenes: 13
+- **en_en_pages_furnished-apartment-rental** (en) · Furnished Apartment Rental
+  - URL: https://puebloladehesa.cl/en/pages/furnished-apartment-rental
+  - Textos extraídos: 103
+  - Imágenes: 403
+- **en_en_pages_seasonal-rental** (en) · Seasonal Rental
+  - URL: https://puebloladehesa.cl/en/pages/seasonal-rental
+  - Textos extraídos: 112
+  - Imágenes: 449
+- **en_en_pages_arriendo-mensual** (en) · Arriendo Mensual
+  - URL: https://puebloladehesa.cl/en/pages/arriendo-mensual
+  - Textos extraídos: 108
+  - Imágenes: 333
+- **en_en_pages_pueblito** (en) · Pueblito
+  - URL: https://puebloladehesa.cl/en/pages/pueblito
+  - Textos extraídos: 142
+  - Imágenes: 114
+- **en_en_pages_guia-huespedes** (en) · Guía Huéspedes
+  - URL: https://puebloladehesa.cl/en/pages/guia-huespedes
+  - Textos extraídos: 84
+  - Imágenes: 144
+- **en_en_collections_tipologias** (en) · Typologies
+  - URL: https://puebloladehesa.cl/en/collections/tipologias
+  - Textos extraídos: 143
+  - Imágenes: 205
+- **en_en_blogs_noticias** (en) · News
+  - URL: https://puebloladehesa.cl/en/blogs/noticias
+  - Textos extraídos: 71
+  - Imágenes: 13
+
+## Imágenes
+- Total únicas detectadas: 4079
+- Del CDN Shopify: 151
+- Descargadas exitosamente: 151
+- Errores: 0
+
+## Textos únicos por idioma
+- **ES:** 693 textos únicos
+- **EN:** 499 textos únicos

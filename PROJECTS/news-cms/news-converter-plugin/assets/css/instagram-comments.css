@@ -1,0 +1,108 @@
+/* Instagram Comments Downloader Styles */
+
+.nc-instagram-comments .nc-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.nc-instagram-comments .nc-card h2 {
+    margin-top: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.nc-instagram-comments .nc-card h3 {
+    margin: 20px 0 10px;
+    color: #1d2327;
+}
+
+.nc-progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #f0f0f1;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.nc-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2271b1, #4f94d4);
+    transition: width 0.3s ease;
+}
+
+.nc-progress-status {
+    text-align: center;
+    color: #646970;
+    font-style: italic;
+}
+
+.nc-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.nc-stat {
+    background: #f6f7f7;
+    padding: 15px;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.nc-stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 600;
+    color: #2271b1;
+}
+
+.nc-stat-label {
+    display: block;
+    font-size: 12px;
+    color: #646970;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+.nc-guide ol {
+    margin-left: 20px;
+}
+
+.nc-guide li {
+    margin: 8px 0;
+}
+
+.nc-guide code {
+    background: #f0f0f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+#download-links {
+    margin-top: 20px;
+}
+
+#download-links .button {
+    margin-right: 10px;
+}
+
+.nc-instagram-comments .spinner {
+    visibility: hidden;
+}
+
+.nc-instagram-comments .spinner.is-active {
+    visibility: visible;
+}
+
+@media screen and (max-width: 782px) {
+    .nc-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Converter - Portal Editorial (Mockup)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1a365d; --secondary: #c53030; --accent: #d69e2e;
+            --success: #38a169; --warning: #d69e2e; --danger: #e53e3e;
+            --light: #f7fafc; --dark: #2d3748; --border: #e2e8f0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--light); color: var(--dark); }
+        .app { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background: var(--primary); color: white; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h1 { font-size: 1.2rem; font-weight: 600; }
+        .sidebar-header p { font-size: 0.8rem; opacity: 0.7; margin-top: 5px; }
+        .user-badge { display: flex; align-items: center; gap: 12px; padding: 15px 20px; background: rgba(0,0,0,0.2); margin: 15px; border-radius: 8px; }
+        .user-avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .nav-menu { padding: 15px 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); border-left-color: var(--accent); }
+        .nav-badge { background: var(--secondary); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+        .main { margin-left: 260px; flex: 1; padding: 30px; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h2 { font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow); border-left: 4px solid var(--primary); }
+        .stat-card.warning { border-left-color: var(--warning); }
+        .stat-card.success { border-left-color: var(--success); }
+        .stat-card.danger { border-left-color: var(--danger); }
+        .stat-value { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
+        .stat-label { color: #718096; font-size: 0.9rem; margin-top: 5px; }
+        .card { background: white; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 25px; }
+        .card-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 1.1rem; color: var(--primary); }
+        .card-body { padding: 25px; }
+        .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--dark); }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .tabs { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+        .tab { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .tab.active { background: var(--primary); color: white; }
+        .queue-item { border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 15px; transition: all 0.2s; }
+        .queue-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .source-icon-box { width: 60px; height: 60px; background: #f7fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .queue-meta { display: flex; gap: 20px; font-size: 0.85rem; color: #718096; margin: 10px 0; flex-wrap: wrap; }
+        .queue-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .keyword-tag { background: #e2e8f0; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px; margin: 3px; }
+        .keyword-tag.include { background: #d1fae5; color: #065f46; }
+        .keyword-tag.exclude { background: #fee2e2; color: #991b1b; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+        .form-group { margin-bottom: 20px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 25px; border-bottom: 1px solid var(--border); }
+        .modal-body { padding: 25px; }
+        .modal-footer { padding: 20px 25px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        @media (max-width: 768px) { .sidebar { width: 200px; } .main { margin-left: 200px; } .stats-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>📰 News Converter</h1>
+                <p>Portal Editorial v2.0</p>
+            </div>
+            <div class="user-badge">
+                <div class="user-avatar">C</div>
+                <div style="font-size: 0.9rem;"><strong>Cota</strong><br><small style="opacity:0.7;">Directora Editorial</small></div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active" data-page="dashboard"><span>📊</span><span>Dashboard</span></div>
+                <div class="nav-item" data-page="queue"><span>📥</span><span>Cola Editorial</span><span class="nav-badge">12</span></div>
+                <div class="nav-item" data-page="sources"><span>📡</span><span>Fuentes</span></div>
+                <div class="nav-item" data-page="sections"><span>📑</span><span>Secciones</span></div>
+                <div class="nav-item" data-page="metrics"><span>📈</span><span>Métricas</span></div>
+                <div class="nav-item" data-page="history"><span>📜</span><span>Historial</span></div>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <!-- DASHBOARD -->
+            <div class="page-section active" id="page-dashboard">
+                <div class="page-header">
+                    <h2>Dashboard Editorial</h2>
+                    <p>Vista general del sistema y actividad reciente</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card warning">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Pendientes de Revisión</div>
+                        <div class="stat-change" style="color:var(--success);font-size:0.8rem;margin-top:5px;">↑ 3 desde ayer</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-value">47</div>
+                        <div class="stat-label">Publicados Hoy</div>
+                        <div style="color:var(--success);font-size:0.8rem;margin-top:5px;">↑ 12% vs ayer</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Fuentes Activas</div>
+                        <div style="color:#718096;font-size:0.8rem;margin-top:5px;">RSS:4 | TW:2 | IG:2</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Errores en Fuentes</div>
+                        <div style="color:var(--danger);font-size:0.8rem;margin-top:5px;">Requiere atención</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header"><h3>⚡ Acciones Rápidas</h3></div>
+                    <div class="card-body" style="display:flex;gap:15px;flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="showPage('queue')">📥 Revisar Cola (12)</button>
+                        <button class="btn btn-secondary" onclick="showModal('add-source')">➕ Agregar Fuente</button>
+                        <button class="btn btn-secondary" onclick="showPage('metrics')">📈 Ver Métricas</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>📰 Últimos Publicados</h3></div>
+                    <div class="card-body">
+                        <div class="queue-item">
+                            <div style="display:flex;justify-content:space-between;align-items:start;">
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--primary);">Gobierno anuncia nueva reforma tributaria para 2026</h4>
+                                    <div class="queue-meta">
+                                        <span>📰 El Mercurio</span><span>🏷️ Economía</span><span>👤 Por: Cota</span><span>🕐 Hace 2 horas</span>
+                                    </div>
+                                </div>
+                                <span class="status-badge status-approved">Publicado</span>
+                            </div>
+                        </div>
+                        <div class="queue-item">
+                            <div style="display:flex;justify-content:space-between;align-items:start;">
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--primary);">Presidente se reúne con empresarios en CEP</h4>
+                                    <div class="queue-meta">
+                                        <span>🐦 Twitter @Presidencia</span><span>🏷️ Política</span><span>👤 Por: Editor A</span><span>🕐 Hace 4 horas</span>
+                                    </div>
+                                </div>
+                                <span class="status-badge status-approved">Publicado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUEUE -->
+            <div class="page-section" id="page-queue">
+                <div class="page-header">
+                    <h2>Cola Editorial</h2>
+                    <p>Revisa, edita y aprueba contenido antes de publicar</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-tab="pending">Pendientes (12)</div>
+                    <div class="tab" data-tab="approved">Aprobados (5)</div>
+                    <div class="tab" data-tab="published">Publicados Hoy (47)</div>
+                    <div class="tab" data-tab="rejected">Rechazados (8)</div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Item Instagram -->
+                        <div class="queue-item">
+                            <div style="display:flex;gap:20px;">
+                                <div class="source-icon-box">📸</div>
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--primary);">Paz Charpentier - Unboxing invitaciones cambio de mando</h4>
+                                    <div class="queue-meta">
+                                        <span>📸 Instagram</span><span>🏷️ Política</span><span>🕐 16:43 hoy</span><span>💬 16 comentarios</span>
+                                    </div>
+                                    <p style="color:#4a5568;line-height:1.6;">
+                                        Diputada electa muestra invitaciones para juramento del miércoles 11. 
+                                        Comentarios destacan controversia sobre financiamiento...
+                                    </p>
+                                    <div style="margin-top:10px;">
+                                        <span class="keyword-tag include">política</span>
+                                        <span class="keyword-tag include">congreso</span>
+                                        <span class="keyword-tag">paz charpentier</span>
+                                        <span class="keyword-tag">cambio de mando</span>
+                                    </div>
+                                </div>
+                                <div class="queue-actions" style="flex-direction:column;min-width:120px;">
+                                    <button class="btn btn-success" onclick="showModal('approve')">✓ Aprobar</button>
+                                    <button class="btn btn-secondary" onclick="showModal('edit')">✏️ Editar</button>
+                                    <button class="btn btn-danger" onclick="showModal('reject')">✕ Rechazar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item RSS -->
+                        <div class="queue-item">
+                            <div style="display:flex;gap:20px;">
+                                <div class="source-icon-box">📰</div>
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--primary);">BCCh mantiene tasa de interés en 6,5% por séptimo mes</h4>
+                                    <div class="queue-meta">
+                                        <span>📰 RSS: Banco Central</span><span>🏷️ Economía</span><span>🕐 15:30 hoy</span>
+                                    </div>
+                                    <p style="color:#4a5568;line-height:1.6;">
+                                        El Consejo del Banco Central acordó mantener la tasa en 6,5%, 
+                                        en línea con las expectativas del mercado...
+                                    </p>
+                                    <div style="margin-top:10px;">
+                                        <span class="keyword-tag include">banco central</span>
+                                        <span class="keyword-tag include">tasa de interés</span>
+                                        <span class="keyword-tag include">inflación</span>
+                                    </div>
+                                </div>
+                                <div class="queue-actions" style="flex-direction:column;min-width:120px;">
+                                    <button class="btn btn-success">✓ Aprobar</button>
+                                    <button class="btn btn-secondary">✏️ Editar</button>
+                                    <button class="btn btn-danger">✕ Rechazar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Twitter -->
+                        <div class="queue-item">
+                            <div style="display:flex;gap:20px;">
+                                <div class="source-icon-box">🐦</div>
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--primary);">Thread: Análisis del nuevo gabinete ministerial</h4>
+                                    <div class="queue-meta">
+                                        <span>🐦 Twitter @politologo_cl</span><span>🏷️ Análisis</span><span>🕐 14:15 hoy</span>
+                                    </div>
+                                    <p style="color:#4a5568;line-height:1.6;">
+                                        Hilo con análisis detallado de los cambios en el gabinete y sus 
+                                        implicancias para la agenda legislativa...
+                                    </p>
+                                </div>
+                                <div class="queue-actions" style="flex-direction:column;min-width:120px;">
+                                    <button class="btn btn-success">✓ Aprobar</button>
+                                    <button class="btn btn-secondary">✏️ Editar</button>
+                                    <button class="btn btn-danger">✕ Rechazar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOURCES -->
+            <div class="page-section" id="page-sources">
+                <div class="page-header">
+                    <h2>Fuentes de Datos</h2>
+                    <p>Configura las fuentes que alimentan el portal</p>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+                    <button class="btn btn-primary" onclick="showModal('add-source')">➕ Agregar Nueva Fuente</button>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Fuentes Activas (8)</h3></div>
+                    <div class="card-body">
+                        <div class="queue-item">
+                            <div style="display:flex;gap:15px;align-items:center;">
+                                <div class="source-icon-box">📰</div>
+                                <div style="flex:1;">
+                                    <h4>El Mercurio - RSS</h4>
+                                    <div class="queue-meta">
+                                        <span>📡 https://mercurio.cl/rss</span><span>⏱️ Cada 5 min</span><span style="color:var(--success);">● Activo</span>
+                                    </div>
+                                    <p style="font-size:0.85rem;color:#718096;">Secciones: Nacional, Economía, Política</p>
+                                </div>
+                                <div class="queue-actions">
+                                    <button class="btn btn-secondary">⚙️ Config</button>
+                                    <button class="btn btn-danger">⏸️ Pausar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="queue-item">
+                            <div style="display:flex;gap:15px;align-items:center;">
+                                <div class="source-icon-box">🐦</div>
+                                <div style="flex:1;">
+                                    <h4>Cuentas Políticas Verificadas</h4>
+                                    <div class="queue-meta">
+                                        <span>📡 Twitter List: @politica_cl</span><span>⏱️ Cada 2 min</span><span style="color:var(--success);">● Activo</span>
+                                    </div>
+                                    <p style="font-size:0.85rem;color:#718096;">Monitoreando: 45 cuentas verificadas</p>
+                                </div>
+                                <div class="queue-actions">
+                                    <button class="btn btn-secondary">⚙️ Config</button>
+                                    <button class="btn btn-danger">⏸️ Pausar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="queue-item">
+                            <div style="display:flex;gap:15px;align-items:center;">
+                                <div class="source-icon-box">📸</div>
+                                <div style="flex:1;">
+                                    <h4>Instagram Política</h4>
+                                    <div class="queue-meta">
+                                        <span>📡 Posts de políticos chilenos</span><span>⏱️ Cada 15 min</span><span style="color:var(--warning);">● Manual</span>
+                                    </div>
+                                    <p style="font-size:0.85rem;color:#718096;">Extracción de comentarios habilitada</p>
+                                </div>
+                                <div class="queue-actions">
+                                    <button class="btn btn-secondary">⚙️ Config</button>
+                                    <button class="btn btn-danger">⏸️ Pausar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTIONS -->
+            <div class="page-section" id="page-sections">
+                <div class="page-header">
+                    <h2>Secciones del Portal</h2>
+                    <p>Organiza el contenido por temas y keywords</p>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Configuración por Sección</h3></div>
+                    <div class="card-body">
+                        <div class="queue-item">
+                            <div>
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                                    <h4 style="color:var(--primary);">🏛️ Política</h4>
+                                    <button class="btn btn-secondary">⚙️ Configurar</button>
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                                    <div>
+                                        <strong style="color:var(--success);">✓ Incluir si contiene:</strong>
+                                        <div style="margin-top:8px;">
+                                            <span class="keyword-tag include">congreso</span>
+                                            <span class="keyword-tag include">senado</span>
+                                            <span class="keyword-tag include">cámara</span>
+                                            <span class="keyword-tag include">gobierno</span>
+                                            <span class="keyword-tag include">reforma</span>
+                                            <span class="keyword-tag include">ley</span>
+                                            <span class="keyword-tag">+ 12 más...</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong style="color:var(--danger);">✕ Excluir si contiene:</strong>
+                                        <div style="margin-top:8px;">
+                                            <span class="keyword-tag exclude">fútbol</span>
+                                            <span class="keyword-tag exclude">farándula</span>
+                                            <span class="keyword-tag exclude">espectáculos</span>
+                                            <span class="keyword-tag">+ 8 más...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top:15px;padding-top:15px;border-top:1px solid var(--border);font-size:0.85rem;color:#718096;">
+                                    📡 Fuentes: 3 activas | 📊 Promedio: 15 posts/día | 👤 Editor: Cota
+                                </div>
+                            </div>
+                        </div>
+                        <div class="queue-item">
+                            <div>
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                                    <h4 style="color:var(--primary);">💰 Economía</h4>
+                                    <button class="btn btn-secondary">⚙️ Configurar</button>
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                                    <div>
+                                        <strong style="color:var(--success);">✓ Incluir:</strong>
+                                        <div style="margin-top:8px;">
+                                            <span class="keyword-tag include">banco central</span>
+                                            <span class="keyword-tag include">inflación</span>
+                                            <span class="keyword-tag include">tasa de interés</span>
+                                            <span class="keyword-tag include">PIB</span>
+                                            <span class="keyword-tag include">dólar</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong style="color:var(--danger);">✕ Excluir:</strong>
+                                        <div style="margin-top:8px;">
+                                            <span class="keyword-tag exclude">casino</span>
+                                            <span class="keyword-tag exclude">apuestas</span>
+                                            <span class="keyword-tag exclude">juegos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- METRICS -->
+            <div class="page-section" id="page-metrics">
+                <div class="page-header">
+                    <h2>Métricas y Desempeño</h2>
+                    <p>Análisis de eficiencia del flujo editorial</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">73%</div>
+                        <div class="stat-label">Tasa de Aprobación</div>
+                        <div style="color:#718096;font-size:0.8rem;margin-top:5px;">Promedio mensual</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">12 min</div>
+                        <div class="stat-label">Tiempo Promedio de Revisión</div>
+                        <div style="color:var(--success);font-size:0.8rem;margin-top:5px;">↓ 3 min vs mes anterior</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">847</div>
+                        <div class="stat-label">Posts Publicados (Mes)</div>
+                        <div style="color:var(--success);font-size:0.8rem;margin-top:5px;">↑ 15% vs abril</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">23%</div>
+                        <div class="stat-label">Proviene de Instagram</div>
+                        <div style="color:#718096;font-size:0.8rem;margin-top:5px;">Nueva fuente este mes</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>📊 Desempeño por Fuente</h3></div>
+                    <div class="card-body">
+                        <table style="width:100%;border-collapse:collapse;">
+                            <thead>
+                                <tr style="border-bottom:2px solid var(--border);">
+                                    <th style="text-align:left;padding:12px;">Fuente</th>
+                                    <th style="text-align:center;padding:12px;">Detectados</th>
+                                    <th style="text-align:center;padding:12px;">Aprobados</th>
+                                    <th style="text-align:center;padding:12px;">Rechazados</th>
+                                    <th style="text-align:center;padding:12px;">Tasa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <td style="padding:12px;">📰 El Mercurio</td>
+                                    <td style="text-align:center;padding:12px;">234</td>
+                                    <td style="text-align:center;padding:12px;color:var(--success);">189</td>
+                                    <td style="text-align:center;padding:12px;color:var(--danger);">45</td>
+                                    <td style="text-align:center;padding:12px;font-weight:600;">81%</td>
+                                </tr>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <td style="padding:12px;">🐦 Twitter Política</td>
+                                    <td style="text-align:center;padding:12px;">567</td>
+                                    <td style="text-align:center;padding:12px;color:var(--success);">398</td>
+                                    <td style="text-align:center;padding:12px;color:var(--danger);">169</td>
+                                    <td style="text-align:center;padding:12px;font-weight:600;">70%</td>
+                                </tr>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <td style="padding:12px;">📸 Instagram</td>
+                                    <td style="text-align:center;padding:12px;">123</td>
+                                    <td style="text-align:center;padding:12px;color:var(--success);">89</td>
+                                    <td style="text-align:center;padding:12px;color:var(--danger);">34</td>
+                                    <td style="text-align:center;padding:12px;font-weight:600;">72%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORY -->
+            <div class="page-section" id="page-history">
+                <div class="page-header">
+                    <h2>Historial de Decisiones</h2>
+                    <p>Registro completo de aprobaciones, rechazos y ediciones</p>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Actividad Reciente</h3></div>
+                    <div class="card-body">
+                        <div class="queue-item">
+                            <div style="display:flex;justify-content:space-between;align-items:start;">
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--success);">✓ Aprobado: "Nueva reforma tributaria 2026"</h4>
+                                    <div class="queue-meta">
+                                        <span>👤 Por: Cota</span><span>🕐 Hace 2 horas</span><span>📰 Fuente: El Mercurio</span>
+                                    </div>
+                                    <p style="font-size:0.85rem;color:#718096;margin-top:8px;">Sin ediciones | Publicado inmediatamente</p>
+                                </div>
+                                <span class="status-badge status-approved">Aprobado</span>
+                            </div>
+                        </div>
+                        <div class="queue-item">
+                            <div style="display:flex;justify-content:space-between;align-items:start;">
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--warning);">✏️ Editado y Aprobado: "Reunión CEP empresarios"</h4>
+                                    <div class="queue-meta">
+                                        <span>👤 Por: Cota</span><span>🕐 Hace 3 horas</span><span>🐦 Fuente: Twitter</span>
+                                    </div>
+                                    <p style="font-size:0.85rem;color:#718096;margin-top:8px;">Cambios: Título modificado, agregado contexto</p>
+                                </div>
+                                <span class="status-badge" style="background:#fef3c7;color:#92400e;">Editado</span>
+                            </div>
+                        </div>
+                        <div class="queue-item">
+                            <div style="display:flex;justify-content:space-between;align-items:start;">
+                                <div style="flex:1;">
+                                    <h4 style="color:var(--danger);">✕ Rechazado: "Comparativa candidatos"</h4>
+                                    <div class="queue-meta">
+                                        <span>👤 Por: Cota</span><span>🕐 Hace 5 horas</span><span>🐦 Fuente: Twitter</span>
+                                    </div>
+                                    <p style="font-size:0.85rem;color:#718096;margin-top:8px;">Razón: Contenido opinión sin respaldo factual</p>
+                                </div>
+                                <span class="status-badge status-rejected">Rechazado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    
+    <!-- Add Source Modal -->
+    <div class="modal-overlay" id="modal-add-source">
+        <div class="modal">
+            <div class="modal-header"><h3>➕ Agregar Nueva Fuente</h3></div>
+            <div class="modal-body">
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:25px;">
+                    <div style="border:2px solid var(--primary);background:#ebf8ff;padding:20px;text-align:center;border-radius:8px;cursor:pointer;">
+                        <div style="font-size:2rem;margin-bottom:10px;">📰</div>
+                        <strong>RSS Feed</strong>
+                        <p style="font-size:0.8rem;color:#718096;margin-top:5px;">XML/RSS tradicional</p>
+                    </div>
+                    <div style="border:2px solid var(--border);padding:20px;text-align:center;border-radius:8px;cursor:pointer;">
+                        <div style="font-size:2rem;margin-bottom:10px;">🐦</div>
+                        <strong>Twitter/X</strong>
+                        <p style="font-size:0.8rem;color:#718096;margin-top:5px;">Cuentas o listas</p>
+                    </div>
+                    <div style="border:2px solid var(--border);padding:20px;text-align:center;border-radius:8px;cursor:pointer;">
+                        <div style="font-size:2rem;margin-bottom:10px;">📸</div>
+                        <strong>Instagram</strong>
+                        <p style="font-size:0.8rem;color:#718096;margin-top:5px;">Posts específicos</p>
+                    </div>
+                    <div style="border:2px solid var(--border);padding:20px;text-align:center;border-radius:8px;cursor:pointer;">
+                        <div style="font-size:2rem;margin-bottom:10px;">🌐</div>
+                        <strong>Web Scraping</strong>
+                        <p style="font-size:0.8rem;color:#718096;margin-top:5px;">Sitios sin RSS</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nombre de la Fuente</label>
+                    <input type="text" class="form-control" placeholder="Ej: El Mercurio - Política">
+                </div>
+                <div class="form-group">
+                    <label>URL del Feed / Endpoint</label>
+                    <input type="url" class="form-control" placeholder="https://...">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="form-group">
+                        <label>Sección Asignada</label>
+                        <select class="form-control">
+                            <option>Política</option>
+                            <option>Economía</option>
+                            <option>Internacional</option>
+                            <option>Sociedad</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Frecuencia de Chequeo</label>
+                        <select class="form-control">
+                            <option>Cada 2 minutos</option>
+                            <option>Cada 5 minutos</option>
+                            <option>Cada 15 minutos</option>
+                            <option>Cada hora</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Keywords para Filtrar (coma separados)</label>
+                    <input type="text" class="form-control" placeholder="congreso, senado, reforma, ley...">
+                    <p style="font-size:0.8rem;color:#718096;margin-top:5px;">Solo se procesarán items que contengan estas palabras</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideModal('add-source')">Cancelar</button>
+                <button class="btn btn-primary">Guardar Fuente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="modal-edit">
+        <div class="modal">
+            <div class="modal-header"><h3>✏️ Editar Noticia</h3></div>
+            <div class="modal-body">
+                <div style="background:#f7fafc;padding:15px;border-radius:8px;margin-bottom:20px;">
+                    <small style="color:#718096;">Fuente original:</small>
+                    <p style="margin-top:5px;">📸 Instagram - Paz Charpentier</p>
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" class="form-control" value="Paz Charpentier - Unboxing invitaciones cambio de mando">
+                </div>
+                <div class="form-group">
+                    <label>Contenido / Excerpt</label>
+                    <textarea class="form-control" rows="5">Diputada electa muestra invitaciones para juramento del miércoles 11. Comentarios destacan controversia sobre financiamiento de estudios...</textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="form-group">
+                        <label>Sección</label>
+                        <select class="form-control">
+                            <option selected>Política</option>
+                            <option>Economía</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Autor Sugerido</label>
+                        <input type="text" class="form-control" value="Redacción NC">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <div style="margin-top:5px;">
+                        <span class="keyword-tag">política <span style="cursor:pointer;opacity:0.5;">×</span></span>
+                        <span class="keyword-tag">congreso <span style="cursor:pointer;opacity:0.5;">×</span></span>
+                        <span class="keyword-tag">paz charpentier <span style="cursor:pointer;opacity:0.5;">×</span></span>
+                        <input type="text" placeholder="+ Agregar tag" style="padding:5px 10px;border:1px solid var(--border);border-radius:15px;font-size:0.85rem;width:100px;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideModal('edit')">Cancelar</button>
+                <button class="btn btn-success">Guardar y Aprobar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" id="modal-reject">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header"><h3>✕ Rechazar Noticia</h3></div>
+            <div class="modal-body">
+                <p style="margin-bottom:20px;">Estás rechazando: <strong>Paz Charpentier - Unboxing invitaciones...</strong></p>
+                <div class="form-group">
+                    <label>Motivo del Rechazo (obligatorio)</label>
+                    <select class="form-control" style="margin-bottom:10px;">
+                        <option>Selecciona un motivo...</option>
+                        <option>Fuera de temática editorial</option>
+                        <option>Contenido de opinión sin respaldo</option>
+                        <option>Noticia ya cubierta</option>
+                        <option>Fuente no confiable</option>
+                        <option>Información incompleta</option>
+                        <option>Otros (especificar)</option>
+                    </select>
+                    <textarea class="form-control" rows="3" placeholder="Comentario adicional..."></textarea>
+                </div>
+                <div style="background:#fff5f5;border:1px solid #fc8181;padding:15px;border-radius:8px;margin-top:20px;">
+                    <strong style="color:#c53030;">⚠️ Atención:</strong>
+                    <p style="font-size:0.9rem;margin-top:5px;color:#742a2a;">Esta acción registrará el rechazo en el historial y entrenará al sistema para futuras detecciones similares.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideModal('reject')">Cancelar</button>
+                <button class="btn btn-danger">Confirmar Rechazo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve Modal -->
+    <div class="modal-overlay" id="modal-approve">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header"><h3>✓ Aprobar para Publicación</h3></div>
+            <div class="modal-body">
+                <p style="margin-bottom:20px;"><strong>Paz Charpentier - Unboxing invitaciones...</strong></p>
+                <div style="background:#f0fff4;border:1px solid #68d391;padding:15px;border-radius:8px;">
+                    <strong style="color:#2f855a;">✓ Previsualización:</strong>
+                    <p style="font-size:0.9rem;margin-top:10px;color:#22543d;">
+                        • Se publicará en: <strong>Sección Política</strong><br>
+                        • Fecha: <strong>Hoy, 16:45</strong><br>
+                        • Autor: <strong>Redacción NC</strong><br>
+                        • Estado: <strong>Publicado inmediatamente</strong>
+                    </p>
+                </div>
+                <div style="margin-top:20px;">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                        <input type="checkbox" checked> Publicar inmediatamente (si no, queda como borrador)
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideModal('approve')">Volver a Editar</button>
+                <button class="btn btn-success">✓ Confirmar y Publicar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                showPage(page);
+            });
+        });
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.querySelector('[data-page="' + pageId + '"]').classList.add('active');
+        }
+
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Modals
+        function showModal(id) {
+            document.getElementById('modal-' + id).classList.add('active');
+        }
+
+        function hideModal(id) {
+            document.getElementById('modal-' + id).classList.remove('active');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
