@@ -1,36 +1,29 @@
-# ---- Build stage: compilar el servidor Rust ----
-FROM rust:1.85-alpine AS builder
+# ---- Single stage: Node + Rust toolchain ----
+FROM node:18-bookworm-slim
 
-RUN apk add --no-cache musl-dev pkgconfig
+# Instalar Rust
+RUN apt-get update && apt-get install -y curl build-essential pkg-config && \
+    curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain 1.85.0 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /build
-COPY servers/quality-gate/Cargo.toml servers/quality-gate/Cargo.lock ./
-COPY servers/quality-gate/src ./src
-
-RUN cargo build --release
-
-# ---- Runtime: Node.js wrapper HTTP → stdio MCP ----
-FROM node:18-alpine AS runner
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /app
 
-# Copiar binario Rust compilado
-COPY --from=builder /build/target/release/quality-gate-server ./servers/quality-gate/target/release/quality-gate-server
-RUN chmod +x ./servers/quality-gate/target/release/quality-gate-server
+# Compilar servidor Rust
+COPY servers/quality-gate/Cargo.toml servers/quality-gate/Cargo.lock ./rust-build/
+COPY servers/quality-gate/src ./rust-build/src
+RUN cd rust-build && cargo build --release && \
+    mkdir -p /app/servers/quality-gate/target/release && \
+    cp target/release/quality-gate-server /app/servers/quality-gate/target/release/ && \
+    cd /app && rm -rf rust-build
 
-# Copiar workspace MCP (contratos, lecciones, tools, config)
+# Copiar workspace MCP
 COPY contracts ./contracts
 COPY lessons ./lessons
 COPY tools ./tools
-COPY reports ./reports
-COPY evidence ./evidence
 COPY mcp-config.json ./
 COPY mcp-subagents-config.json ./
-COPY INTEGRATION_GUIDE.md ./
-COPY MCP_EVOLUTION_PLAN.md ./
-COPY SUBAGENT_ARCHITECTURE.md ./
-
-# HTTP wrapper que expone el MCP como REST API para Cloud Run
 COPY http-wrapper.mjs ./
 
 ENV NODE_ENV=production
