@@ -17,6 +17,7 @@ import { validateCoreWebVitals } from "./validators/core-web-vitals.mjs";
 import { validateGoogleAdsPolicies } from "./validators/google-ads-policies.mjs";
 import { validateSEOTechnical } from "./validators/seo-technical.mjs";
 import { validateMobileFirst } from "./validators/mobile-first.mjs";
+import { chatLoop, TOOLS as CHAT_TOOLS } from "./chat.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -206,6 +207,60 @@ const server = createServer(async (req, res) => {
       }
     });
     return;
+  }
+
+  // Chat — Anthropic tool-use loop (Initial → Tool request → Data retrieval → Final response)
+  if (req.method === "POST" && url.pathname === "/chat") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", async () => {
+      try {
+        const payload = JSON.parse(body || "{}");
+        const { email, name, message, messages, model, maxTurns } = payload;
+
+        // Auth: solo @retarget.cl
+        const cfg = JSON.parse(readFileSync(join(__dirname, "mcp-subagents-config.json"), "utf8"));
+        const allowlist = cfg.auth?.domain_allowlist || ["@retarget.cl"];
+        const ok = typeof email === "string" && allowlist.some((d) => email.toLowerCase().endsWith(d));
+        if (!ok) {
+          res.writeHead(403, { "Content-Type": "application/json; charset=utf-8" });
+          return res.end(JSON.stringify({
+            authorized: false,
+            message: cfg.auth?.on_unauthorized || "No autorizado.",
+            signature: cfg.identity?.signature
+          }));
+        }
+
+        // Construir historial: aceptamos `messages` (array) o `message` (string)
+        const history = Array.isArray(messages) && messages.length
+          ? messages
+          : [{ role: "user", content: String(message || "").slice(0, 8000) }];
+
+        const result = await chatLoop({
+          messages: history,
+          userEmail: email,
+          userName: name,
+          model,
+          maxTurns: maxTurns || 8
+        });
+
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({
+          ...result,
+          signature: cfg.identity?.signature
+        }));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Tools — lista las herramientas que el chat expone a Claude
+  if (req.method === "GET" && url.pathname === "/chat/tools") {
+    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    return res.end(JSON.stringify({ tools: CHAT_TOOLS }));
   }
 
   // Status

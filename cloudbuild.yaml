@@ -27,6 +27,7 @@ steps:
       - '--min-instances=0'
       - '--max-instances=2'
       - '--set-env-vars=NODE_ENV=production,WORKSPACE_MCP_HOME=/app,RETARGET_WORKSPACE=/app/contracts'
+      - '--update-secrets=ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest'
 
 images:
   - 'europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:latest'

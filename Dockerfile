@@ -26,6 +26,7 @@ COPY validators ./validators
 COPY mcp-config.json ./
 COPY mcp-subagents-config.json ./
 COPY http-wrapper.mjs ./
+COPY chat.mjs ./
 COPY onboarding ./onboarding
 
 ENV NODE_ENV=production
