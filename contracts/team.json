@@ -48,6 +48,20 @@
         "se necesita un dato verificado para una nota"
       ],
       "message_template": "Periodista:\\nTEMA: {tema}\\nDATO PRINCIPAL: {dato} (fuente: {url})\\nDATOS DE APOYO:\\n  - {dato2} (fuente: {url2})\\n  - {dato3} (fuente: {url3})\\nVERSIÓN CORTA (≤140): {tweet}\\nVERSIÓN LARGA: {parrafo}"
+    },
+    {
+      "id": "publicista",
+      "name": "Publicista",
+      "role": "Estrategia de marketing / Contenido publicitario",
+      "tone": "creativo, orientado a conversión, data-driven",
+      "how_to_write": "Propuestas con métricas. Incluir: objetivo de campaña, público objetivo, canales, presupuesto estimado, KPIs esperados. Adjuntar ejemplos o referencias.",
+      "trigger_when": [
+        "se necesita estrategia de marketing para un proyecto",
+        "hay que crear contenido publicitario o campaña",
+        "se requiere análisis de audiencia o posicionamiento",
+        "se necesita optimizar conversión o engagement"
+      ],
+      "message_template": "Publicista:\\n• Objetivo: {objetivo_campaña}\\n• Público objetivo: {audiencia}\\n• Canales: {canales}\\n• Presupuesto estimado: {presupuesto}\\n• KPIs esperados: {kpis}\\n• Referencia: {ejemplo_url}\\nMétricas actuales: {metricas_baseline}"
     }
   ],
   "communication_rules": {
