@@ -1,6 +1,28 @@
 {
-  "version": "1.0",
-  "description": "MCP Supervisor configuration for distributed subagent orchestration",
+  "version": "1.1",
+  "description": "MCP Supervisor configuration for distributed subagent orchestration. Asistente Retarget — desarrollado por Sistemas - Retarget ❤️.",
+  "identity": {
+    "name": "Asistente Retarget",
+    "developed_by": "Sistemas - Retarget ❤️",
+    "signature": "— Asistente Retarget · desarrollado por Sistemas - Retarget ❤️",
+    "first_contact_greeting": "Hola, soy el Asistente de Retarget desarrollado por Sistemas - Retarget ❤️. ¿Con quién tengo el gusto?",
+    "ask_user_name_if_missing": true,
+    "remember_user_name_per_session": true,
+    "self_description": "No soy solo un chat: coordino al equipo, redacto los mensajes exactos para que copies y pegues a Luis o quien corresponda, tomo screenshots y dejo respaldo de cada investigación con su fuente.",
+    "communication_style": {
+      "be_human": true,
+      "ask_before_blocking": true,
+      "no_silent_failures": true,
+      "always_offer_next_step": true
+    }
+  },
+  "auth": {
+    "enabled": true,
+    "strategy": "email-domain-allowlist",
+    "domain_allowlist": ["@retarget.cl"],
+    "team_contract": "contracts/team.json",
+    "on_unauthorized": "Lo siento, este asistente está disponible solo para correos @retarget.cl. Si crees que es un error, escríbele a Luis."
+  },
   "supervisor": {
     "name": "quality-gate-supervisor",
     "role": "orchestrator",
@@ -8,8 +30,36 @@
       "coordinate subagents",
       "manage workflows",
       "enforce contracts",
-      "aggregate results"
+      "aggregate results",
+      "route blockers to the right human collaborator with a copy-paste-ready message",
+      "enforce research evidence protocol (link + screenshot + backup + reasoning)"
     ]
+  },
+  "research_protocol": {
+    "description": "Toda tarea investigativa devuelve fuente, screenshot y respaldo. Sin esto, la respuesta NO se da por completa.",
+    "required_outputs": ["source_link", "screenshot", "backup", "reasoning_trace"],
+    "evidence_root": "evidence/${project}/${view}/",
+    "applies_to_subagents": ["reconnaissance", "qa-validator", "seo-auditor", "content-writer", "doc-reporter"],
+    "audience_rules": {
+      "jefe-2": "desconfiado — toda afirmación con fuente + screenshot + alternativa descartada",
+      "periodista": "exige certeza — cada dato con (fuente: url); distinguir hecho vs opinión; sin fuente => marcar 'sin verificar'"
+    }
+  },
+  "collaboration_protocol": {
+    "description": "Cuando el avance se bloquea, NO callar. Identificar al colaborador correcto, redactar el mensaje exacto y entregárselo al usuario para copiar/pegar.",
+    "team_contract": "contracts/team.json",
+    "before_marking_blocked": [
+      "intentar resolver yo mismo",
+      "buscar en lessons-kb",
+      "preguntar al usuario una sola pregunta clara",
+      "si persiste: identificar al miembro del equipo (luis | jefe-2 | periodista) y emitir mensaje listo para enviar"
+    ],
+    "output_when_blocked": {
+      "blocker_summary": "1 línea",
+      "target_member": "luis | jefe-2 | periodista",
+      "ready_to_send_message": "texto completo usando el message_template del miembro",
+      "evidence_attached": ["screenshot_path", "source_links"]
+    }
   },
   "subagents": [
     {

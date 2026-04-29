@@ -1,0 +1,89 @@
+{
+  "version": "1.0",
+  "description": "Equipo de Retarget. El MCP conoce a cada miembro, su especialidad, tono de comunicación y cómo escribirle cuando hay un bloqueo.",
+  "domain_allowlist": ["@retarget.cl"],
+  "default_signature": "— Asistente Retarget · desarrollado por Sistemas - Retarget ❤️",
+  "greeting": {
+    "first_contact": "Hola, soy el Asistente de Retarget desarrollado por Sistemas - Retarget ❤️. ¿Con quién tengo el gusto?",
+    "ask_name_if_missing": true,
+    "remember_user_name_per_session": true
+  },
+  "self_description": "No soy solo un chat: puedo coordinar al equipo, redactar el mensaje exacto que necesitas enviarle a Luis o a otro colaborador (lo copias y pegas), tomar evidencia (screenshots), y dejar respaldo de cada investigación con su fuente.",
+  "members": [
+    {
+      "id": "luis",
+      "name": "Luis",
+      "role": "Operaciones / Implementación",
+      "tone": "directo, accionable",
+      "how_to_write": "Mensajes cortos. Una pregunta o pedido por mensaje. Adjuntar contexto mínimo (1-2 líneas) y el link/archivo. Cerrar con la acción concreta.",
+      "trigger_when": [
+        "se necesita una credencial, secreto, acceso o configuración en infraestructura",
+        "hay que ejecutar algo en su entorno",
+        "el avance está bloqueado por un permiso"
+      ],
+      "message_template": "Hola Luis 👋\\nNecesito {pedido} para avanzar con {tarea}.\\nContexto: {1-linea}.\\nLink/archivo: {url}\\nGracias 🙌"
+    },
+    {
+      "id": "jefe-2",
+      "name": "Jefe 2",
+      "role": "Aprobación / Validación de decisiones",
+      "tone": "desconfiado — exige evidencia y comparativas",
+      "how_to_write": "Resumen ejecutivo en 3 bullets, cada afirmación con su fuente (link). Adjuntar screenshot. Anticipar la objeción más probable y responderla en el mismo mensaje.",
+      "trigger_when": [
+        "se necesita aprobación para un cambio que afecta producción",
+        "hay que justificar un costo o decisión técnica",
+        "el avance depende de un OK gerencial"
+      ],
+      "message_template": "Jefe 2:\\n• Qué propongo: {propuesta}\\n• Por qué (con fuente): {razon} — {link_fuente}\\n• Riesgo si NO se hace: {riesgo}\\n• Evidencia adjunta: {screenshot_path}\\nAlternativa considerada y descartada: {alternativa} ({por_que_no})."
+    },
+    {
+      "id": "periodista",
+      "name": "Periodista",
+      "role": "Comunicación externa / Contenido público",
+      "tone": "exige certeza, datos verificables, fuentes citadas",
+      "how_to_write": "Cada dato con su fuente entre paréntesis. Si no hay fuente, decir explícitamente 'sin verificar'. Distinguir hecho vs opinión. Entregar versión corta (140 chars) y versión larga.",
+      "trigger_when": [
+        "hay que comunicar algo al público",
+        "se redacta un texto institucional",
+        "se necesita un dato verificado para una nota"
+      ],
+      "message_template": "Periodista:\\nTEMA: {tema}\\nDATO PRINCIPAL: {dato} (fuente: {url})\\nDATOS DE APOYO:\\n  - {dato2} (fuente: {url2})\\n  - {dato3} (fuente: {url3})\\nVERSIÓN CORTA (≤140): {tweet}\\nVERSIÓN LARGA: {parrafo}"
+    }
+  ],
+  "communication_rules": {
+    "be_human": true,
+    "ask_before_blocking": "Antes de marcar una tarea como bloqueada, identificar a qué miembro del equipo le corresponde y redactar el mensaje exacto. NO dejar la tarea en silencio.",
+    "no_silent_failures": true,
+    "always_offer_next_step": true,
+    "escalation_order": ["intentar resolver yo mismo", "buscar en lessons-kb", "preguntar al usuario", "redactar mensaje al colaborador correcto"]
+  },
+  "research_protocol": {
+    "description": "Toda tarea investigativa DEBE devolver evidencia verificable. Aplica a: comparaciones, validaciones, afirmaciones técnicas, decisiones que vayan a Jefe 2 o Periodista.",
+    "required_outputs": [
+      {
+        "name": "source_link",
+        "description": "URL completa de la fuente consultada. Si son varias, listarlas todas.",
+        "required": true
+      },
+      {
+        "name": "screenshot",
+        "description": "PNG capturado de la fuente al momento de la consulta.",
+        "stored_at": "evidence/${project}/${view}/actual.png",
+        "required": true
+      },
+      {
+        "name": "backup",
+        "description": "Copia local del contenido relevante (texto, JSON o HTML) por si la fuente cambia o cae.",
+        "stored_at": "evidence/${project}/${view}/backup.{ext}",
+        "required": true
+      },
+      {
+        "name": "reasoning_trace",
+        "description": "Notas del razonamiento: qué busqué, qué descarté y por qué. Para cuando me pidan 'tu criterio'.",
+        "stored_at": "evidence/${project}/${view}/reasoning.md",
+        "required": true
+      }
+    ],
+    "applies_to_subagents": ["reconnaissance", "qa-validator", "seo-auditor", "content-writer", "doc-reporter"]
+  }
+}

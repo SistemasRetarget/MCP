@@ -112,6 +112,102 @@ const server = createServer(async (req, res) => {
     return res.end(JSON.stringify({ status: "ok", service: "quality-gate-mcp" }));
   }
 
+  // Identity — quién es el asistente
+  if (req.method === "GET" && url.pathname === "/identity") {
+    try {
+      const cfg = JSON.parse(readFileSync(join(__dirname, "mcp-subagents-config.json"), "utf8"));
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify({
+        identity: cfg.identity,
+        auth: { domain_allowlist: cfg.auth?.domain_allowlist || [] }
+      }));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // Auth check — valida que el correo sea @retarget.cl
+  if (req.method === "POST" && url.pathname === "/auth/check") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const { email, name } = JSON.parse(body || "{}");
+        const cfg = JSON.parse(readFileSync(join(__dirname, "mcp-subagents-config.json"), "utf8"));
+        const allowlist = cfg.auth?.domain_allowlist || ["@retarget.cl"];
+        const ok = typeof email === "string" && allowlist.some((d) => email.toLowerCase().endsWith(d));
+        res.writeHead(ok ? 200 : 403, { "Content-Type": "application/json; charset=utf-8" });
+        if (!ok) {
+          return res.end(JSON.stringify({
+            authorized: false,
+            message: cfg.auth?.on_unauthorized || "No autorizado.",
+            signature: cfg.identity?.signature
+          }));
+        }
+        const greeting = name
+          ? `Hola ${name}, soy el Asistente de Retarget desarrollado por Sistemas - Retarget ❤️. ¿En qué te ayudo?`
+          : cfg.identity?.first_contact_greeting;
+        res.end(JSON.stringify({
+          authorized: true,
+          email,
+          name: name || null,
+          greeting,
+          signature: cfg.identity?.signature
+        }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Team — lista miembros del equipo y cómo escribirles
+  if (req.method === "GET" && url.pathname === "/team") {
+    try {
+      const team = JSON.parse(readFileSync(join(__dirname, "contracts/team.json"), "utf8"));
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify(team));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // Notify — el asistente redacta el mensaje listo para copiar/pegar al colaborador correcto
+  if (req.method === "POST" && url.pathname === "/notify") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const { member_id, vars = {} } = JSON.parse(body || "{}");
+        const team = JSON.parse(readFileSync(join(__dirname, "contracts/team.json"), "utf8"));
+        const member = team.members.find((m) => m.id === member_id);
+        if (!member) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify({ error: `Miembro no encontrado: ${member_id}. Disponibles: ${team.members.map(m => m.id).join(", ")}` }));
+        }
+        let msg = (member.message_template || "").replace(/\\n/g, "\n");
+        for (const [k, v] of Object.entries(vars)) {
+          msg = msg.replaceAll(`{${k}}`, String(v ?? `[${k} pendiente]`));
+        }
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({
+          target_member: member.name,
+          tone: member.tone,
+          how_to_write: member.how_to_write,
+          ready_to_send_message: msg,
+          instructions: "Copia este mensaje y pégalo en el canal donde escribes a este colaborador."
+        }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
   // Status
   if (req.method === "GET" && url.pathname === "/status") {
     res.writeHead(200, { "Content-Type": "application/json" });
