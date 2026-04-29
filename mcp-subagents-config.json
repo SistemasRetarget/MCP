@@ -427,6 +427,24 @@
         "content": "lessons/lessons.jsonl",
         "ttl_minutes": 30,
         "shared": true
+      },
+      {
+        "name": "mcp-enterprise-analysis",
+        "content": "docs/MCP_ENTERPRISE_ANALYSIS.md",
+        "ttl_minutes": 180,
+        "shared": true
+      },
+      {
+        "name": "prompt-engineering-guide",
+        "content": "docs/guia-ejecutiva-prompt-engineering.md",
+        "ttl_minutes": 180,
+        "shared": true
+      },
+      {
+        "name": "anthropic-operators",
+        "content": "docs/prompt-engineering-8-operadores-anthropic.md",
+        "ttl_minutes": 180,
+        "shared": true
       }
     ]
   },
