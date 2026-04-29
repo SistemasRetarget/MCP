@@ -23,7 +23,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'mcp-version-1'
+      - 'cmsretargetv1'
       - '--image=europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
       - '--region=europe-west1'
       - '--platform=managed'
