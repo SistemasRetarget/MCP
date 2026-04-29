@@ -12,7 +12,7 @@ import { createServer } from "http";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
 import { validateCoreWebVitals } from "./validators/core-web-vitals.mjs";
 import { validateGoogleAdsPolicies } from "./validators/google-ads-policies.mjs";
 import { validateSEOTechnical } from "./validators/seo-technical.mjs";
