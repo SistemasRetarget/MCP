@@ -13,6 +13,10 @@ import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { validateCoreWebVitals } from "./validators/core-web-vitals.mjs";
+import { validateGoogleAdsPolicies } from "./validators/google-ads-policies.mjs";
+import { validateSEOTechnical } from "./validators/seo-technical.mjs";
+import { validateMobileFirst } from "./validators/mobile-first.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -171,6 +175,83 @@ const server = createServer(async (req, res) => {
       res.writeHead(404, { "Content-Type": "text/plain" });
       return res.end("Onboarding page not found");
     }
+  }
+
+  // Website validation endpoint
+  if (req.method === "POST" && url.pathname === "/api/v1/validate-website") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", async () => {
+      try {
+        const data = JSON.parse(body);
+        
+        if (!data || !data.url) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify({ error: "URL requerida" }));
+        }
+
+        const url = data.url;
+        const strategy = data.strategy || "mobile";
+
+        const results = {
+          url,
+          passed: true,
+          overall_score: 0,
+          core_web_vitals: {},
+          google_ads_policies: {},
+          seo_technical: {},
+          mobile_first: {},
+          mobile_first_compliant: false,
+          issues: [],
+          recommendations: []
+        };
+
+        // Core Web Vitals
+        const cwvResults = await validateCoreWebVitals(url, process.env.PAGESPEED_API_KEY);
+        results.core_web_vitals = cwvResults;
+        if (!cwvResults.passed) results.passed = false;
+        if (cwvResults.issues) results.issues.push(...cwvResults.issues);
+
+        // Google Ads Policies
+        const adsResults = await validateGoogleAdsPolicies(url);
+        results.google_ads_policies = adsResults;
+        if (!adsResults.passed) results.passed = false;
+        if (adsResults.issues) results.issues.push(...adsResults.issues);
+        if (adsResults.warnings) results.recommendations.push(...adsResults.warnings);
+
+        // SEO Técnico
+        const seoResults = await validateSEOTechnical(url);
+        results.seo_technical = seoResults;
+        if (!seoResults.passed) results.passed = false;
+        if (seoResults.issues) results.issues.push(...seoResults.issues);
+        if (seoResults.recommendations) results.recommendations.push(...seoResults.recommendations);
+
+        // Mobile First
+        const mobileResults = await validateMobileFirst(url);
+        results.mobile_first = mobileResults;
+        results.mobile_first_compliant = mobileResults.mobile_first_compliant || false;
+        if (!mobileResults.passed) results.passed = false;
+        if (mobileResults.issues) results.issues.push(...mobileResults.issues);
+        if (mobileResults.recommendations) results.recommendations.push(...mobileResults.recommendations);
+
+        // Calculate overall score
+        const scores = [];
+        if (cwvResults.overall_score) scores.push(cwvResults.overall_score * 0.25);
+        if (seoResults.score) scores.push(seoResults.score * 0.25);
+        if (mobileResults.score) scores.push(mobileResults.score * 0.25);
+        if (adsResults.passed) scores.push(100 * 0.25);
+        else scores.push(0 * 0.25);
+
+        results.overall_score = Math.round(scores.reduce((a, b) => a + b, 0));
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(results));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
   }
 
   res.writeHead(404, { "Content-Type": "application/json" });
