@@ -22,6 +22,7 @@ RUN cd rust-build && cargo build --release && \
 COPY contracts ./contracts
 COPY lessons ./lessons
 COPY tools ./tools
+COPY validators ./validators
 COPY mcp-config.json ./
 COPY mcp-subagents-config.json ./
 COPY http-wrapper.mjs ./
