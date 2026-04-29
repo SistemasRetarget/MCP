@@ -62,7 +62,8 @@
   },
   "replication": {
     "status": "in_progress",
-    "phase": "content_mapping",
+    "phase": "phase_2_complete",
+    "progress_percent": 40,
     "completed_sections": [
       "metadata",
       "hero_section",
@@ -89,10 +90,12 @@
         "message": "docs: Estado de replicación de puyehue.cl",
         "date": "2026-04-29T03:35:00Z"
       }
-    ]
+    ],
+    "last_verified": "2026-04-29T04:15:00Z",
+    "verification_notes": "✅ Metadata actualizado, ✅ Hero section con 'Bienvenido a Puyehue', ✅ Narrativa 'Termas Naturales', ✅ Features (Termas, Parque, Bienestar), ✅ Servicios (Alojamiento, Spa, Actividades)"
   },
   "workflow": {
-    "current_step": "content_replication",
+    "current_step": "navigation_replication",
     "steps": [
       {
         "id": 1,
@@ -103,28 +106,34 @@
       {
         "id": 2,
         "name": "Content Mapping",
-        "status": "in_progress",
-        "date": "2026-04-29T03:50:00Z"
+        "status": "completed",
+        "date": "2026-04-29T04:15:00Z",
+        "details": "Metadata, hero, narrativa, features, servicios actualizados y desplegados"
       },
       {
         "id": 3,
         "name": "Navigation Replication",
-        "status": "pending"
+        "status": "in_progress",
+        "date": "2026-04-29T04:15:00Z",
+        "details": "Próximo: Replicar menú (Promociones, Destino, Hotel, Qué Hacer, Programas, Eventos, Sostenibilidad, Ven por el Día)"
       },
       {
         "id": 4,
         "name": "Features & Sections",
-        "status": "pending"
+        "status": "pending",
+        "details": "Galería, booking form, footer, promociones"
       },
       {
         "id": 5,
         "name": "QA & Validation",
-        "status": "pending"
+        "status": "pending",
+        "details": "Visual diff, Core Web Vitals, SEO, responsive"
       },
       {
         "id": 6,
         "name": "Production Deploy",
-        "status": "pending"
+        "status": "pending",
+        "details": "Merge a main, deploy a producción, monitoreo"
       }
     ]
   },
@@ -148,8 +157,11 @@
     "region": "europe-west1",
     "url": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app",
     "status": "deployed",
-    "last_revision": "puyehue-web-00004-ng5",
-    "build_status": "in_progress"
+    "last_revision": "puyehue-web-00005-676",
+    "build_status": "success",
+    "last_deploy": "2026-04-29T03:43:47Z",
+    "generation": 5,
+    "traffic_percent": 100
   },
   "endpoints": {
     "project_status": "/api/projects/puyehue-cl/status",
