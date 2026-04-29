@@ -276,6 +276,37 @@ const server = createServer(async (req, res) => {
     }));
   }
 
+  // Projects — lista proyectos activos
+  if (req.method === "GET" && url.pathname === "/api/projects") {
+    try {
+      const projectsDir = join(__dirname, "projects");
+      const files = readdirSync(projectsDir).filter(f => f.endsWith("-config.json"));
+      const projects = files.map(f => {
+        const content = readFileSync(join(projectsDir, f), "utf8");
+        return JSON.parse(content);
+      });
+      res.writeHead(200, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ projects, count: projects.length }));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // Project Status — estado de un proyecto específico
+  if (req.method === "GET" && url.pathname.startsWith("/api/projects/")) {
+    const projectId = url.pathname.split("/")[3];
+    try {
+      const configPath = join(__dirname, `projects/${projectId}-config.json`);
+      const config = JSON.parse(readFileSync(configPath, "utf8"));
+      res.writeHead(200, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify(config));
+    } catch (err) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: `Project ${projectId} not found` }));
+    }
+  }
+
   // MCP proxy endpoint
   if (req.method === "POST" && url.pathname === "/mcp") {
     let body = "";
