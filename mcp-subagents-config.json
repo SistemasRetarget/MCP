@@ -33,13 +33,77 @@
         "key": "reconnaissance-context"
       },
       "max_iterations": 3,
-      "timeout_seconds": 300
+      "timeout_seconds": 300,
+      "workspace_folders": {
+        "input": "projects/${project}/reconnaissance/",
+        "output": "projects/${project}/specs/"
+      }
+    },
+    {
+      "id": "designer",
+      "name": "Designer Subagent",
+      "model": "claude-opus",
+      "role": "Create and manage visual design, layouts, and UI components",
+      "skills": [
+        "visual-design",
+        "component-design",
+        "color-theory",
+        "typography",
+        "responsive-layouts"
+      ],
+      "tools": [
+        "write",
+        "edit",
+        "screenshot",
+        "visual-diff",
+        "lessons-search"
+      ],
+      "context_cache": {
+        "enabled": true,
+        "ttl_minutes": 90,
+        "key": "designer-context"
+      },
+      "max_iterations": 5,
+      "timeout_seconds": 600,
+      "workspace_folders": {
+        "input": "projects/${project}/content/designer/",
+        "output": "projects/${project}/src/components/"
+      }
+    },
+    {
+      "id": "content-writer",
+      "name": "Content Writer Subagent",
+      "model": "claude-sonnet",
+      "role": "Create and manage content, copy, and text assets",
+      "skills": [
+        "copywriting",
+        "content-strategy",
+        "seo-copy",
+        "multilingual-content",
+        "brand-voice"
+      ],
+      "tools": [
+        "write",
+        "edit",
+        "lessons-search"
+      ],
+      "context_cache": {
+        "enabled": true,
+        "ttl_minutes": 120,
+        "key": "content-writer-context"
+      },
+      "max_iterations": 3,
+      "timeout_seconds": 400,
+      "workspace_folders": {
+        "input": "projects/${project}/content/writer/",
+        "output": "projects/${project}/content/published/"
+      }
     },
     {
       "id": "layout-builder",
       "name": "Layout Builder Subagent",
       "model": "claude-opus",
-      "role": "Build and fix CSS/HTML layouts",
+      "role": "Build and fix CSS/HTML layouts from designer specs",
       "skills": [
         "css-fix",
         "responsive-design",
@@ -58,13 +122,17 @@
         "key": "layout-builder-context"
       },
       "max_iterations": 5,
-      "timeout_seconds": 600
+      "timeout_seconds": 600,
+      "workspace_folders": {
+        "input": "projects/${project}/specs/",
+        "output": "projects/${project}/src/components/"
+      }
     },
     {
       "id": "content-loader",
       "name": "Content Loader Subagent",
       "model": "claude-opus",
-      "role": "Download and manage assets",
+      "role": "Download and manage assets from designer/content folders",
       "skills": [
         "asset-download",
         "cdn-management",
@@ -82,7 +150,11 @@
         "key": "content-loader-context"
       },
       "max_iterations": 2,
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "workspace_folders": {
+        "input": "projects/${project}/content/designer/",
+        "output": "projects/${project}/public/media/"
+      }
     },
     {
       "id": "qa-validator",
@@ -107,7 +179,11 @@
         "key": "qa-validator-context"
       },
       "max_iterations": 4,
-      "timeout_seconds": 300
+      "timeout_seconds": 300,
+      "workspace_folders": {
+        "input": "projects/${project}/src/",
+        "output": "projects/${project}/reports/qa/"
+      }
     },
     {
       "id": "deployment",
@@ -132,7 +208,11 @@
         "key": "deployment-context"
       },
       "max_iterations": 3,
-      "timeout_seconds": 600
+      "timeout_seconds": 600,
+      "workspace_folders": {
+        "input": "projects/${project}/",
+        "output": "projects/${project}/.deploy/"
+      }
     },
     {
       "id": "doc-reporter",
@@ -178,7 +258,11 @@
         "lessons_logged": "lessons/lessons.jsonl"
       },
       "max_iterations": 1,
-      "timeout_seconds": 600
+      "timeout_seconds": 600,
+      "workspace_folders": {
+        "input": "projects/${project}/",
+        "output": "reports/${project}/"
+      }
     },
     {
       "id": "seo-auditor",
@@ -211,7 +295,11 @@
         "contracts/${project}.json"
       ],
       "max_iterations": 1,
-      "timeout_seconds": 600
+      "timeout_seconds": 600,
+      "workspace_folders": {
+        "input": "projects/${project}/",
+        "output": "projects/${project}/reports/seo/"
+      }
     }
   ],
   "workflows": [
