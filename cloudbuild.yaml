@@ -3,20 +3,20 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/workspace-mcp-global/mcp-server:latest'
+      - 'europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:latest'
       - '.'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/workspace-mcp-global/mcp-server:latest'
+      - 'europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:latest'
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
@@ -24,7 +24,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'mcp-version-1'
-      - '--image=europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
+      - '--image=europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
       - '--region=europe-west1'
       - '--platform=managed'
       - '--allow-unauthenticated'
@@ -36,5 +36,5 @@ steps:
       - '--set-env-vars=NODE_ENV=production,PORT=8080,WORKSPACE_MCP_HOME=/app,RETARGET_WORKSPACE=/app/contracts'
 
 images:
-  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
-  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/workspace-mcp-global/mcp-server:latest'
+  - 'europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:$COMMIT_SHA'
+  - 'europe-west1-docker.pkg.dev/retarget-mcp/cloud-run-source-deploy/workspace-mcp-global/mcp-server:latest'
