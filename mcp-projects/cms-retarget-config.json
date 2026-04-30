@@ -1,0 +1,58 @@
+{
+  "project_id": "cms-retarget",
+  "project_name": "cms-retarget",
+  "description": "News AI CMS — Payload 3 + Next.js 15 con recolección automática, cola de aprobación editorial por ámbito y analizador de tendencias",
+  "status": "active",
+  "created_at": "2026-04-30T03:33:31.303Z",
+  "repositories": {
+    "source": {
+      "url": "",
+      "type": "unknown",
+      "description": "Por definir"
+    },
+    "qa": {
+      "url": "",
+      "type": "unknown",
+      "github": "https://github.com/SistemasRetarget/cms-retarget",
+      "description": "Por definir — agregar URL de QA cuando exista deploy"
+    },
+    "production": {
+      "url": "",
+      "type": "unknown",
+      "description": "Por definir"
+    }
+  },
+  "github": {
+    "url": "https://github.com/SistemasRetarget/cms-retarget",
+    "default_branch": "main",
+    "is_private": false,
+    "last_pushed_at": "2026-04-25T03:42:16Z",
+    "last_updated_at": "2026-04-25T03:42:21Z"
+  },
+  "reconnaissance": {
+    "status": "pending"
+  },
+  "replication": {
+    "status": "not_started",
+    "progress_percent": 0,
+    "completed_sections": [],
+    "pending_sections": []
+  },
+  "workflow": {
+    "current_step": "discovery",
+    "steps": []
+  },
+  "team_assignments": {},
+  "deployment": {
+    "status": "not_deployed"
+  },
+  "landings": [],
+  "resources": {
+    "github_repo": "https://github.com/SistemasRetarget/cms-retarget",
+    "production_url": "",
+    "qa_url": "",
+    "notes": "Sincronizado desde GitHub el 2026-04-30. Editar este archivo para añadir landings, recursos y workflow."
+  },
+  "team": [],
+  "branding": {}
+}
