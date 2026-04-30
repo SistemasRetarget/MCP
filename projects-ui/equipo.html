@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Equipo · MCP Retarget</title>
+<style>
+  :root { --bg:#0a0c11; --panel:#11141b; --border:#1f2430; --muted:#7d8595; --text:#e8eaef; --accent:#FF6B35; --ok:#22c55e; --warn:#f59e0b; --crit:#ef4444; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  header{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px}
+  header .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff}
+  header h1{font-size:15px;margin:0;font-weight:700}
+  header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+  nav{margin-left:auto;display:flex;gap:8px}
+  nav a{color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500}
+  nav a.active{color:var(--text);background:var(--border)} nav a:hover{color:var(--text)}
+  main{padding:24px;max-width:1100px;margin:0 auto}
+  h2{font-size:24px;margin:0 0 4px}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff;font-size:22px}
+  .name{font-weight:700;font-size:16px}
+  .role{font-size:12px;color:var(--muted)}
+  .info{display:flex;flex-direction:column;gap:8px;font-size:13px}
+  .info .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+  .info .row:last-child{border-bottom:0}
+  .info .k{color:var(--muted)} .info .v{font-weight:500}
+  .tone{display:inline-block;padding:3px 10px;border-radius:20px;background:rgba(59,130,246,.15);color:#60a5fa;font-size:11px;font-weight:600}
+  .templates{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+  .templates h4{margin:0 0 8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .template{font-family:ui-monospace,SF Mono,monospace;font-size:11px;color:var(--muted);background:var(--bg);padding:8px 10px;border-radius:6px;margin-bottom:6px;border-left:2px solid var(--accent)}
+  .empty{padding:60px;text-align:center;color:var(--muted)}
+  footer{padding:24px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px}
+  footer strong{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <h1>MCP · Sistemas Retarget<small>Equipo Retarget</small></h1>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/salud">Salud</a>
+    <a href="/eventos">Eventos</a>
+    <a href="/equipo" class="active">Equipo</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Equipo</h2>
+  <div class="subtitle" id="sub">Cargando miembros del equipo desde <code>contracts/team.json</code>…</div>
+  <div class="grid" id="grid"><div class="empty">Cargando…</div></div>
+</main>
+
+<footer>Vista desarrollada por <strong>Luis</strong> con ❤ · Sistemas Retarget · MCP v0.4</footer>
+
+<script>
+function initials(name){ return name.split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase(); }
+
+async function load(){
+  try{
+    const r = await fetch("/team");
+    const d = await r.json();
+    const members = Array.isArray(d.members) ? d.members : (Array.isArray(d) ? d : []);
+    const grid = document.getElementById("grid");
+    if (!members.length){ grid.innerHTML = `<div class="empty">No hay miembros configurados.</div>`; return; }
+    document.getElementById("sub").textContent = `${members.length} miembro(s) en el equipo`;
+    grid.innerHTML = members.map(m => {
+      const name = m.name || m.id || "—";
+      const role = m.role || m.title || "—";
+      const email = m.email || "";
+      const tone = m.tone || m.communication_tone || "";
+      const templates = m.message_templates || m.templates || {};
+      const tplHtml = Object.entries(templates).slice(0,3).map(([k,v]) =>
+        `<div class="template"><strong>${k}:</strong> ${typeof v === "string" ? v : JSON.stringify(v)}</div>`
+      ).join("");
+      return `<div class="card">
+        <div class="head">
+          <div class="avatar">${initials(name)}</div>
+          <div>
+            <div class="name">${name}</div>
+            <div class="role">${role}</div>
+          </div>
+        </div>
+        <div class="info">
+          ${email ? `<div class="row"><span class="k">Email</span><span class="v">${email}</span></div>` : ""}
+          ${tone ? `<div class="row"><span class="k">Tono</span><span class="v"><span class="tone">${tone}</span></span></div>` : ""}
+          ${m.active !== undefined ? `<div class="row"><span class="k">Activo</span><span class="v">${m.active ? "✅ Sí" : "❌ No"}</span></div>` : ""}
+        </div>
+        ${tplHtml ? `<div class="templates"><h4>Plantillas de comunicación</h4>${tplHtml}</div>` : ""}
+      </div>`;
+    }).join("");
+  } catch(err){
+    document.getElementById("grid").innerHTML = `<div class="empty">Error: ${err.message}</div>`;
+  }
+}
+load();
+</script>
+</body>
+</html>

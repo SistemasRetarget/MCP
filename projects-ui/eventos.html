@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Eventos · MCP Retarget</title>
+<style>
+  :root { --bg:#0a0c11; --panel:#11141b; --border:#1f2430; --muted:#7d8595; --text:#e8eaef; --accent:#FF6B35; --ok:#22c55e; --warn:#f59e0b; --crit:#ef4444; --info:#3b82f6; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  header{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px}
+  header .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff}
+  header h1{font-size:15px;margin:0;font-weight:700}
+  header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+  nav{margin-left:auto;display:flex;gap:8px}
+  nav a{color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500}
+  nav a.active{color:var(--text);background:var(--border)} nav a:hover{color:var(--text)}
+  main{padding:24px;max-width:1200px;margin:0 auto}
+  h2{font-size:24px;margin:0 0 4px}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+  .filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .filter{padding:6px 12px;border-radius:20px;background:var(--panel);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:12px}
+  .filter.active{color:var(--text);border-color:var(--accent);background:rgba(255,107,53,.08)}
+  .events{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .event{padding:14px 18px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:auto 90px 200px 1fr;gap:12px;align-items:start;font-size:13px}
+  .event:last-child{border-bottom:0}
+  .event .lvl{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;text-align:center;align-self:center}
+  .event .lvl.info{background:rgba(59,130,246,.15);color:var(--info)}
+  .event .lvl.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+  .event .lvl.error,.event .lvl.crit{background:rgba(239,68,68,.15);color:var(--crit)}
+  .event .lvl.ok,.event .lvl.success{background:rgba(34,197,94,.15);color:var(--ok)}
+  .event .ts{color:var(--muted);font-family:ui-monospace,SF Mono,monospace;font-size:11px;align-self:center}
+  .event .kind{font-weight:600;color:var(--text);align-self:center}
+  .event .msg{color:var(--muted);font-size:12px}
+  .empty{padding:60px 20px;text-align:center;color:var(--muted)}
+  footer{padding:24px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px}
+  footer strong{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <h1>MCP · Sistemas Retarget<small>Eventos del sistema</small></h1>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/salud">Salud</a>
+    <a href="/eventos" class="active">Eventos</a>
+    <a href="/equipo">Equipo</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Eventos</h2>
+  <div class="subtitle" id="sub">Cargando…</div>
+
+  <div class="filters" id="filters">
+    <span class="filter active" data-f="all">Todos</span>
+    <span class="filter" data-f="info">Info</span>
+    <span class="filter" data-f="warn">Warn</span>
+    <span class="filter" data-f="error">Error</span>
+  </div>
+
+  <div class="events" id="events"><div class="empty">Cargando…</div></div>
+</main>
+
+<footer>Vista desarrollada por <strong>Luis</strong> con ❤ · Sistemas Retarget · MCP v0.4 · Auto-refresh 30s</footer>
+
+<script>
+let allEvents = [];
+let currentFilter = "all";
+
+async function refresh(){
+  try{
+    const r = await fetch("/events");
+    const d = await r.json();
+    allEvents = Array.isArray(d.events) ? d.events : (Array.isArray(d) ? d : []);
+    render();
+    document.getElementById("sub").textContent = `${allEvents.length} eventos · actualizado ${new Date().toLocaleTimeString("es-CL")}`;
+  } catch(err){
+    document.getElementById("events").innerHTML = `<div class="empty">Error al cargar eventos: ${err.message}</div>`;
+  }
+}
+
+function render(){
+  const filtered = currentFilter === "all" ? allEvents : allEvents.filter(e => (e.level || "info").toLowerCase() === currentFilter);
+  const cont = document.getElementById("events");
+  if (!filtered.length){ cont.innerHTML = `<div class="empty">Sin eventos para el filtro <em>${currentFilter}</em>.</div>`; return; }
+  cont.innerHTML = filtered.slice().reverse().map(e => {
+    const lvl = (e.level || "info").toLowerCase();
+    const ts = e.ts ? new Date(e.ts).toLocaleString("es-CL") : "—";
+    const kind = e.kind || e.type || "event";
+    const msg = e.message || e.detail || JSON.stringify(e.data || {});
+    return `<div class="event">
+      <span class="lvl ${lvl}">${lvl}</span>
+      <span class="ts">${ts}</span>
+      <span class="kind">${kind}</span>
+      <span class="msg">${msg}</span>
+    </div>`;
+  }).join("");
+}
+
+document.getElementById("filters").addEventListener("click", ev => {
+  if (ev.target.classList.contains("filter")){
+    document.querySelectorAll(".filter").forEach(f => f.classList.remove("active"));
+    ev.target.classList.add("active");
+    currentFilter = ev.target.dataset.f;
+    render();
+  }
+});
+
+refresh();
+setInterval(refresh, 30000);
+</script>
+</body>
+</html>

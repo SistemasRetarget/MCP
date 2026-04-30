@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Salud · MCP Retarget</title>
+<style>
+  :root { --bg:#0a0c11; --panel:#11141b; --border:#1f2430; --muted:#7d8595; --text:#e8eaef; --accent:#FF6B35; --ok:#22c55e; --warn:#f59e0b; --crit:#ef4444; --info:#3b82f6; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  header{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px}
+  header .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff}
+  header h1{font-size:15px;margin:0;font-weight:700}
+  header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+  nav{margin-left:auto;display:flex;gap:8px}
+  nav a{color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500}
+  nav a.active{color:var(--text);background:var(--border)} nav a:hover{color:var(--text)}
+  main{padding:24px;max-width:1200px;margin:0 auto}
+  h2{font-size:24px;margin:0 0 4px}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+  .alert{padding:18px 20px;border-radius:12px;border:1px solid;margin-bottom:24px;display:flex;gap:14px;align-items:flex-start}
+  .alert.ok{border-color:var(--ok);background:rgba(34,197,94,.08)}
+  .alert.warn{border-color:var(--warn);background:rgba(245,158,11,.08)}
+  .alert.crit{border-color:var(--crit);background:rgba(239,68,68,.08)}
+  .alert .icon{font-size:28px;line-height:1}
+  .alert .body{flex:1}
+  .alert .body h3{margin:0 0 6px;font-size:16px}
+  .alert .body p{margin:0;color:var(--muted);font-size:13px}
+  .alert .body a{color:var(--accent);font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:24px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
+  .card h3{margin:0 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .row:last-child{border-bottom:0}
+  .row .k{color:var(--muted)} .row .v{font-weight:600;font-family:ui-monospace,SF Mono,monospace;font-size:12px}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .pill.ok{background:rgba(34,197,94,.15);color:var(--ok)}
+  .pill.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+  .pill.crit{background:rgba(239,68,68,.15);color:var(--crit)}
+  .pill.info{background:rgba(59,130,246,.15);color:var(--info)}
+  footer{padding:24px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px}
+  footer strong{color:var(--accent)}
+  .raw{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;font-family:ui-monospace,SF Mono,monospace;font-size:11px;color:var(--muted);overflow:auto;max-height:300px;white-space:pre}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <h1>MCP · Sistemas Retarget<small>Salud del sistema</small></h1>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/salud" class="active">Salud</a>
+    <a href="/eventos">Eventos</a>
+    <a href="/equipo">Equipo</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Estado de salud</h2>
+  <div class="subtitle" id="sub">Cargando snapshot…</div>
+
+  <div id="alert-box"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <details>
+    <summary style="cursor:pointer;color:var(--muted);font-size:12px;margin-bottom:12px">Ver JSON completo (/health)</summary>
+    <div class="raw" id="raw"></div>
+  </details>
+</main>
+
+<footer>Vista desarrollada por <strong>Luis</strong> con ❤ · Sistemas Retarget · MCP v0.4 · Auto-refresh 30s · <span id="ts"></span></footer>
+
+<script>
+function pill(level, text){
+  const cls = level === "critical" || level === "credit_balance_too_low" ? "crit"
+            : level === "degraded" || level === "warn" ? "warn"
+            : level === "ok" || level === "alive" || level === true ? "ok"
+            : "info";
+  return `<span class="pill ${cls}">${text}</span>`;
+}
+function row(k, v){ return `<div class="row"><span class="k">${k}</span><span class="v">${v ?? "—"}</span></div>`; }
+
+async function refresh(){
+  try{
+    const r = await fetch("/health");
+    const d = await r.json();
+    document.getElementById("raw").textContent = JSON.stringify(d, null, 2);
+
+    // Top alert según overall
+    let alertHtml = "";
+    if (d.overall === "degraded" || d.overall === "critical"){
+      const msg = d.cascade_message || "Sistema degradado.";
+      const action = d.anthropic?.action || "";
+      alertHtml = `<div class="alert crit">
+        <div class="icon">⚠️</div>
+        <div class="body">
+          <h3>Sistema en estado: ${d.overall.toUpperCase()}</h3>
+          <p>${msg}</p>
+          ${action ? `<p style="margin-top:8px"><a href="https://console.anthropic.com/settings/billing" target="_blank">${action} →</a></p>` : ""}
+        </div>
+      </div>`;
+    } else {
+      alertHtml = `<div class="alert ok">
+        <div class="icon">✅</div>
+        <div class="body"><h3>Sistema operativo</h3><p>Todos los componentes responden con normalidad.</p></div>
+      </div>`;
+    }
+    document.getElementById("alert-box").innerHTML = alertHtml;
+
+    // Cards
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    // Anthropic
+    if (d.anthropic){
+      grid.insertAdjacentHTML("beforeend", `<div class="card">
+        <h3>🤖 Anthropic API</h3>
+        ${row("Estado", pill(d.anthropic.status, d.anthropic.status))}
+        ${row("Crítico", d.anthropic.critical ? pill("critical","SÍ") : pill("ok","No"))}
+        ${row("Última verificación", d.anthropic.at ? new Date(d.anthropic.at).toLocaleString("es-CL") : "—")}
+        ${d.anthropic.detail ? `<div style="font-size:11px;color:var(--muted);margin-top:10px;padding:10px;background:var(--bg);border-radius:6px">${d.anthropic.detail}</div>` : ""}
+      </div>`);
+    }
+
+    // MCP process
+    if (d.mcp){
+      grid.insertAdjacentHTML("beforeend", `<div class="card">
+        <h3>⚙️ MCP Process</h3>
+        ${row("Vivo", d.mcp.alive ? pill("ok","SÍ") : pill("crit","NO"))}
+        ${row("Uptime", (d.mcp.uptime_seconds || 0) + " s")}
+        ${row("Pending requests", d.mcp.pending_requests ?? 0)}
+      </div>`);
+    }
+
+    // Operational
+    if (d.operational){
+      grid.insertAdjacentHTML("beforeend", `<div class="card">
+        <h3>🔧 Operacional</h3>
+        ${row("/chat endpoint", d.operational.chat_endpoint ? pill("ok","operativo") : pill("crit","bloqueado"))}
+        ${row("Validators", d.operational.validators ? pill("ok","activos") : pill("warn","no"))}
+        ${row("Notify enabled", d.operational.notify ? pill("ok","sí") : pill("warn","no"))}
+      </div>`);
+    }
+
+    document.getElementById("sub").textContent = "Snapshot capturado el " + new Date(d.at || Date.now()).toLocaleString("es-CL");
+    document.getElementById("ts").textContent = new Date().toLocaleString("es-CL");
+  } catch(err){
+    document.getElementById("alert-box").innerHTML = `<div class="alert crit">
+      <div class="icon">❌</div>
+      <div class="body"><h3>Error al consultar /health</h3><p>${err.message}</p></div>
+    </div>`;
+  }
+}
+refresh();
+setInterval(refresh, 30000);
+</script>
+</body>
+</html>

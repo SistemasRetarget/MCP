@@ -199,6 +199,40 @@ const server = createServer(async (req, res) => {
       return res.end(JSON.stringify({ error: err.message }));
     }
   }
+  // GET /salud → vista HTML profesional de la salud del sistema (consume /health)
+  if (req.method === "GET" && (url.pathname === "/salud" || url.pathname === "/salud/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/salud.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+  // GET /eventos → vista HTML de eventos del sistema (consume /events)
+  if (req.method === "GET" && (url.pathname === "/eventos" || url.pathname === "/eventos/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/eventos.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+  // GET /equipo → vista HTML del equipo (consume /team)
+  if (req.method === "GET" && (url.pathname === "/equipo" || url.pathname === "/equipo/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/equipo.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
   // GET /api/tests/run → ejecuta los 17 tests
   if (req.method === "GET" && url.pathname === "/api/tests/run") {
     try {
