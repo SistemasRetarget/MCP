@@ -647,9 +647,16 @@ function renderLandings(p){
         
         <!-- Notas de Page Speed -->
         <div class="pagespeed-box">
-          <div class="label">📊 Notas de Page Speed</div>
-          <textarea id="pagespeed-${l.id}" placeholder="Copia y pega aquí los resultados de Page Speed (Core Web Vitals, SEO, Performance, etc.)..." style="width:100%;min-height:80px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;resize:vertical;margin-bottom:8px">${escapeHtml(l.pagespeed_notes || '')}</textarea>
-          <button onclick="savePageSpeed('${l.id}')" class="btn secondary" style="font-size:12px;padding:6px 12px">💾 Guardar Page Speed</button>
+          <div class="label">📊 Page Speed Insights</div>
+          ${l.pagespeed_result ? `
+            <div style="margin-bottom:8px;padding:8px;background:${l.pagespeed_result.passed ? 'var(--bg-ok)' : 'var(--bg-err)'};border-radius:6px">
+              <div style="font-weight:600;margin-bottom:4px">Score: ${l.pagespeed_result.overall_score}/100 ${l.pagespeed_result.passed ? '✅' : '❌'}</div>
+              <div style="font-size:11px;color:var(--muted)">${escapeHtml(l.pagespeed_at || '')}</div>
+            </div>
+          ` : ''}
+          <input type="url" id="pagespeed-url-${l.id}" placeholder="URL de la landing (ej: https://puebloladehesa.cl/)" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;margin-bottom:8px" value="${escapeHtml(l.pagespeed_url || '')}">
+          <button onclick="runPageSpeed('${l.id}')" class="btn secondary" style="font-size:12px;padding:6px 12px">⚡ Ejecutar Page Speed</button>
+          ${l.pagespeed_notes ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);white-space:pre-wrap">${escapeHtml(l.pagespeed_notes)}</div>` : ''}
         </div>
         
         <form class="obs-form" onsubmit="addObservation(event, '${l.id}', this)">
@@ -872,26 +879,33 @@ async function postJSON(url, body, msgEl) {
   }
 }
 
-async function savePageSpeed(landingId) {
-  const textarea = document.getElementById(`pagespeed-${landingId}`);
-  const notes = textarea.value.trim();
-  if (!notes) {
-    alert("Por favor ingresa notas de Page Speed");
+async function runPageSpeed(landingId) {
+  const input = document.getElementById(`pagespeed-url-${landingId}`);
+  const url = input.value.trim();
+  if (!url) {
+    alert("Por favor ingresa la URL de la landing");
     return;
   }
+  
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = "Ejecutando...";
   
   try {
     const r = await fetch(`/api/projects/${PROJECT_ID}/landings/${landingId}/pagespeed`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notes })
+      body: JSON.stringify({ url })
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "Error");
-    alert("✅ Notas de Page Speed guardadas");
-    textarea.value = "";
+    alert("✅ Page Speed ejecutado correctamente");
+    loadProject();
   } catch(err) {
     alert("❌ Error: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "⚡ Ejecutar Page Speed";
   }
 }
 

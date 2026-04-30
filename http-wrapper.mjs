@@ -947,14 +947,14 @@ const server = createServer(async (req, res) => {
       const action = parts[5]; // "screenshot" | "progress" | "pagespeed"
       let body = "";
       req.on("data", (c) => (body += c));
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const payload = JSON.parse(body || "{}");
           let saved;
           if (action === "screenshot") saved = setLandingScreenshot(projectId, landingId, payload);
           else if (action === "progress") saved = updateLandingProgress(projectId, landingId, payload);
           else if (action === "review-score") saved = setReviewScore(projectId, landingId, payload);
-          else if (action === "pagespeed") saved = setLandingPageSpeed(projectId, landingId, payload);
+          else if (action === "pagespeed") saved = await setLandingPageSpeed(projectId, landingId, payload);
           else throw new Error("Action no soportado: " + action);
           logEvent("info", `landing_${action}`, `${projectId}/${landingId}`, { project: projectId, landing: landingId });
           res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });

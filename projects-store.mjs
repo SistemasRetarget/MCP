@@ -158,13 +158,42 @@ export function setLandingScreenshot(id, landingId, payload) {
   return d.landings_state[landingId];
 }
 
-export function setLandingPageSpeed(id, landingId, payload) {
+export async function setLandingPageSpeed(id, landingId, payload) {
   if (!landingId) throw new Error("landingId requerido");
   const d = getProjectData(id);
   d.landings_state = d.landings_state || {};
   d.landings_state[landingId] = d.landings_state[landingId] || {};
-  d.landings_state[landingId].pagespeed_notes = String(payload.notes || "").slice(0, 10000);
-  d.landings_state[landingId].pagespeed_at = new Date().toISOString();
+  
+  // Si se proporciona URL, ejecutar prueba automática de Page Speed
+  if (payload.url) {
+    try {
+      const { validateCoreWebVitals } = await import("../validators/core-web-vitals.mjs");
+      const apiKey = process.env.PAGESPEED_API_KEY || null;
+      const result = await validateCoreWebVitals(payload.url, apiKey);
+      
+      d.landings_state[landingId].pagespeed_result = result;
+      d.landings_state[landingId].pagespeed_url = payload.url;
+      d.landings_state[landingId].pagespeed_at = new Date().toISOString();
+      
+      // Generar notas automáticamente del resultado
+      const notes = [
+        `Performance Score: ${result.overall_score}/100`,
+        `Status: ${result.passed ? '✅ PASS' : '❌ FAIL'}`,
+        result.metrics?.performance_score ? `Lighthouse Performance: ${Math.round(result.metrics.performance_score)}/100` : '',
+        result.issues?.length ? `Issues: ${result.issues.join(', ')}` : 'No critical issues'
+      ].filter(Boolean).join('\n');
+      
+      d.landings_state[landingId].pagespeed_notes = notes;
+    } catch (err) {
+      d.landings_state[landingId].pagespeed_notes = `Error al ejecutar Page Speed: ${err.message}`;
+      d.landings_state[landingId].pagespeed_error = err.message;
+    }
+  } else if (payload.notes) {
+    // Fallback a notas manuales
+    d.landings_state[landingId].pagespeed_notes = String(payload.notes || "").slice(0, 10000);
+    d.landings_state[landingId].pagespeed_at = new Date().toISOString();
+  }
+  
   saveToDisk(id, d);
   return d.landings_state[landingId];
 }
@@ -358,6 +387,9 @@ export function getProjectFull(id) {
         },
         pagespeed_notes: state.pagespeed_notes || l.pagespeed_notes || null,
         pagespeed_at: state.pagespeed_at || l.pagespeed_at || null,
+        pagespeed_url: state.pagespeed_url || l.pagespeed_url || null,
+        pagespeed_result: state.pagespeed_result || l.pagespeed_result || null,
+        pagespeed_error: state.pagespeed_error || l.pagespeed_error || null,
         observations: data.landings_observations?.[l.id] || [],
         updated_at: state.updated_at || null,
       };
