@@ -31,6 +31,7 @@ import {
   addAnnotation,
   setReviewScore,
   setProjectStatus,
+  quickCreateProject,
 } from "./projects-store.mjs";
 import { runAllTests } from "./tests/run-tests.mjs";
 import { gradePrompt, codeBasedGrade } from "./prompt-eval/grader.mjs";
@@ -666,13 +667,34 @@ const server = createServer(async (req, res) => {
   // API: listar proyectos (con counts de feedback/errors/reasoning)
   if (req.method === "GET" && (url.pathname === "/api/projects/list" || url.pathname === "/api/projects")) {
     try {
-      const projects = listProjects();
+      const statusFilter = url.searchParams.get("status");
+      const projects = listProjects({ status: statusFilter, exclude_status: url.searchParams.get("exclude_status") });
       res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
       return res.end(JSON.stringify({ projects, count: projects.length }));
     } catch (err) {
       res.writeHead(500, { "Content-Type": "application/json" });
       return res.end(JSON.stringify({ error: err.message }));
     }
+  }
+
+  // API: crear proyecto rápido (para cambios simples como banners)
+  if (req.method === "POST" && url.pathname === "/api/projects/quick-create") {
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      try {
+        const payload = JSON.parse(body || "{}");
+        if (!payload.name) throw new Error("name es requerido");
+        const result = quickCreateProject(payload.name, payload.description);
+        logEvent("info", "quick_project_created", `Proyecto rápido: ${result.project_id}`);
+        res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ ok: true, ...result }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
   }
 
   // API: rutas /api/projects/<id>/...

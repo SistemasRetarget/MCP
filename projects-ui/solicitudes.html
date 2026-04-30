@@ -121,9 +121,11 @@
         <div class="row2">
           <div class="field">
             <label for="project_id">Proyecto</label>
-            <select id="project_id">
+            <select id="project_id" onchange="onProjectChange(this.value)">
               <option value="general">— general —</option>
+              <option value="__new__">➕ Nuevo proyecto...</option>
             </select>
+            <input type="text" id="new_project_name" placeholder="Nombre del nuevo proyecto (ej: banner-promo)" style="display:none;margin-top:8px;" maxlength="80">
           </div>
           <div class="field">
             <label for="type">Tipo</label>
@@ -220,15 +222,27 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;',
 let currentRequests = [];
 let projectIds = ["general"];
 
+function onProjectChange(val){
+  const newInput = $("#new_project_name");
+  if (val === "__new__") {
+    newInput.style.display = "block";
+    newInput.required = true;
+    newInput.focus();
+  } else {
+    newInput.style.display = "none";
+    newInput.required = false;
+  }
+}
+
 async function loadProjects(){
   try {
-    const r = await fetch("/api/projects/list");
+    const r = await fetch("/api/projects/list?status=active");
     const d = await r.json();
-    projectIds = ["general", ...((d.projects||[]).map(p => p.id))];
+    projectIds = ["general", ...((d.projects||[]).filter(p => p.status !== "archived").map(p => p.id))];
     const sel = $("#project_id"), filt = $("#filter-project");
     const keep = sel.value || "general";
-    sel.innerHTML = projectIds.map(id => `<option value="${id}">${id === "general" ? "— general —" : id}</option>`).join("");
-    sel.value = keep;
+    sel.innerHTML = projectIds.map(id => `<option value="${id}">${id === "general" ? "— general —" : id}</option>`).join("") + `<option value="__new__">➕ Nuevo proyecto...</option>`;
+    if (keep !== "__new__") sel.value = keep;
     filt.innerHTML = `<option value="">Todos los proyectos</option>` + projectIds.map(id => `<option value="${id}">${id}</option>`).join("");
   } catch(err){ console.warn("loadProjects:", err); }
 }
@@ -328,10 +342,30 @@ $("#form").addEventListener("submit", async (ev) => {
   const btn = $("#submit-btn");
   btn.disabled = true; btn.textContent = "Enviando…";
   try {
+    let projectId = $("#project_id").value;
+
+    // Si es nuevo proyecto, crearlo primero
+    if (projectId === "__new__") {
+      const newName = $("#new_project_name").value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "-");
+      if (!newName || newName.length < 2) throw new Error("Ingresa un nombre válido para el nuevo proyecto");
+      const createR = await fetch("/api/projects/quick-create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName, description: "Creado desde solicitud" }),
+      });
+      if (!createR.ok) throw new Error("No se pudo crear el proyecto");
+      const createD = await createR.json();
+      projectId = createD.project_id;
+      await loadProjects();
+      $("#project_id").value = projectId;
+      $("#new_project_name").value = "";
+      onProjectChange(projectId);
+    }
+
     const payload = {
       client_name: $("#client_name").value.trim(),
       client_email: $("#client_email").value.trim(),
-      project_id: $("#project_id").value,
+      project_id: projectId,
       type: $("#type").value,
       priority: $("#priority").value,
       title: $("#title").value.trim(),

@@ -204,10 +204,10 @@ export function setProjectStatus(id, status) {
   return { id, status, status_changed_at: d.status_changed_at };
 }
 
-export function listProjects() {
+export function listProjects(filter = {}) {
   try {
     const files = readdirSync(PROJECTS_DIR).filter(f => f.endsWith("-config.json"));
-    return files.map(f => {
+    let projects = files.map(f => {
       const cfg = JSON.parse(readFileSync(join(PROJECTS_DIR, f), "utf8"));
       const id = cfg.project_id || cfg.id || f.replace("-config.json", "");
       const data = getProjectData(id);
@@ -233,9 +233,63 @@ export function listProjects() {
         last_feedback: data.feedback[data.feedback.length - 1] || null,
       };
     });
+    if (filter.status) {
+      projects = projects.filter(p => p.status === filter.status);
+    }
+    if (filter.exclude_status) {
+      projects = projects.filter(p => p.status !== filter.exclude_status);
+    }
+    return projects;
   } catch (err) {
     console.error(`[projects-store] listProjects: ${err.message}`);
     return [];
+  }
+}
+
+/**
+ * Crea un proyecto rápido (lightweight) para cambios simples como banners.
+ * No crea repo GitHub, solo config local.
+ */
+export function quickCreateProject(name, description = "") {
+  const id = name.toLowerCase().replace(/[^a-z0-9_-]/g, "-").replace(/^-+|-+$/g, "");
+  if (!id || id.length < 2) throw new Error("Nombre de proyecto inválido");
+  
+  const configPath = join(PROJECTS_DIR, `${id}-config.json`);
+  if (existsSync(configPath)) throw new Error(`El proyecto "${id}" ya existe`);
+  
+  const now = new Date().toISOString();
+  const cfg = {
+    project_id: id,
+    project_name: name,
+    description: description || `Proyecto rápido: ${name}`,
+    status: "active",
+    created_at: now,
+    quick_project: true,
+    repositories: {
+      source: { url: "", type: "local", description: "Proyecto rápido - sin repo GitHub" },
+      qa: { url: "", type: "local", description: "Por definir" },
+      production: { url: "", type: "local", description: "Por definir" }
+    },
+    reconnaissance: { status: "completed" },
+    replication: { 
+      status: "in_progress", 
+      progress_percent: 10,
+      completed_sections: [],
+      pending_sections: ["assets", "content"]
+    },
+    workflow: { current_step: "scoping", steps: [] },
+    deployment: { status: "not_deployed" },
+    landings: [],
+    resources: { notes: "Creado desde módulo de solicitudes" },
+    team: [],
+    branding: {}
+  };
+  
+  try {
+    writeFileSync(configPath, JSON.stringify(cfg, null, 2), "utf8");
+    return { project_id: id, created: true, path: configPath };
+  } catch (err) {
+    throw new Error(`No se pudo crear el proyecto: ${err.message}`);
   }
 }
 
