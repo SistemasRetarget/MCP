@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Solicitudes · MCP Retarget</title>
+<style>
+  :root { --bg:#0a0c11; --panel:#11141b; --panel-2:#161a23; --border:#1f2430; --muted:#7d8595; --text:#e8eaef; --accent:#FF6B35; --ok:#22c55e; --warn:#f59e0b; --crit:#ef4444; --info:#3b82f6; --purple:#a855f7; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  header{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px}
+  header .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff}
+  header h1{font-size:15px;margin:0;font-weight:700}
+  header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+  nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  nav a{color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500}
+  nav a.active{color:var(--text);background:var(--border)} nav a:hover{color:var(--text)}
+  main{padding:24px;max-width:1300px;margin:0 auto}
+  h2{font-size:24px;margin:0 0 4px}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+
+  .layout{display:grid;grid-template-columns:380px 1fr;gap:20px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+  /* Form panel */
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .panel h3{margin:0 0 4px;font-size:16px}
+  .panel .hint{font-size:12px;color:var(--muted);margin-bottom:16px}
+  label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:600}
+  input,textarea,select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font:inherit;outline:none;transition:border .15s}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+  textarea{resize:vertical;min-height:90px;font-family:inherit}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .field{margin-bottom:14px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;background:var(--accent);color:#fff;border:0;font:inherit;font-weight:600;cursor:pointer;transition:filter .15s}
+  .btn:hover{filter:brightness(1.1)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+  .btn.ghost:hover{color:var(--text);border-color:var(--accent)}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+  .stat .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:22px;font-weight:700;margin-top:4px}
+  .stat .v.ok{color:var(--ok)} .stat .v.warn{color:var(--warn)} .stat .v.crit{color:var(--crit)}
+
+  /* Filters */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+  .filters select{flex:0 0 auto;width:auto;min-width:140px;font-size:12px;padding:6px 10px}
+  .filters .clear{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline}
+  .filters .clear:hover{color:var(--text)}
+
+  /* Cards de solicitud */
+  .req{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;transition:border .15s}
+  .req:hover{border-color:var(--accent)}
+  .req-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+  .req-title{font-weight:700;font-size:15px;color:var(--text);margin:0 0 4px}
+  .req-meta{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+  .req-msg{color:var(--muted);font-size:13px;margin:8px 0;white-space:pre-wrap;line-height:1.5}
+  .req-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .pill.priority-baja{background:rgba(59,130,246,.15);color:var(--info)}
+  .pill.priority-media{background:rgba(125,133,149,.2);color:var(--muted)}
+  .pill.priority-alta{background:rgba(245,158,11,.15);color:var(--warn)}
+  .pill.priority-critica{background:rgba(239,68,68,.18);color:var(--crit)}
+  .pill.status-nuevo{background:rgba(168,85,247,.15);color:var(--purple)}
+  .pill.status-revisando{background:rgba(59,130,246,.15);color:var(--info)}
+  .pill.status-en_progreso{background:rgba(245,158,11,.15);color:var(--warn)}
+  .pill.status-resuelto{background:rgba(34,197,94,.15);color:var(--ok)}
+  .pill.status-descartado{background:rgba(125,133,149,.15);color:var(--muted)}
+  .pill.type{background:var(--panel-2);color:var(--text)}
+  .pill.project{background:rgba(255,107,53,.12);color:var(--accent)}
+  .req-actions{margin-left:auto;display:flex;gap:6px}
+  .req-actions select{width:auto;font-size:11px;padding:4px 8px}
+  .empty{padding:60px 20px;text-align:center;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:12px}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--panel);border:1px solid var(--accent);padding:12px 18px;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.4);max-width:360px;z-index:50;animation:in .25s}
+  .toast.error{border-color:var(--crit)} .toast.ok{border-color:var(--ok)}
+  @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  footer{padding:24px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px}
+  footer strong{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <h1>MCP · Sistemas Retarget<small>Solicitudes para Luis · ajustes diarios</small></h1>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/solicitudes" class="active">Solicitudes</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/salud">Salud</a>
+    <a href="/eventos">Eventos</a>
+    <a href="/equipo">Equipo</a>
+    <a href="/tests">Tests</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Solicitudes</h2>
+  <p class="subtitle">Cualquier persona del equipo o cliente puede dejar una solicitud aquí. Luis las revisa y prioriza. <strong>No requiere login.</strong></p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="layout">
+    <!-- FORM -->
+    <div class="panel">
+      <h3>📨 Nueva solicitud</h3>
+      <p class="hint">Llena los campos y envía. Aparece al instante en la lista.</p>
+
+      <form id="form">
+        <div class="field">
+          <label for="client_name">Tu nombre <span style="color:var(--crit)">*</span></label>
+          <input type="text" id="client_name" required maxlength="120" placeholder="Ej: Carolina (Hotel Puyehue)">
+        </div>
+
+        <div class="field">
+          <label for="client_email">Email (opcional)</label>
+          <input type="email" id="client_email" maxlength="200" placeholder="contacto@cliente.cl">
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="project_id">Proyecto</label>
+            <select id="project_id">
+              <option value="general">— general —</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="type">Tipo</label>
+            <select id="type">
+              <option value="ajuste">Ajuste</option>
+              <option value="error">Error / Bug</option>
+              <option value="idea">Idea / Sugerencia</option>
+              <option value="bloqueo">Bloqueo</option>
+              <option value="urgente">Urgente</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="priority">Prioridad sugerida</label>
+          <select id="priority">
+            <option value="baja">Baja — cuando se pueda</option>
+            <option value="media" selected>Media — esta semana</option>
+            <option value="alta">Alta — esta semana, prioritario</option>
+            <option value="critica">Crítica — bloqueante</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="title">Título (resumen 1 línea) <span style="color:var(--crit)">*</span></label>
+          <input type="text" id="title" required maxlength="200" placeholder="Ej: Cambiar logo del header en home">
+        </div>
+
+        <div class="field">
+          <label for="message">Detalle <span style="color:var(--crit)">*</span></label>
+          <textarea id="message" required maxlength="4000" placeholder="Cuenta qué hay que ajustar, dónde, contexto, links si aplica…"></textarea>
+        </div>
+
+        <button type="submit" class="btn" id="submit-btn">📨 Enviar solicitud</button>
+      </form>
+    </div>
+
+    <!-- LISTA -->
+    <div>
+      <div class="filters">
+        <select id="filter-project"><option value="">Todos los proyectos</option></select>
+        <select id="filter-status">
+          <option value="">Todos los estados</option>
+          <option value="nuevo">Nuevo</option>
+          <option value="revisando">Revisando</option>
+          <option value="en_progreso">En progreso</option>
+          <option value="resuelto">Resuelto</option>
+          <option value="descartado">Descartado</option>
+        </select>
+        <select id="filter-type">
+          <option value="">Todos los tipos</option>
+          <option value="ajuste">Ajuste</option>
+          <option value="error">Error</option>
+          <option value="idea">Idea</option>
+          <option value="bloqueo">Bloqueo</option>
+          <option value="urgente">Urgente</option>
+          <option value="otro">Otro</option>
+        </select>
+        <span class="clear" onclick="clearFilters()">Limpiar filtros</span>
+      </div>
+
+      <div id="list"><div class="empty">Cargando solicitudes…</div></div>
+    </div>
+  </div>
+</main>
+
+<footer>Vista desarrollada por <strong>Luis</strong> con ❤ · Sistemas Retarget · MCP v0.4 · Auto-refresh 30s</footer>
+
+<div id="toast-container"></div>
+
+<script>
+function $(s){ return document.querySelector(s); }
+function toast(msg, type="ok"){
+  const c = document.getElementById("toast-container");
+  const t = document.createElement("div");
+  t.className = "toast " + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+function fmtTs(iso){
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return "hace " + Math.floor(diff) + "s";
+  if (diff < 3600) return "hace " + Math.floor(diff/60) + "m";
+  if (diff < 86400) return "hace " + Math.floor(diff/3600) + "h";
+  if (diff < 604800) return "hace " + Math.floor(diff/86400) + "d";
+  return d.toLocaleDateString("es-CL");
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let currentRequests = [];
+let projectIds = ["general"];
+
+async function loadProjects(){
+  try {
+    const r = await fetch("/api/projects/list");
+    const d = await r.json();
+    projectIds = ["general", ...((d.projects||[]).map(p => p.id))];
+    const sel = $("#project_id"), filt = $("#filter-project");
+    const keep = sel.value || "general";
+    sel.innerHTML = projectIds.map(id => `<option value="${id}">${id === "general" ? "— general —" : id}</option>`).join("");
+    sel.value = keep;
+    filt.innerHTML = `<option value="">Todos los proyectos</option>` + projectIds.map(id => `<option value="${id}">${id}</option>`).join("");
+  } catch(err){ console.warn("loadProjects:", err); }
+}
+
+async function loadRequests(){
+  try {
+    const params = new URLSearchParams();
+    if ($("#filter-project").value) params.set("project", $("#filter-project").value);
+    if ($("#filter-status").value) params.set("status", $("#filter-status").value);
+    if ($("#filter-type").value) params.set("type", $("#filter-type").value);
+    const url = "/api/requests" + (params.toString() ? "?" + params.toString() : "");
+    const r = await fetch(url);
+    const d = await r.json();
+    currentRequests = d.requests || [];
+    renderStats(d.stats || {});
+    renderList(currentRequests);
+  } catch(err){
+    $("#list").innerHTML = `<div class="empty">Error al cargar: ${err.message}</div>`;
+  }
+}
+
+function renderStats(stats){
+  const total = stats.total || 0;
+  const open = stats.open || 0;
+  const critical = (stats.by_priority || {}).critica || 0;
+  const resolved = (stats.by_status || {}).resuelto || 0;
+  $("#stats").innerHTML = `
+    <div class="stat"><div class="k">Total</div><div class="v">${total}</div></div>
+    <div class="stat"><div class="k">Abiertas</div><div class="v warn">${open}</div></div>
+    <div class="stat"><div class="k">Críticas</div><div class="v ${critical>0?'crit':''}">${critical}</div></div>
+    <div class="stat"><div class="k">Resueltas</div><div class="v ok">${resolved}</div></div>
+  `;
+}
+
+function renderList(items){
+  const list = $("#list");
+  if (!items.length){ list.innerHTML = `<div class="empty">Sin solicitudes para los filtros actuales.</div>`; return; }
+  list.innerHTML = items.map(r => `
+    <div class="req" data-id="${r.id}">
+      <div class="req-head">
+        <div style="flex:1;min-width:0">
+          <h4 class="req-title">${escapeHtml(r.title)}</h4>
+          <div class="req-meta">
+            <span>👤 <strong>${escapeHtml(r.client_name)}</strong></span>
+            ${r.client_email ? `<span>📧 ${escapeHtml(r.client_email)}</span>` : ""}
+            <span>🕐 ${fmtTs(r.created_at)}</span>
+            <span style="color:var(--muted);font-family:ui-monospace,SF Mono,monospace;font-size:10px">#${r.id}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="req-msg">${escapeHtml(r.message)}</div>
+
+      <div class="req-foot">
+        <span class="pill project">${escapeHtml(r.project_id)}</span>
+        <span class="pill type">${escapeHtml(r.type)}</span>
+        <span class="pill priority-${r.priority}">${r.priority}</span>
+        <span class="pill status-${r.status}">${r.status.replace("_", " ")}</span>
+        <span class="req-actions">
+          <select onchange="changeStatus('${r.id}', this.value)">
+            <option value="">Cambiar estado…</option>
+            <option value="nuevo">→ Nuevo</option>
+            <option value="revisando">→ Revisando</option>
+            <option value="en_progreso">→ En progreso</option>
+            <option value="resuelto">→ Resuelto</option>
+            <option value="descartado">→ Descartado</option>
+          </select>
+        </span>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function changeStatus(id, status){
+  if (!status) return;
+  try {
+    const r = await fetch(`/api/requests/${encodeURIComponent(id)}/update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+    if (!r.ok){ const e = await r.json().catch(()=>({})); throw new Error(e.error || `HTTP ${r.status}`); }
+    toast(`Solicitud #${id} → ${status}`);
+    loadRequests();
+  } catch(err){ toast("Error: " + err.message, "error"); }
+}
+
+function clearFilters(){
+  $("#filter-project").value = "";
+  $("#filter-status").value = "";
+  $("#filter-type").value = "";
+  loadRequests();
+}
+
+$("#form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const btn = $("#submit-btn");
+  btn.disabled = true; btn.textContent = "Enviando…";
+  try {
+    const payload = {
+      client_name: $("#client_name").value.trim(),
+      client_email: $("#client_email").value.trim(),
+      project_id: $("#project_id").value,
+      type: $("#type").value,
+      priority: $("#priority").value,
+      title: $("#title").value.trim(),
+      message: $("#message").value.trim(),
+    };
+    const r = await fetch("/api/requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!r.ok){ const e = await r.json().catch(()=>({})); throw new Error(e.error || `HTTP ${r.status}`); }
+    const d = await r.json();
+    toast(`✅ Solicitud creada: #${d.request.id}`);
+    $("#title").value = ""; $("#message").value = "";
+    loadRequests();
+  } catch(err){ toast("Error: " + err.message, "error"); }
+  finally { btn.disabled = false; btn.textContent = "📨 Enviar solicitud"; }
+});
+
+["filter-project","filter-status","filter-type"].forEach(id => {
+  document.getElementById(id).addEventListener("change", loadRequests);
+});
+
+loadProjects().then(loadRequests);
+setInterval(loadRequests, 30000);
+</script>
+</body>
+</html>

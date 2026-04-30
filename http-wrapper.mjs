@@ -34,6 +34,14 @@ import {
 } from "./projects-store.mjs";
 import { runAllTests } from "./tests/run-tests.mjs";
 import { gradePrompt, codeBasedGrade } from "./prompt-eval/grader.mjs";
+import {
+  addRequest,
+  listRequests,
+  getRequest,
+  updateRequest,
+  getRequestsStats,
+  REQUEST_CONSTANTS,
+} from "./requests-store.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -232,6 +240,89 @@ const server = createServer(async (req, res) => {
       res.writeHead(500, { "Content-Type": "application/json" });
       return res.end(JSON.stringify({ error: err.message }));
     }
+  }
+
+  // GET /solicitudes → vista HTML del módulo de solicitudes
+  if (req.method === "GET" && (url.pathname === "/solicitudes" || url.pathname === "/solicitudes/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/solicitudes.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // GET /api/requests → lista solicitudes (con filtros opcionales ?project=X&status=Y&type=Z)
+  if (req.method === "GET" && url.pathname === "/api/requests") {
+    try {
+      const filter = {
+        project_id: url.searchParams.get("project") || undefined,
+        status: url.searchParams.get("status") || undefined,
+        type: url.searchParams.get("type") || undefined,
+      };
+      const items = listRequests(filter);
+      const stats = getRequestsStats();
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify({ requests: items, stats, constants: REQUEST_CONSTANTS }));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // POST /api/requests → crear nueva solicitud (sin auth: cualquiera puede pedir)
+  if (req.method === "POST" && url.pathname === "/api/requests") {
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      try {
+        const payload = JSON.parse(body || "{}");
+        const created = addRequest(payload);
+        logEvent("info", "request_created", `${created.id} · ${created.client_name} → ${created.project_id}`, {
+          request_id: created.id, project: created.project_id, type: created.type, priority: created.priority,
+        });
+        res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ ok: true, request: created }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // GET /api/requests/<id> → detalle de una solicitud
+  if (req.method === "GET" && url.pathname.startsWith("/api/requests/")) {
+    const id = url.pathname.split("/")[3];
+    const r = getRequest(id);
+    if (!r) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: `solicitud ${id} no encontrada` }));
+    }
+    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    return res.end(JSON.stringify(r));
+  }
+
+  // POST /api/requests/<id>/update → cambiar status/priority/agregar nota
+  if (req.method === "POST" && url.pathname.match(/^\/api\/requests\/[^/]+\/update$/)) {
+    const id = url.pathname.split("/")[3];
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      try {
+        const payload = JSON.parse(body || "{}");
+        const updated = updateRequest(id, payload);
+        logEvent("info", "request_updated", `${id} · ${JSON.stringify(payload)}`, { request_id: id, changes: payload });
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ ok: true, request: updated }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
   }
 
   // GET /api/tests/run → ejecuta los 17 tests
