@@ -656,12 +656,17 @@ function renderLandings(p){
 
 function renderVisual(p){
   const landings = p.landings || [];
+  console.log("renderVisual - landings:", landings.length, landings);
+  
   if (landings.length === 0) {
     $("#visual-list").innerHTML = '<div class="empty">Sin landings — sin Visual QA disponible.</div>';
     return;
   }
+  
   $("#visual-list").innerHTML = landings.map(l => {
     const ss = l.screenshots || {};
+    console.log("renderVisual - landing:", l.id, "screenshots:", ss);
+    
     return `
     <div class="card" style="margin-bottom:20px">
       <h3>${escapeHtml(l.name)} — Visual QA</h3>
