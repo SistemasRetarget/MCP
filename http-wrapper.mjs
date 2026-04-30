@@ -26,6 +26,8 @@ import {
   addError,
   addReasoning,
   setDeploy,
+  setLandingScreenshot,
+  updateLandingProgress,
 } from "./projects-store.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -477,6 +479,30 @@ const server = createServer(async (req, res) => {
         res.writeHead(404, { "Content-Type": "application/json" });
         return res.end(JSON.stringify({ error: `Proyecto no encontrado: ${projectId}` }));
       }
+    }
+
+    // POST /api/projects/<id>/landings/<landingId>/{screenshot|progress}
+    if (req.method === "POST" && sub === "landings" && parts[4] && parts[5]) {
+      const landingId = parts[4];
+      const action = parts[5]; // "screenshot" | "progress"
+      let body = "";
+      req.on("data", (c) => (body += c));
+      req.on("end", () => {
+        try {
+          const payload = JSON.parse(body || "{}");
+          let saved;
+          if (action === "screenshot") saved = setLandingScreenshot(projectId, landingId, payload);
+          else if (action === "progress") saved = updateLandingProgress(projectId, landingId, payload);
+          else throw new Error("Action no soportado: " + action);
+          logEvent("info", `landing_${action}`, `${projectId}/${landingId}`, { project: projectId, landing: landingId });
+          res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({ ok: true, landing: landingId, item: saved }));
+        } catch (err) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
     }
 
     // POST /api/projects/<id>/{feedback|errors|reasoning|deploy}

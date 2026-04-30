@@ -144,8 +144,8 @@
     "qa_validator": "luis@retarget.cl",
     "deployment": "luis@retarget.cl"
   },
-  "resources": {
-    "documentation": [
+  "internal_paths": {
+    "documentation_files": [
       "RECONNAISSANCE_PUYEHUE.md",
       "REPLICATION_STATUS.md"
     ],
@@ -168,5 +168,69 @@
     "reconnaissance": "/api/projects/puyehue-cl/reconnaissance",
     "replication_progress": "/api/projects/puyehue-cl/replication",
     "deploy_logs": "/api/projects/puyehue-cl/deploy-logs"
+  },
+  "landings": [
+    {
+      "id": "home",
+      "name": "Home",
+      "path": "/",
+      "url_qa": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app/",
+      "url_prod": "https://puyehue.cl/",
+      "url_reference": "https://puyehue.cl/",
+      "status": "in_progress",
+      "progress": 60,
+      "header": {
+        "status": "completed",
+        "notes": "Logo + nav (8 items) replicados. Pendiente: dropdown de submenu en Programas."
+      },
+      "footer": {
+        "status": "pending",
+        "notes": "Aun no se replica — proximo paso del workflow."
+      },
+      "sections": [
+        { "name": "Hero", "status": "completed", "notes": "Bienvenido a Puyehue + CTA RESERVAR" },
+        { "name": "Promociones", "status": "pending", "notes": "Carousel de 4 promos" },
+        { "name": "Destino", "status": "completed", "notes": "Termas naturales + parque" },
+        { "name": "Hotel", "status": "completed", "notes": "Tipos de habitacion + servicios" },
+        { "name": "Que Hacer", "status": "pending", "notes": "Grid de actividades" },
+        { "name": "Programas", "status": "pending", "notes": "Cards de paquetes" },
+        { "name": "Eventos", "status": "pending", "notes": "Lista cronologica" },
+        { "name": "Sostenibilidad", "status": "pending", "notes": "Pilares + certificaciones" },
+        { "name": "Ven por el Dia", "status": "pending", "notes": "CTA + horarios" }
+      ],
+      "screenshots": {
+        "reference_url": null,
+        "actual_url": null,
+        "diff_url": null,
+        "captured_at": null,
+        "notes": "Subir referencia desde panel Visual o usar /api/projects/puyehue-cl/visual"
+      },
+      "reasoning": "Home como landing principal — replica fiel del original WordPress en Next.js. Decisiones clave: (1) mantener orden de secciones identico, (2) componentes reutilizables por seccion, (3) imagenes desde CDN del original durante QA para evitar reupload, (4) i18n preparado aunque solo ES inicial."
+    }
+  ],
+  "resources": {
+    "drive_folder": "",
+    "documentation": "",
+    "brand_guide": "",
+    "wireframes": "",
+    "design_system": "",
+    "content_brief": "",
+    "github_repo": "https://github.com/SistemasRetarget/puyehue-cl",
+    "production_url": "https://puyehue.cl",
+    "qa_url": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app",
+    "notes": "Configurar drive_folder y documentation en Drive de Retarget. Pegar URLs aqui para que el equipo tenga todo a un click."
+  },
+  "team": [
+    {
+      "name": "Luis Sebastian",
+      "role": "Lead / Designer / QA",
+      "email": "luis@retarget.cl",
+      "active": true
+    }
+  ],
+  "branding": {
+    "primary_color": "#FF6B35",
+    "accent_color": "#0a0c11",
+    "logo_url": "https://puyehue.cl/wp-content/uploads/2024/11/logo-hotel-termas-puyehue-gris.svg"
   }
 }

@@ -96,6 +96,34 @@ export function addReasoning(id, { phase, decision, rationale, alternatives = []
   });
 }
 
+export function setLandingScreenshot(id, landingId, payload) {
+  if (!landingId) throw new Error("landingId requerido");
+  const d = getProjectData(id);
+  d.landings_state = d.landings_state || {};
+  d.landings_state[landingId] = d.landings_state[landingId] || {};
+  const kind = payload.kind || "actual"; // reference | actual | diff
+  d.landings_state[landingId][`${kind}_url`] = payload.url || null;
+  d.landings_state[landingId].captured_at = new Date().toISOString();
+  if (payload.notes) d.landings_state[landingId].notes = String(payload.notes).slice(0, 1000);
+  saveToDisk(id, d);
+  return d.landings_state[landingId];
+}
+
+export function updateLandingProgress(id, landingId, payload) {
+  if (!landingId) throw new Error("landingId requerido");
+  const d = getProjectData(id);
+  d.landings_state = d.landings_state || {};
+  d.landings_state[landingId] = d.landings_state[landingId] || {};
+  if (typeof payload.progress === "number") d.landings_state[landingId].progress = Math.max(0, Math.min(100, payload.progress));
+  if (payload.status) d.landings_state[landingId].status = payload.status;
+  if (payload.reasoning) d.landings_state[landingId].reasoning = String(payload.reasoning).slice(0, 4000);
+  if (payload.header_status) d.landings_state[landingId].header_status = payload.header_status;
+  if (payload.footer_status) d.landings_state[landingId].footer_status = payload.footer_status;
+  d.landings_state[landingId].updated_at = new Date().toISOString();
+  saveToDisk(id, d);
+  return d.landings_state[landingId];
+}
+
 export function setDeploy(id, deployInfo) {
   const d = getProjectData(id);
   d.deploy = {
@@ -160,8 +188,30 @@ export function getProjectFull(id) {
     }
     if (!cfg) return null;
     const data = getProjectData(id);
+    // Mergear landings con su estado runtime (screenshots, progreso editado en vivo)
+    const landings = (cfg.landings || []).map((l) => {
+      const state = data.landings_state?.[l.id] || {};
+      return {
+        ...l,
+        progress: state.progress ?? l.progress,
+        status: state.status || l.status,
+        reasoning: state.reasoning || l.reasoning,
+        header: { ...l.header, status: state.header_status || l.header?.status },
+        footer: { ...l.footer, status: state.footer_status || l.footer?.status },
+        screenshots: {
+          ...l.screenshots,
+          reference_url: state.reference_url || l.screenshots?.reference_url || null,
+          actual_url: state.actual_url || l.screenshots?.actual_url || null,
+          diff_url: state.diff_url || l.screenshots?.diff_url || null,
+          captured_at: state.captured_at || l.screenshots?.captured_at || null,
+          notes: state.notes || l.screenshots?.notes || null,
+        },
+        updated_at: state.updated_at || null,
+      };
+    });
     return {
       ...cfg,
+      landings,
       runtime: {
         feedback: data.feedback.slice(-50).reverse(),
         errors: data.errors.slice(-50).reverse(),

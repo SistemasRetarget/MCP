@@ -9,7 +9,7 @@
     --bg: #0a0c11; --panel: #111419; --panel-2: #161a22; --panel-3: #1c2230;
     --border: #232838; --border-strong: #2e3548;
     --text: #e6e8ee; --muted: #8a92a6; --muted-2: #6b7280;
-    --ok: #4ade80; --warn: #fbbf24; --err: #f87171; --crit: #ef4444;
+    --ok: #4ade80; --warn: #fbbf24; --err: #f87171;
     --accent: #FF6B35; --link: #93c5fd;
     --mono: 'SF Mono', ui-monospace, Menlo, monospace;
   }
@@ -18,6 +18,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; line-height: 1.5; }
   a { color: var(--link); text-decoration: none; } a:hover { text-decoration: underline; }
   code { font-family: var(--mono); background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  img { max-width: 100%; }
 
   .topbar { padding: 14px 32px; border-bottom: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: center; gap: 16px;
@@ -40,16 +41,14 @@
   .hero-meta .item { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); }
   .hero-meta .item strong { color: var(--text); font-weight: 500; }
 
-  /* Progress hero */
   .hero-progress { background: var(--panel); border: 1px solid var(--border); padding: 16px 22px; border-radius: 10px; min-width: 280px; }
   .hero-progress .pct { font-size: 36px; font-weight: 700; letter-spacing: -1px; }
   .hero-progress .bar { height: 6px; background: var(--panel-3); border-radius: 3px; margin-top: 10px; overflow: hidden; }
   .hero-progress .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #ff8e5a); transition: width 0.4s; }
   .hero-progress .step { color: var(--muted); font-size: 12px; margin-top: 8px; }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
-  .tab { padding: 11px 18px; cursor: pointer; font-size: 13px; color: var(--muted);
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; }
+  .tab { padding: 11px 16px; cursor: pointer; font-size: 13px; color: var(--muted);
     border: 1px solid transparent; border-bottom: 0; border-radius: 6px 6px 0 0; user-select: none; }
   .tab:hover { color: var(--text); }
   .tab.active { background: var(--panel); border-color: var(--border); color: var(--text); margin-bottom: -1px; }
@@ -58,16 +57,14 @@
 
   .tab-content { display: none; } .tab-content.active { display: block; }
 
-  /* Overview - cards */
   .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; }
   .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
   .card h3 { margin: 0 0 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; }
-  .card .row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px dashed var(--border); }
+  .card .row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px dashed var(--border); gap: 12px; }
   .card .row:last-child { border-bottom: 0; }
-  .card .row .k { color: var(--muted); }
-  .card .row .v { font-family: var(--mono); font-size: 12px; }
+  .card .row .k { color: var(--muted); flex-shrink: 0; }
+  .card .row .v { font-family: var(--mono); font-size: 12px; text-align: right; word-break: break-all; }
 
-  /* Phases / workflow */
   .phases { display: flex; flex-direction: column; gap: 8px; }
   .phase { padding: 12px 14px; border-radius: 8px; background: var(--panel-2);
     border: 1px solid var(--border); display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 12px; }
@@ -81,7 +78,58 @@
   .phase.completed .state { color: var(--ok); }
   .phase.in_progress .state { color: var(--accent); }
 
-  /* Reasoning timeline */
+  /* ======================= LANDINGS ======================= */
+  .landing-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; }
+  .landing-head { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; margin-bottom: 16px; }
+  .landing-head h3 { margin: 0; font-size: 19px; font-weight: 600; }
+  .landing-head .desc { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .landing-head .links { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .landing-head .links a { font-size: 11px; padding: 4px 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; color: var(--muted); }
+  .landing-head .links a:hover { color: var(--text); border-color: var(--border-strong); text-decoration: none; }
+
+  .landing-progress { min-width: 180px; text-align: right; }
+  .landing-progress .pct { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+  .landing-progress .bar { height: 5px; background: var(--panel-3); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+  .landing-progress .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #ff8e5a); }
+
+  .hf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .hf-item { padding: 12px 14px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; }
+  .hf-item .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+  .hf-item .notes { font-size: 12px; color: var(--text); }
+  .hf-item.pending { border-left: 3px solid var(--warn); }
+  .hf-item.completed { border-left: 3px solid var(--ok); }
+  .hf-item.in_progress { border-left: 3px solid var(--accent); }
+
+  .sec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .sec-item { padding: 8px 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; }
+  .sec-item .name { font-weight: 600; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+  .sec-item .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .sec-item.completed .dot { background: var(--ok); }
+  .sec-item.in_progress .dot { background: var(--accent); }
+  .sec-item.pending .dot { background: var(--warn); }
+  .sec-item .det { color: var(--muted); font-size: 11px; }
+
+  .reasoning-box { background: var(--panel-2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 6px; margin-top: 12px; }
+  .reasoning-box .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+  .reasoning-box .body { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+  /* ======================= VISUAL ======================= */
+  .visual-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 14px; }
+  .visual-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .visual-item .label { padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .visual-item .label .pill { padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+  .visual-item img { display: block; width: 100%; max-height: 400px; object-fit: cover; object-position: top; cursor: zoom-in; }
+  .visual-item .empty-img { padding: 60px 20px; text-align: center; color: var(--muted-2); font-size: 12px; background: var(--bg); }
+  .visual-item.diff { border-color: rgba(248,113,113,0.35); }
+
+  /* Lightbox */
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 100; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .lightbox.active { display: flex; }
+  .lightbox img { max-width: 95%; max-height: 95%; border-radius: 8px; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
+  .lightbox .close { position: absolute; top: 20px; right: 24px; color: white; font-size: 28px; cursor: pointer; }
+
+  /* ======================= LISTS / TIMELINE ======================= */
   .timeline { position: relative; padding-left: 22px; }
   .timeline::before { content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: var(--border); }
   .timeline-item { position: relative; padding-bottom: 18px; }
@@ -90,12 +138,10 @@
   .timeline-item .phase-tag { display: inline-block; font-size: 10px; padding: 2px 8px; background: var(--panel-3); border-radius: 4px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
   .timeline-item h4 { margin: 6px 0; font-size: 15px; }
   .timeline-item p { margin: 4px 0; color: var(--muted); font-size: 13px; }
-  .timeline-item .alts { margin-top: 6px; font-size: 12px; color: var(--muted-2); }
 
-  /* Feedback list */
   .item-list { display: flex; flex-direction: column; gap: 10px; }
   .item { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
-  .item .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 8px; }
+  .item .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 8px; flex-wrap: wrap; }
   .item .author { font-weight: 600; font-size: 13px; }
   .item .ts { color: var(--muted); font-size: 11px; font-family: var(--mono); }
   .item .kind { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; padding: 2px 8px; border-radius: 4px; background: var(--panel-3); color: var(--muted); }
@@ -105,7 +151,7 @@
   .item .source { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 4px; }
   .item .stack { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--bg); padding: 8px 10px; border-radius: 4px; margin-top: 8px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
 
-  /* Forms */
+  /* ======================= FORMS ======================= */
   .form-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
   .form-card h3 { margin: 0 0 12px; font-size: 14px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
@@ -114,26 +160,57 @@
     width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
     padding: 10px 12px; border-radius: 6px; font-size: 13px; font-family: inherit;
   }
-  textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+  textarea { resize: vertical; min-height: 80px; }
   input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
   button.primary { background: var(--accent); color: white; border: 0; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
   button.primary:hover { background: #ff8047; }
-  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+  button.ghost:hover { color: var(--text); border-color: var(--border-strong); }
   .form-msg { margin-top: 8px; font-size: 12px; }
   .form-msg.ok { color: var(--ok); }
   .form-msg.err { color: var(--err); }
 
-  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+  /* ======================= RESOURCES ======================= */
+  .res-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .res-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; transition: all 0.15s; }
+  .res-item:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .res-item.empty { opacity: 0.45; }
+  .res-icon { width: 38px; height: 38px; flex-shrink: 0; border-radius: 8px; display: grid; place-items: center; font-size: 18px; background: var(--panel-2); }
+  .res-icon.drive { background: rgba(74,222,128,0.12); color: var(--ok); }
+  .res-icon.docs { background: rgba(147,197,253,0.12); color: var(--link); }
+  .res-icon.brand { background: rgba(255,107,53,0.12); color: var(--accent); }
+  .res-icon.git { background: rgba(180,180,180,0.12); color: #ddd; }
+  .res-body { flex: 1; min-width: 0; }
+  .res-body .title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .res-body .url { font-size: 11px; color: var(--muted); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .res-body .url.empty { font-style: italic; }
 
-  .pill { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-  .pill.healthy, .pill.success, .pill.ok, .pill.deployed { background: rgba(74,222,128,0.12); color: var(--ok); }
-  .pill.warn { background: rgba(251,191,36,0.12); color: var(--warn); }
+  /* ======================= TEAM ======================= */
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .team-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+  .team-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #ff8e5a); display: grid; place-items: center; font-weight: 700; color: white; flex-shrink: 0; }
+  .team-info .name { font-weight: 600; font-size: 13px; }
+  .team-info .role { color: var(--muted); font-size: 12px; }
+  .team-info .email { color: var(--muted-2); font-size: 11px; font-family: var(--mono); }
+
+  /* ======================= MISC ======================= */
+  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .pill { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+  .pill.ok, .pill.completed, .pill.success, .pill.deployed, .pill.healthy { background: rgba(74,222,128,0.12); color: var(--ok); }
+  .pill.in_progress, .pill.warn { background: rgba(251,191,36,0.12); color: var(--warn); }
+  .pill.pending { background: rgba(180,180,180,0.1); color: var(--muted); }
   .pill.err, .pill.failure, .pill.error { background: rgba(239,68,68,0.12); color: var(--err); }
 
-  .deploy-card { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
-  .deploy-card .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px; }
-  .deploy-card .meta-grid .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .deploy-card .meta-grid .v { font-family: var(--mono); }
+  .deploy-card { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .deploy-card .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .deploy-card .meta-grid .k { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .deploy-card .meta-grid .v { font-family: var(--mono); font-size: 13px; }
+
+  /* ======================= FOOTER ======================= */
+  footer.luis { text-align: center; padding: 32px 20px 24px; color: var(--muted-2); font-size: 11px;
+    border-top: 1px solid var(--border); margin-top: 48px; letter-spacing: 0.02em; }
+  footer.luis .heart { color: var(--accent); display: inline-block; transform: scale(1); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 </style>
 </head>
 <body>
@@ -171,13 +248,17 @@
 
   <div class="tabs">
     <div class="tab active" data-tab="overview">Overview</div>
+    <div class="tab" data-tab="landings">Landings <span class="badge" id="cnt-landings">0</span></div>
+    <div class="tab" data-tab="visual">Visual QA</div>
+    <div class="tab" data-tab="resources">Recursos</div>
+    <div class="tab" data-tab="team">Equipo</div>
     <div class="tab" data-tab="reasoning">Razonamiento <span class="badge" id="cnt-reasoning">0</span></div>
     <div class="tab" data-tab="feedback">Feedback <span class="badge" id="cnt-feedback">0</span></div>
     <div class="tab" data-tab="errors">Errores <span class="badge" id="cnt-errors">0</span></div>
     <div class="tab" data-tab="deploy">Deploy</div>
   </div>
 
-  <!-- Overview -->
+  <!-- OVERVIEW -->
   <section class="tab-content active" data-tab="overview">
     <div class="grid-cards">
       <div class="card">
@@ -193,27 +274,58 @@
         <div id="recon"></div>
       </div>
       <div class="card">
-        <h3>Sections (replicación)</h3>
+        <h3>Sections (replicación global)</h3>
         <div id="sections"></div>
       </div>
     </div>
   </section>
 
-  <!-- Reasoning -->
+  <!-- LANDINGS — vista por landing con header, footer, sections, razonamiento -->
+  <section class="tab-content" data-tab="landings">
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+      Cada landing del sitio con su header, footer, secciones y razonamiento de diseño.
+      El equipo puede ver exactamente <strong>qué se decidió y por qué</strong>.
+    </p>
+    <div id="landings-list"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <!-- VISUAL QA — referencia vs actual vs diff por landing -->
+  <section class="tab-content" data-tab="visual">
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+      Comparación visual de cada landing. Si la captura <strong>actual</strong> difiere de la
+      <strong>referencia</strong>, el panel <em>diff</em> muestra dónde. Click en cualquier imagen para zoom.
+      <br>👉 Para registrar una imagen, pega su URL (Drive público, Imgur, etc.) en el formulario debajo.
+    </p>
+    <div id="visual-list"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section class="tab-content" data-tab="resources">
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+      Todo lo que el equipo necesita para trabajar este proyecto, en un solo lugar.
+    </p>
+    <div class="res-grid" id="resources-list"></div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="tab-content" data-tab="team">
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+      Quiénes trabajan o pueden ayudar en este proyecto.
+    </p>
+    <div class="team-grid" id="team-list"></div>
+  </section>
+
+  <!-- REASONING (decisiones cross-proyecto) -->
   <section class="tab-content" data-tab="reasoning">
     <div class="form-card">
-      <h3>Registrar decisión / razonamiento</h3>
+      <h3>Registrar decisión / razonamiento global</h3>
       <form id="form-reasoning">
         <div class="form-row">
-          <input name="phase" placeholder="Fase (ej: hero_section)" />
+          <input name="phase" placeholder="Fase (ej: nav, footer, seo)" />
           <input name="alternatives" placeholder="Alternativas (separadas por coma)" />
         </div>
-        <div class="form-row full">
-          <input name="decision" required placeholder="Decisión (resumen — qué se hizo)" />
-        </div>
-        <div class="form-row full">
-          <textarea name="rationale" placeholder="Razonamiento — por qué se tomó esa decisión"></textarea>
-        </div>
+        <div class="form-row full"><input name="decision" required placeholder="Decisión (qué se hizo)" /></div>
+        <div class="form-row full"><textarea name="rationale" placeholder="Razonamiento — por qué"></textarea></div>
         <button type="submit" class="primary">Registrar decisión</button>
         <span class="form-msg" id="msg-reasoning"></span>
       </form>
@@ -221,7 +333,7 @@
     <div class="timeline" id="timeline-reasoning"><div class="empty">Cargando…</div></div>
   </section>
 
-  <!-- Feedback -->
+  <!-- FEEDBACK -->
   <section class="tab-content" data-tab="feedback">
     <div class="form-card">
       <h3>Enviar feedback al proyecto</h3>
@@ -248,9 +360,7 @@
             <option value="1">★☆☆☆☆ (1)</option>
           </select>
         </div>
-        <div class="form-row full">
-          <textarea name="message" required placeholder="Tu feedback…"></textarea>
-        </div>
+        <div class="form-row full"><textarea name="message" required placeholder="Tu feedback…"></textarea></div>
         <button type="submit" class="primary">Enviar feedback</button>
         <span class="form-msg" id="msg-feedback"></span>
       </form>
@@ -258,10 +368,10 @@
     <div class="item-list" id="list-feedback"><div class="empty">Cargando…</div></div>
   </section>
 
-  <!-- Errors -->
+  <!-- ERRORS -->
   <section class="tab-content" data-tab="errors">
     <div class="form-card">
-      <h3>Reportar error manualmente</h3>
+      <h3>Reportar error</h3>
       <form id="form-error">
         <div class="form-row">
           <input name="source" placeholder="Source (ej: frontend, build, deploy)" />
@@ -271,15 +381,9 @@
             <option value="critical">critical</option>
           </select>
         </div>
-        <div class="form-row full">
-          <input name="url" placeholder="URL donde ocurrió (opcional)" />
-        </div>
-        <div class="form-row full">
-          <input name="message" required placeholder="Mensaje del error" />
-        </div>
-        <div class="form-row full">
-          <textarea name="stack" placeholder="Stack trace (opcional)"></textarea>
-        </div>
+        <div class="form-row full"><input name="url" placeholder="URL donde ocurrió (opcional)" /></div>
+        <div class="form-row full"><input name="message" required placeholder="Mensaje del error" /></div>
+        <div class="form-row full"><textarea name="stack" placeholder="Stack trace (opcional)"></textarea></div>
         <button type="submit" class="primary">Reportar error</button>
         <span class="form-msg" id="msg-error"></span>
       </form>
@@ -287,7 +391,7 @@
     <div class="item-list" id="list-errors"><div class="empty">Cargando…</div></div>
   </section>
 
-  <!-- Deploy -->
+  <!-- DEPLOY -->
   <section class="tab-content" data-tab="deploy">
     <div class="card">
       <h3>Deploy actual</h3>
@@ -301,11 +405,18 @@
   </section>
 </main>
 
+<div class="lightbox" id="lightbox"><span class="close">×</span><img id="lightbox-img" src="" /></div>
+
+<footer class="luis">
+  Vista desarrollada por <strong>Luis</strong> con <span class="heart">❤</span> ·
+  Sistemas Retarget · MCP v0.4 ·
+  <span id="now"></span>
+</footer>
+
 <script>
 const PROJECT_ID = location.pathname.split("/").pop();
 const $ = (s) => document.querySelector(s);
 
-// Tabs
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
   document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
   document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
@@ -313,169 +424,348 @@ document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () =>
   document.querySelector(`.tab-content[data-tab="${t.dataset.tab}"]`).classList.add("active");
 }));
 
+// Lightbox
+const lb = document.getElementById("lightbox");
+const lbImg = document.getElementById("lightbox-img");
+lb.addEventListener("click", () => lb.classList.remove("active"));
+function openLightbox(src){ lbImg.src = src; lb.classList.add("active"); }
+
 function fmtTs(iso){ if(!iso) return "—"; const d = new Date(iso); return d.toLocaleString("es-CL", { hour12:false }); }
-function ago(iso){ if(!iso) return "—"; const diff = (Date.now()-new Date(iso).getTime())/1000;
+function ago(iso){ if(!iso) return "—"; const diff=(Date.now()-new Date(iso).getTime())/1000;
   if(diff<60) return "hace " + Math.floor(diff) + "s"; if(diff<3600) return "hace " + Math.floor(diff/60) + "m";
   if(diff<86400) return "hace " + Math.floor(diff/3600) + "h"; return "hace " + Math.floor(diff/86400) + "d"; }
 function escapeHtml(s){ if(s==null) return ""; return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function shortHash(h){ return h ? String(h).slice(0,7) : "—"; }
 
+function tick(){ const n=document.getElementById("now"); if(n) n.textContent = new Date().toLocaleString("es-CL",{hour12:false}); }
+tick(); setInterval(tick, 1000);
+
 async function loadProject(){
   try {
     const r = await fetch(`/api/projects/${encodeURIComponent(PROJECT_ID)}/full`, { cache:"no-store" });
     if (!r.ok) {
-      document.body.innerHTML = `<div class="empty"><h2>Proyecto no encontrado: ${escapeHtml(PROJECT_ID)}</h2><a href="/projects">← Volver a proyectos</a></div>`;
+      document.body.innerHTML = `<div class="empty"><h2>Proyecto no encontrado: ${escapeHtml(PROJECT_ID)}</h2><a href="/projects">← Volver</a></div>`;
       return;
     }
     const p = await r.json();
-
-    document.getElementById("page-title").textContent = (p.project_name || PROJECT_ID) + " · MCP Retarget";
-    $("#bc-name").textContent = p.project_name || PROJECT_ID;
-    $("#proj-name").textContent = p.project_name || PROJECT_ID;
-    $("#proj-desc").textContent = p.description || "";
-    const pct = p.replication?.progress_percent ?? 0;
-    $("#prog-pct").textContent = pct;
-    $("#prog-fill").style.width = pct + "%";
-    $("#prog-step").textContent = p.workflow?.current_step || p.replication?.phase || "—";
-
-    // Hero meta
-    const meta = [];
-    if (p.status) meta.push(`<span class="item"><span class="pill ${p.status==='active'?'healthy':''}">${p.status}</span></span>`);
-    if (p.repositories?.qa?.url) meta.push(`<span class="item">QA: <a href="${p.repositories.qa.url}" target="_blank">${p.repositories.qa.url.replace(/^https?:\/\//, '')}</a></span>`);
-    if (p.repositories?.qa?.github) meta.push(`<span class="item">GitHub: <a href="${p.repositories.qa.github}" target="_blank">${p.repositories.qa.github.replace('https://github.com/', '')}</a></span>`);
-    if (p.created_at) meta.push(`<span class="item">Creado: <strong>${fmtTs(p.created_at)}</strong></span>`);
-    $("#proj-meta").innerHTML = meta.join("");
-
-    // Phases
-    const steps = p.workflow?.steps || [];
-    $("#phases").innerHTML = steps.length === 0 ? '<div class="empty">Sin fases definidas</div>' : steps.map(s => `
-      <div class="phase ${s.status||''}">
-        <div class="num">${s.id}</div>
-        <div><div class="title">${escapeHtml(s.name||'-')}</div>${s.details?`<div class="det">${escapeHtml(s.details)}</div>`:''}</div>
-        <div class="state">${s.status||'-'}</div>
-      </div>
-    `).join("");
-
-    // Repos
-    const repos = p.repositories || {};
-    $("#repos").innerHTML = Object.entries(repos).map(([key, v]) => `
-      <div class="row"><span class="k">${key}</span><span class="v"><a href="${v.url}" target="_blank">${(v.url||'').replace(/^https?:\/\//,'')}</a></span></div>
-    `).join("") || "—";
-
-    // Reconnaissance
-    const recon = p.reconnaissance?.findings || {};
-    $("#recon").innerHTML = `
-      <div class="row"><span class="k">Identidad</span><span class="v">${escapeHtml(recon.identity||'—')}</span></div>
-      <div class="row"><span class="k">Plataforma</span><span class="v">${escapeHtml(recon.platform||'—')}</span></div>
-      <div class="row"><span class="k">Idioma</span><span class="v">${escapeHtml(recon.language||'—')}</span></div>
-      <div class="row"><span class="k">Status reconnaissance</span><span class="v"><span class="pill ${p.reconnaissance?.status==='completed'?'healthy':'warn'}">${p.reconnaissance?.status||'—'}</span></span></div>
-    `;
-
-    // Sections
-    const completed = p.replication?.completed_sections || [];
-    const pending = p.replication?.pending_sections || [];
-    $("#sections").innerHTML = `
-      <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">Completadas (${completed.length})</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${completed.map(s=>`<code style="color:var(--ok);background:rgba(74,222,128,0.08)">${escapeHtml(s)}</code>`).join("") || '<span style="color:var(--muted)">—</span>'}</div>
-      <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">Pendientes (${pending.length})</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">${pending.map(s=>`<code style="color:var(--warn);background:rgba(251,191,36,0.08)">${escapeHtml(s)}</code>`).join("") || '<span style="color:var(--muted)">—</span>'}</div>
-    `;
-
-    // Reasoning
-    const reasoning = p.runtime?.reasoning || [];
-    $("#cnt-reasoning").textContent = reasoning.length;
-    $("#timeline-reasoning").innerHTML = reasoning.length === 0
-      ? '<div class="empty">Aún no hay decisiones registradas para este proyecto.</div>'
-      : reasoning.map(r => `
-        <div class="timeline-item">
-          <span class="ts">${fmtTs(r.at)} · ${ago(r.at)}</span>
-          <span class="phase-tag">${escapeHtml(r.phase||'—')}</span>
-          <h4>${escapeHtml(r.decision||'')}</h4>
-          ${r.rationale?`<p>${escapeHtml(r.rationale)}</p>`:''}
-          ${r.alternatives && r.alternatives.length ? `<div class="alts">Alternativas consideradas: ${r.alternatives.map(escapeHtml).join(", ")}</div>` : ''}
-        </div>
-      `).join("");
-
-    // Feedback
-    const feedback = p.runtime?.feedback || [];
-    $("#cnt-feedback").textContent = feedback.length;
-    $("#list-feedback").innerHTML = feedback.length === 0
-      ? '<div class="empty">Sin feedback aún. Sé el primero usando el formulario.</div>'
-      : feedback.map(f => `
-        <div class="item">
-          <div class="head">
-            <div><span class="author">${escapeHtml(f.author||'anónimo')}</span> ${f.rating?'· '+'★'.repeat(f.rating):''}</div>
-            <div><span class="kind">${escapeHtml(f.kind||'general')}</span> <span class="ts">${ago(f.at)}</span></div>
-          </div>
-          <div class="msg">${escapeHtml(f.message||'')}</div>
-          ${f.email?`<div class="ts" style="margin-top:4px">${escapeHtml(f.email)}</div>`:''}
-        </div>
-      `).join("");
-
-    // Errors
-    const errors = p.runtime?.errors || [];
-    $("#cnt-errors").textContent = errors.length;
-    $("#list-errors").innerHTML = errors.length === 0
-      ? '<div class="empty">Sin errores registrados. 🎉</div>'
-      : errors.map(e => `
-        <div class="item ${e.level||'error'}">
-          <div class="head">
-            <div><span class="pill err">${escapeHtml(e.level||'error')}</span> <span class="source">${escapeHtml(e.source||'unknown')}</span></div>
-            <span class="ts">${ago(e.at)}</span>
-          </div>
-          <div class="msg">${escapeHtml(e.message||'')}</div>
-          ${e.url?`<div class="ts" style="margin-top:4px">URL: <code>${escapeHtml(e.url)}</code></div>`:''}
-          ${e.stack?`<pre class="stack">${escapeHtml(e.stack)}</pre>`:''}
-        </div>
-      `).join("");
-
-    // Deploy
-    const dep = p.runtime?.deploy || p.deployment || {};
-    $("#deploy-info").innerHTML = `
-      <div class="meta-grid">
-        <div class="k">Estado</div><div class="v"><span class="pill ${dep.status||'warn'}">${dep.status||'unknown'}</span></div>
-        <div class="k">URL</div><div class="v"><a href="${dep.url||'#'}" target="_blank">${(dep.url||'—').replace(/^https?:\/\//,'')}</a></div>
-        <div class="k">Último commit</div><div class="v">${shortHash(dep.last_commit)}</div>
-        <div class="k">Versión / revisión</div><div class="v">${escapeHtml(dep.version || dep.last_revision || dep.revision || '—')}</div>
-        <div class="k">Build</div><div class="v">${escapeHtml(dep.build_status || dep.build_id || '—')}</div>
-        <div class="k">Last deploy</div><div class="v">${fmtTs(dep.last_deploy_at || dep.last_deploy)}</div>
-        <div class="k">Region</div><div class="v">${escapeHtml(dep.region||'—')}</div>
-        <div class="k">Service</div><div class="v">${escapeHtml(dep.cloud_run_service||'—')}</div>
-      </div>
-      ${dep.url ? `<a class="primary" href="${dep.url}" target="_blank" style="display:inline-block;padding:9px 14px;background:var(--accent);color:white;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600">Abrir deploy →</a>` : ''}
-    `;
-
-    // Commits
-    const commits = p.replication?.commits || [];
-    $("#commits-list").innerHTML = commits.length === 0
-      ? '<div class="empty">Sin commits registrados.</div>'
-      : commits.slice().reverse().map(c => `
-        <div class="row">
-          <span class="k"><code>${shortHash(c.hash)}</code></span>
-          <span class="v" style="text-align:left;flex:1;margin-left:14px">${escapeHtml(c.message||'')}</span>
-          <span class="v" style="margin-left:14px">${fmtTs(c.date)}</span>
-        </div>
-      `).join("");
-
+    renderHero(p);
+    renderOverview(p);
+    renderLandings(p);
+    renderVisual(p);
+    renderResources(p);
+    renderTeam(p);
+    renderReasoning(p);
+    renderFeedback(p);
+    renderErrors(p);
+    renderDeploy(p);
   } catch(err) {
     document.body.innerHTML = `<div class="empty"><h3>Error al cargar el proyecto</h3><p>${escapeHtml(err.message)}</p><a href="/projects">← Volver</a></div>`;
   }
 }
 
-// Form submitters
+function renderHero(p){
+  document.getElementById("page-title").textContent = (p.project_name || PROJECT_ID) + " · MCP Retarget";
+  $("#bc-name").textContent = p.project_name || PROJECT_ID;
+  $("#proj-name").textContent = p.project_name || PROJECT_ID;
+  $("#proj-desc").textContent = p.description || "";
+  const pct = p.replication?.progress_percent ?? 0;
+  $("#prog-pct").textContent = pct;
+  $("#prog-fill").style.width = pct + "%";
+  $("#prog-step").textContent = p.workflow?.current_step || p.replication?.phase || "—";
+
+  const meta = [];
+  if (p.status) meta.push(`<span class="item"><span class="pill ${p.status==='active'?'ok':''}">${p.status}</span></span>`);
+  if (p.repositories?.qa?.url) meta.push(`<span class="item">QA: <a href="${p.repositories.qa.url}" target="_blank">${p.repositories.qa.url.replace(/^https?:\/\//, '')}</a></span>`);
+  if (p.repositories?.qa?.github) meta.push(`<span class="item">GitHub: <a href="${p.repositories.qa.github}" target="_blank">${p.repositories.qa.github.replace('https://github.com/', '')}</a></span>`);
+  if (p.created_at) meta.push(`<span class="item">Creado: <strong>${fmtTs(p.created_at)}</strong></span>`);
+  $("#proj-meta").innerHTML = meta.join("");
+}
+
+function renderOverview(p){
+  const steps = p.workflow?.steps || [];
+  $("#phases").innerHTML = steps.length === 0 ? '<div class="empty">Sin fases</div>' : steps.map(s => `
+    <div class="phase ${s.status||''}">
+      <div class="num">${s.id}</div>
+      <div><div class="title">${escapeHtml(s.name||'-')}</div>${s.details?`<div class="det">${escapeHtml(s.details)}</div>`:''}</div>
+      <div class="state">${s.status||'-'}</div>
+    </div>`).join("");
+
+  const repos = p.repositories || {};
+  $("#repos").innerHTML = Object.entries(repos).map(([k, v]) => `
+    <div class="row"><span class="k">${k}</span><span class="v"><a href="${v.url}" target="_blank">${(v.url||'').replace(/^https?:\/\//,'')}</a></span></div>`).join("") || "—";
+
+  const recon = p.reconnaissance?.findings || {};
+  $("#recon").innerHTML = `
+    <div class="row"><span class="k">Identidad</span><span class="v">${escapeHtml(recon.identity||'—')}</span></div>
+    <div class="row"><span class="k">Plataforma</span><span class="v">${escapeHtml(recon.platform||'—')}</span></div>
+    <div class="row"><span class="k">Idioma</span><span class="v">${escapeHtml(recon.language||'—')}</span></div>
+    <div class="row"><span class="k">Status</span><span class="v"><span class="pill ${p.reconnaissance?.status==='completed'?'ok':'warn'}">${p.reconnaissance?.status||'—'}</span></span></div>`;
+
+  const completed = p.replication?.completed_sections || [];
+  const pending = p.replication?.pending_sections || [];
+  $("#sections").innerHTML = `
+    <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">Completadas (${completed.length})</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${completed.map(s=>`<code style="color:var(--ok)">${escapeHtml(s)}</code>`).join("") || '—'}</div>
+    <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">Pendientes (${pending.length})</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${pending.map(s=>`<code style="color:var(--warn)">${escapeHtml(s)}</code>`).join("") || '—'}</div>`;
+}
+
+function renderLandings(p){
+  const landings = p.landings || [];
+  $("#cnt-landings").textContent = landings.length;
+  if (landings.length === 0) {
+    $("#landings-list").innerHTML = '<div class="empty">Sin landings configuradas. Agrega <code>landings</code> al config del proyecto.</div>';
+    return;
+  }
+  $("#landings-list").innerHTML = landings.map(l => `
+    <div class="landing-card">
+      <div class="landing-head">
+        <div>
+          <h3>${escapeHtml(l.name)} <span class="pill ${l.status||'pending'}">${l.status||'pending'}</span></h3>
+          <div class="desc">${escapeHtml(l.path||'')} · ${l.sections?.length||0} secciones</div>
+          <div class="links">
+            ${l.url_qa?`<a href="${l.url_qa}" target="_blank">🔵 QA</a>`:''}
+            ${l.url_prod?`<a href="${l.url_prod}" target="_blank">🟢 Producción</a>`:''}
+            ${l.url_reference?`<a href="${l.url_reference}" target="_blank">📌 Referencia</a>`:''}
+          </div>
+        </div>
+        <div class="landing-progress">
+          <div class="pct">${l.progress||0}%</div>
+          <div class="bar"><div class="bar-fill" style="width:${l.progress||0}%"></div></div>
+        </div>
+      </div>
+
+      <div class="hf-grid">
+        <div class="hf-item ${l.header?.status||'pending'}">
+          <div class="label">🧭 HEADER <span class="pill ${l.header?.status||'pending'}">${l.header?.status||'pending'}</span></div>
+          <div class="notes">${escapeHtml(l.header?.notes||'—')}</div>
+        </div>
+        <div class="hf-item ${l.footer?.status||'pending'}">
+          <div class="label">🦶 FOOTER <span class="pill ${l.footer?.status||'pending'}">${l.footer?.status||'pending'}</span></div>
+          <div class="notes">${escapeHtml(l.footer?.notes||'—')}</div>
+        </div>
+      </div>
+
+      ${(l.sections||[]).length ? `
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px">Secciones</div>
+      <div class="sec-grid">
+        ${l.sections.map(s => `
+          <div class="sec-item ${s.status||'pending'}">
+            <div class="name"><span class="dot"></span>${escapeHtml(s.name)}</div>
+            <div class="det">${escapeHtml(s.notes||'—')}</div>
+          </div>`).join("")}
+      </div>` : ''}
+
+      ${l.reasoning ? `
+      <div class="reasoning-box">
+        <div class="label">💭 Razonamiento de diseño</div>
+        <div class="body">${escapeHtml(l.reasoning)}</div>
+      </div>` : ''}
+    </div>
+  `).join("");
+}
+
+function renderVisual(p){
+  const landings = p.landings || [];
+  if (landings.length === 0) {
+    $("#visual-list").innerHTML = '<div class="empty">Sin landings — sin Visual QA disponible.</div>';
+    return;
+  }
+  $("#visual-list").innerHTML = landings.map(l => {
+    const ss = l.screenshots || {};
+    return `
+    <div class="card" style="margin-bottom:20px">
+      <h3>${escapeHtml(l.name)} — Visual QA</h3>
+      <div class="visual-grid">
+        ${["reference","actual","diff"].map(kind => {
+          const url = ss[kind+"_url"];
+          const labels = { reference: "📌 Referencia (cómo debe verse)", actual: "📷 Actual (lo que tenemos)", diff: "🔥 Diff (dónde está el error)" };
+          return `
+          <div class="visual-item ${kind}">
+            <div class="label">${labels[kind]} ${url?'<span class="pill ok">cargada</span>':'<span class="pill pending">vacío</span>'}</div>
+            ${url ? `<img src="${url}" alt="${kind}" onclick="openLightbox('${url}')" loading="lazy" />` : `<div class="empty-img">No hay imagen — sube una URL en el formulario debajo</div>`}
+          </div>`;
+        }).join("")}
+      </div>
+      ${ss.captured_at ? `<div style="margin-top:10px;color:var(--muted-2);font-size:11px">Última captura: ${fmtTs(ss.captured_at)} · ${ago(ss.captured_at)}</div>` : ''}
+
+      <div class="form-card" style="margin-top:14px;margin-bottom:0;background:var(--panel-2)">
+        <h3>Registrar imagen para esta landing</h3>
+        <form data-landing="${l.id}" class="form-screenshot">
+          <div class="form-row">
+            <select name="kind" required>
+              <option value="reference">📌 Referencia (cómo debe verse)</option>
+              <option value="actual">📷 Actual (cómo se ve hoy)</option>
+              <option value="diff">🔥 Diff (highlights de diferencias)</option>
+            </select>
+            <input name="url" required placeholder="https://drive.google.com/... o cualquier URL pública" />
+          </div>
+          <div class="form-row full"><input name="notes" placeholder="Notas (opcional, p. ej. 'tras fix de Header')" /></div>
+          <button type="submit" class="primary">Guardar imagen</button>
+          <span class="form-msg msg-screenshot"></span>
+        </form>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.querySelectorAll(".form-screenshot").forEach(f => {
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const landingId = f.dataset.landing;
+      const body = { kind: f.kind.value, url: f.url.value.trim(), notes: f.notes.value.trim() };
+      const msg = f.querySelector(".msg-screenshot");
+      try {
+        const r = await fetch(`/api/projects/${PROJECT_ID}/landings/${landingId}/screenshot`, {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || "Error");
+        msg.textContent = "✅ Guardado."; msg.className = "form-msg msg-screenshot ok";
+        setTimeout(loadProject, 600);
+      } catch(err) {
+        msg.textContent = "❌ " + err.message; msg.className = "form-msg msg-screenshot err";
+      }
+    });
+  });
+}
+
+function renderResources(p){
+  const r = p.resources || {};
+  const items = [
+    { key: "drive_folder", title: "Drive del proyecto", icon: "📁", cls: "drive", desc: "Carpeta principal en Google Drive" },
+    { key: "documentation", title: "Documentación", icon: "📚", cls: "docs", desc: "Brief, especificaciones, contenido" },
+    { key: "brand_guide", title: "Brand Guide", icon: "🎨", cls: "brand", desc: "Manual de marca, colores, tipos" },
+    { key: "wireframes", title: "Wireframes", icon: "🧩", cls: "docs", desc: "Diseños iniciales / Figma" },
+    { key: "design_system", title: "Design System", icon: "💎", cls: "brand", desc: "Componentes y guías UI" },
+    { key: "content_brief", title: "Brief de contenido", icon: "📝", cls: "docs", desc: "Textos, imágenes, copys" },
+    { key: "github_repo", title: "Repositorio (GitHub)", icon: "⌥", cls: "git", desc: "Código fuente del proyecto" },
+    { key: "production_url", title: "Producción", icon: "🟢", cls: "drive", desc: "Sitio en vivo" },
+    { key: "qa_url", title: "QA / Staging", icon: "🔵", cls: "docs", desc: "Versión en QA" },
+  ];
+  $("#resources-list").innerHTML = items.map(it => {
+    const url = r[it.key];
+    const filled = url && String(url).trim();
+    return `
+      <a href="${filled||'#'}" ${filled?'target="_blank"':''} class="res-item ${filled?'':'empty'}" ${filled?'':'onclick="event.preventDefault(); alert(\'Sin configurar — agrega la URL en el config del proyecto\')"'}>
+        <div class="res-icon ${it.cls}">${it.icon}</div>
+        <div class="res-body">
+          <div class="title">${it.title}</div>
+          <div class="url ${filled?'':'empty'}">${filled ? String(url).replace(/^https?:\/\//,'') : 'no configurado'}</div>
+        </div>
+      </a>`;
+  }).join("");
+  if (r.notes) $("#resources-list").insertAdjacentHTML("afterend", `<p style="margin-top:14px;color:var(--muted);font-size:12px">💡 ${escapeHtml(r.notes)}</p>`);
+}
+
+function renderTeam(p){
+  const members = p.team || [];
+  const assignments = p.team_assignments || {};
+  const html = [];
+  if (members.length) {
+    html.push(members.map(m => `
+      <div class="team-card">
+        <div class="team-avatar">${(m.name||"?").slice(0,1).toUpperCase()}</div>
+        <div class="team-info">
+          <div class="name">${escapeHtml(m.name)}</div>
+          <div class="role">${escapeHtml(m.role||'—')}</div>
+          <div class="email">${escapeHtml(m.email||'')}</div>
+        </div>
+      </div>`).join(""));
+  }
+  if (Object.keys(assignments).length) {
+    html.push(`<div class="card" style="margin-top:14px;grid-column:1/-1">
+      <h3>Asignaciones</h3>
+      ${Object.entries(assignments).map(([rol, email]) => `<div class="row"><span class="k">${rol}</span><span class="v">${escapeHtml(email)}</span></div>`).join("")}
+    </div>`);
+  }
+  $("#team-list").innerHTML = html.join("") || '<div class="empty">Sin equipo configurado.</div>';
+}
+
+function renderReasoning(p){
+  const reasoning = p.runtime?.reasoning || [];
+  $("#cnt-reasoning").textContent = reasoning.length;
+  $("#timeline-reasoning").innerHTML = reasoning.length === 0
+    ? '<div class="empty">Aún no hay decisiones registradas.</div>'
+    : reasoning.map(r => `
+      <div class="timeline-item">
+        <span class="ts">${fmtTs(r.at)} · ${ago(r.at)}</span>
+        <span class="phase-tag">${escapeHtml(r.phase||'—')}</span>
+        <h4>${escapeHtml(r.decision||'')}</h4>
+        ${r.rationale?`<p>${escapeHtml(r.rationale)}</p>`:''}
+        ${r.alternatives && r.alternatives.length ? `<div style="font-size:12px;color:var(--muted-2);margin-top:6px">Alternativas: ${r.alternatives.map(escapeHtml).join(", ")}</div>` : ''}
+      </div>`).join("");
+}
+
+function renderFeedback(p){
+  const feedback = p.runtime?.feedback || [];
+  $("#cnt-feedback").textContent = feedback.length;
+  $("#list-feedback").innerHTML = feedback.length === 0
+    ? '<div class="empty">Sin feedback aún.</div>'
+    : feedback.map(f => `
+      <div class="item">
+        <div class="head">
+          <div><span class="author">${escapeHtml(f.author||'anónimo')}</span> ${f.rating?'· '+'★'.repeat(f.rating):''}</div>
+          <div><span class="kind">${escapeHtml(f.kind||'general')}</span> <span class="ts">${ago(f.at)}</span></div>
+        </div>
+        <div class="msg">${escapeHtml(f.message||'')}</div>
+        ${f.email?`<div class="ts" style="margin-top:4px">${escapeHtml(f.email)}</div>`:''}
+      </div>`).join("");
+}
+
+function renderErrors(p){
+  const errors = p.runtime?.errors || [];
+  $("#cnt-errors").textContent = errors.length;
+  $("#list-errors").innerHTML = errors.length === 0
+    ? '<div class="empty">Sin errores. 🎉</div>'
+    : errors.map(e => `
+      <div class="item ${e.level||'error'}">
+        <div class="head">
+          <div><span class="pill err">${escapeHtml(e.level||'error')}</span> <span class="source">${escapeHtml(e.source||'unknown')}</span></div>
+          <span class="ts">${ago(e.at)}</span>
+        </div>
+        <div class="msg">${escapeHtml(e.message||'')}</div>
+        ${e.url?`<div class="ts" style="margin-top:4px">URL: <code>${escapeHtml(e.url)}</code></div>`:''}
+        ${e.stack?`<pre class="stack">${escapeHtml(e.stack)}</pre>`:''}
+      </div>`).join("");
+}
+
+function renderDeploy(p){
+  const dep = p.runtime?.deploy || p.deployment || {};
+  $("#deploy-info").innerHTML = `
+    <div class="meta-grid">
+      <div><div class="k">Estado</div><div class="v"><span class="pill ${dep.status||'warn'}">${dep.status||'unknown'}</span></div></div>
+      <div><div class="k">URL</div><div class="v"><a href="${dep.url||'#'}" target="_blank">${(dep.url||'—').replace(/^https?:\/\//,'')}</a></div></div>
+      <div><div class="k">Último commit</div><div class="v">${shortHash(dep.last_commit)}</div></div>
+      <div><div class="k">Versión / revisión</div><div class="v">${escapeHtml(dep.version || dep.last_revision || dep.revision || '—')}</div></div>
+      <div><div class="k">Build</div><div class="v">${escapeHtml(dep.build_status || dep.build_id || '—')}</div></div>
+      <div><div class="k">Last deploy</div><div class="v">${fmtTs(dep.last_deploy_at || dep.last_deploy)}</div></div>
+      <div><div class="k">Region</div><div class="v">${escapeHtml(dep.region||'—')}</div></div>
+      <div><div class="k">Service</div><div class="v">${escapeHtml(dep.cloud_run_service||'—')}</div></div>
+    </div>
+    ${dep.url ? `<div style="margin-top:14px"><a href="${dep.url}" target="_blank" style="display:inline-block;padding:9px 14px;background:var(--accent);color:white;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600">Abrir deploy →</a></div>` : ''}`;
+
+  const commits = p.replication?.commits || [];
+  $("#commits-list").innerHTML = commits.length === 0
+    ? '<div class="empty">Sin commits.</div>'
+    : commits.slice().reverse().map(c => `
+      <div class="row">
+        <span class="k"><code>${shortHash(c.hash)}</code></span>
+        <span class="v" style="text-align:left;flex:1;margin-left:14px">${escapeHtml(c.message||'')}</span>
+        <span class="v" style="margin-left:14px">${fmtTs(c.date)}</span>
+      </div>`).join("");
+}
+
+// Form submitters globales
 async function postJSON(url, body, msgEl) {
-  msgEl.textContent = "Enviando…";
-  msgEl.className = "form-msg";
+  msgEl.textContent = "Enviando…"; msgEl.className = "form-msg";
   try {
     const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "Error " + r.status);
-    msgEl.textContent = "✅ Guardado.";
-    msgEl.className = "form-msg ok";
+    msgEl.textContent = "✅ Guardado."; msgEl.className = "form-msg ok";
     return data;
   } catch(err) {
-    msgEl.textContent = "❌ " + err.message;
-    msgEl.className = "form-msg err";
+    msgEl.textContent = "❌ " + err.message; msgEl.className = "form-msg err";
     throw err;
   }
 }
@@ -483,23 +773,40 @@ async function postJSON(url, body, msgEl) {
 document.getElementById("form-feedback").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = e.target;
-  const body = { author: f.author.value.trim(), email: f.email.value.trim(), kind: f.kind.value, rating: f.rating.value ? Number(f.rating.value) : null, message: f.message.value.trim() };
-  try { await postJSON(`/api/projects/${PROJECT_ID}/feedback`, body, document.getElementById("msg-feedback")); f.reset(); loadProject(); } catch {}
+  try {
+    await postJSON(`/api/projects/${PROJECT_ID}/feedback`, {
+      author: f.author.value.trim(), email: f.email.value.trim(),
+      kind: f.kind.value, rating: f.rating.value ? Number(f.rating.value) : null,
+      message: f.message.value.trim()
+    }, document.getElementById("msg-feedback"));
+    f.reset(); loadProject();
+  } catch {}
 });
 
 document.getElementById("form-error").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = e.target;
-  const body = { source: f.source.value.trim() || "manual", level: f.level.value, url: f.url.value.trim() || null, message: f.message.value.trim(), stack: f.stack.value.trim() || null };
-  try { await postJSON(`/api/projects/${PROJECT_ID}/errors`, body, document.getElementById("msg-error")); f.reset(); loadProject(); } catch {}
+  try {
+    await postJSON(`/api/projects/${PROJECT_ID}/errors`, {
+      source: f.source.value.trim() || "manual", level: f.level.value,
+      url: f.url.value.trim() || null, message: f.message.value.trim(),
+      stack: f.stack.value.trim() || null
+    }, document.getElementById("msg-error"));
+    f.reset(); loadProject();
+  } catch {}
 });
 
 document.getElementById("form-reasoning").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = e.target;
   const alts = f.alternatives.value.split(",").map(s => s.trim()).filter(Boolean);
-  const body = { phase: f.phase.value.trim() || "general", decision: f.decision.value.trim(), rationale: f.rationale.value.trim() || null, alternatives: alts };
-  try { await postJSON(`/api/projects/${PROJECT_ID}/reasoning`, body, document.getElementById("msg-reasoning")); f.reset(); loadProject(); } catch {}
+  try {
+    await postJSON(`/api/projects/${PROJECT_ID}/reasoning`, {
+      phase: f.phase.value.trim() || "general", decision: f.decision.value.trim(),
+      rationale: f.rationale.value.trim() || null, alternatives: alts
+    }, document.getElementById("msg-reasoning"));
+    f.reset(); loadProject();
+  } catch {}
 });
 
 loadProject();
