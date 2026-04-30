@@ -55,8 +55,15 @@
       "progress": 100,
       "url_prod": "https://puebloladehesa.cl/",
       "url_qa": "",
+      "url_reference": "https://puebloladehesa.cl/",
       "header": { "status": "completado" },
       "footer": { "status": "completado" },
+      "screenshots": {
+        "reference_url": "",
+        "actual_url": "",
+        "diff_url": "",
+        "captured_at": null
+      },
       "observations": []
     },
     {
@@ -66,7 +73,8 @@
       "status": "completado",
       "progress": 100,
       "url_prod": "https://puebloladehesa.cl/promociones",
-      "url_qa": "",
+      "url_qa": "https://puebloladehesa.cl/promociones",
+      "url_reference": "https://puebloladehesa.cl/promociones",
       "header": { "status": "completado" },
       "footer": { "status": "completado" },
       "observations": []
@@ -78,7 +86,8 @@
       "status": "completado",
       "progress": 100,
       "url_prod": "https://puebloladehesa.cl/habitaciones",
-      "url_qa": "",
+      "url_qa": "https://puebloladehesa.cl/habitaciones",
+      "url_reference": "https://puebloladehesa.cl/habitaciones",
       "header": { "status": "completado" },
       "footer": { "status": "completado" },
       "observations": []
@@ -90,7 +99,8 @@
       "status": "completado",
       "progress": 100,
       "url_prod": "https://puebloladehesa.cl/servicios",
-      "url_qa": "",
+      "url_qa": "https://puebloladehesa.cl/servicios",
+      "url_reference": "https://puebloladehesa.cl/servicios",
       "header": { "status": "completado" },
       "footer": { "status": "completado" },
       "observations": []
@@ -102,7 +112,8 @@
       "status": "completado",
       "progress": 100,
       "url_prod": "https://puebloladehesa.cl/contacto",
-      "url_qa": "",
+      "url_qa": "https://puebloladehesa.cl/contacto",
+      "url_reference": "https://puebloladehesa.cl/contacto",
       "header": { "status": "completado" },
       "footer": { "status": "completado" },
       "observations": []
@@ -114,7 +125,8 @@
       "status": "en_progreso",
       "progress": 60,
       "url_prod": "https://puebloladehesa.cl/galeria",
-      "url_qa": "",
+      "url_qa": "https://puebloladehesa.cl/galeria",
+      "url_reference": "https://puebloladehesa.cl/galeria",
       "header": { "status": "completado" },
       "footer": { "status": "completado" },
       "observations": []
