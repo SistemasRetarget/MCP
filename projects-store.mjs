@@ -158,6 +158,17 @@ export function setLandingScreenshot(id, landingId, payload) {
   return d.landings_state[landingId];
 }
 
+export function setLandingPageSpeed(id, landingId, payload) {
+  if (!landingId) throw new Error("landingId requerido");
+  const d = getProjectData(id);
+  d.landings_state = d.landings_state || {};
+  d.landings_state[landingId] = d.landings_state[landingId] || {};
+  d.landings_state[landingId].pagespeed_notes = String(payload.notes || "").slice(0, 10000);
+  d.landings_state[landingId].pagespeed_at = new Date().toISOString();
+  saveToDisk(id, d);
+  return d.landings_state[landingId];
+}
+
 export function updateLandingProgress(id, landingId, payload) {
   if (!landingId) throw new Error("landingId requerido");
   const d = getProjectData(id);
@@ -345,6 +356,8 @@ export function getProjectFull(id) {
           captured_at: state.captured_at || l.screenshots?.captured_at || null,
           notes: state.notes || l.screenshots?.notes || null,
         },
+        pagespeed_notes: state.pagespeed_notes || l.pagespeed_notes || null,
+        pagespeed_at: state.pagespeed_at || l.pagespeed_at || null,
         observations: data.landings_observations?.[l.id] || [],
         updated_at: state.updated_at || null,
       };

@@ -635,7 +635,7 @@ function renderLandings(p){
 
       <!-- Observaciones de colaboradores -->
       <div class="observations-box">
-        <div class="label">💬 Observaciones del equipo</div>
+        <div class="label">💬 Observaciones del equipo <button onclick="copyAllObservations('${l.id}')" class="btn secondary" style="font-size:11px;padding:4px 8px;margin-left:8px">📋 Copiar todas</button></div>
         <div class="obs-list" id="obs-${l.id}">
           ${(l.observations || []).length === 0 ? '<div class="obs-empty">Sin observaciones aún. Sé el primero en comentar.</div>' : (l.observations || []).map(obs => `
             <div class="obs-item">
@@ -644,6 +644,14 @@ function renderLandings(p){
             </div>
           `).join('')}
         </div>
+        
+        <!-- Notas de Page Speed -->
+        <div class="pagespeed-box">
+          <div class="label">📊 Notas de Page Speed</div>
+          <textarea id="pagespeed-${l.id}" placeholder="Copia y pega aquí los resultados de Page Speed (Core Web Vitals, SEO, Performance, etc.)..." style="width:100%;min-height:80px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;resize:vertical;margin-bottom:8px">${escapeHtml(l.pagespeed_notes || '')}</textarea>
+          <button onclick="savePageSpeed('${l.id}')" class="btn secondary" style="font-size:12px;padding:6px 12px">💾 Guardar Page Speed</button>
+        </div>
+        
         <form class="obs-form" onsubmit="addObservation(event, '${l.id}', this)">
           <input type="text" name="by" placeholder="Tu nombre" required style="width:140px"/>
           <input type="text" name="text" placeholder="Escribe una observación..." required style="flex:1"/>
@@ -862,6 +870,49 @@ async function postJSON(url, body, msgEl) {
     msgEl.textContent = "❌ " + err.message; msgEl.className = "form-msg err";
     throw err;
   }
+}
+
+async function savePageSpeed(landingId) {
+  const textarea = document.getElementById(`pagespeed-${landingId}`);
+  const notes = textarea.value.trim();
+  if (!notes) {
+    alert("Por favor ingresa notas de Page Speed");
+    return;
+  }
+  
+  try {
+    const r = await fetch(`/api/projects/${PROJECT_ID}/landings/${landingId}/pagespeed`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notes })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Error");
+    alert("✅ Notas de Page Speed guardadas");
+    textarea.value = "";
+  } catch(err) {
+    alert("❌ Error: " + err.message);
+  }
+}
+
+function copyAllObservations(landingId) {
+  const obsList = document.getElementById(`obs-${landingId}`);
+  const obsItems = obsList.querySelectorAll('.obs-text');
+  let allText = "";
+  obsItems.forEach(item => {
+    allText += item.textContent + "\n\n";
+  });
+  
+  if (!allText.trim()) {
+    alert("No hay observaciones para copiar");
+    return;
+  }
+  
+  navigator.clipboard.writeText(allText).then(() => {
+    alert("✅ Observaciones copiadas al portapapeles");
+  }).catch(err => {
+    alert("❌ Error al copiar: " + err.message);
+  });
 }
 
 document.getElementById("form-feedback").addEventListener("submit", async (e) => {

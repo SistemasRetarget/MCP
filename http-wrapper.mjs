@@ -941,10 +941,10 @@ const server = createServer(async (req, res) => {
       return;
     }
 
-    // POST /api/projects/<id>/landings/<landingId>/{screenshot|progress}
+    // POST /api/projects/<id>/landings/<landingId>/{screenshot|progress|pagespeed}
     if (req.method === "POST" && sub === "landings" && parts[4] && parts[5]) {
       const landingId = parts[4];
-      const action = parts[5]; // "screenshot" | "progress"
+      const action = parts[5]; // "screenshot" | "progress" | "pagespeed"
       let body = "";
       req.on("data", (c) => (body += c));
       req.on("end", () => {
@@ -954,6 +954,7 @@ const server = createServer(async (req, res) => {
           if (action === "screenshot") saved = setLandingScreenshot(projectId, landingId, payload);
           else if (action === "progress") saved = updateLandingProgress(projectId, landingId, payload);
           else if (action === "review-score") saved = setReviewScore(projectId, landingId, payload);
+          else if (action === "pagespeed") saved = setLandingPageSpeed(projectId, landingId, payload);
           else throw new Error("Action no soportado: " + action);
           logEvent("info", `landing_${action}`, `${projectId}/${landingId}`, { project: projectId, landing: landingId });
           res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
