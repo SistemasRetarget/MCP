@@ -198,6 +198,56 @@ export async function setLandingPageSpeed(id, landingId, payload) {
   return d.landings_state[landingId];
 }
 
+export async function captureLandingScreenshot(id, landingId, payload) {
+  if (!landingId) throw new Error("landingId requerido");
+  const d = getProjectData(id);
+  d.landings_state = d.landings_state || {};
+  d.landings_state[landingId] = d.landings_state[landingId] || {};
+  
+  const kind = payload.kind || "actual"; // reference | actual | diff
+  const url = payload.url;
+  
+  if (!url) throw new Error("URL requerida para captura");
+  
+  try {
+    // Intentar usar playwright para capturar screenshot
+    const { exec } = await import("child_process");
+    const fs = await import("fs");
+    const path = await import("path");
+    
+    const uploadsDir = path.join(__dirname, "uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    
+    const filename = `${landingId}-${kind}-${Date.now()}.png`;
+    const filePath = path.join(uploadsDir, filename);
+    
+    // Usar npx playwright para capturar screenshot
+    const cmd = `npx playwright screenshot "${url}" -o "${filePath}" --wait-for-selector="body" --timeout=10000`;
+    await new Promise((resolve, reject) => {
+      exec(cmd, (error, stdout, stderr) => {
+        if (error) reject(error);
+        else resolve(stdout);
+      });
+    });
+    
+    // Guardar la URL del screenshot
+    d.landings_state[landingId][`${kind}_url`] = `/uploads/${filename}`;
+    d.landings_state[landingId].captured_at = new Date().toISOString();
+    
+    saveToDisk(id, d);
+    return d.landings_state[landingId];
+  } catch (err) {
+    // Si playwright falla, guardar la URL como referencia
+    d.landings_state[landingId][`${kind}_url`] = url;
+    d.landings_state[landingId].captured_at = new Date().toISOString();
+    d.landings_state[landingId][`${kind}_error`] = err.message;
+    saveToDisk(id, d);
+    return d.landings_state[landingId];
+  }
+}
+
 export function updateLandingProgress(id, landingId, payload) {
   if (!landingId) throw new Error("landingId requerido");
   const d = getProjectData(id);

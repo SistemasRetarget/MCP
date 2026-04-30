@@ -661,7 +661,7 @@ function renderLandings(p){
         
         <form class="obs-form" onsubmit="addObservation(event, '${l.id}', this)">
           <input type="text" name="by" placeholder="Tu nombre" required style="width:140px"/>
-          <input type="text" name="text" placeholder="Escribe una observación..." required style="flex:1"/>
+          <textarea name="text" placeholder="Escribe una observación... (puedes pegar múltiples líneas, cada una será una observación separada)" required style="flex:1;min-height:40px;resize:vertical"></textarea>
           <button type="submit">💬</button>
         </form>
       </div>
@@ -713,6 +713,13 @@ function renderVisual(p){
           <button type="submit" class="primary">Guardar imagen</button>
           <span class="form-msg msg-screenshot"></span>
         </form>
+        ${l.url_prod || l.url_qa ? `
+          <div style="margin-top:12px;padding:8px;background:var(--bg);border-radius:6px;border:1px dashed var(--border)">
+            <div style="font-size:11px;margin-bottom:4px">O captura automáticamente desde:</div>
+            <button onclick="captureScreenshot('${l.id}', 'reference', '${l.url_prod || l.url_qa}')" class="btn secondary" style="font-size:11px;padding:4px 8px;margin-right:4px">📌 Referencia</button>
+            <button onclick="captureScreenshot('${l.id}', 'actual', '${l.url_qa || l.url_prod}')" class="btn secondary" style="font-size:11px;padding:4px 8px">📷 Actual</button>
+          </div>
+        ` : ''}
       </div>
     </div>`;
   }).join("");
@@ -929,6 +936,27 @@ function copyAllObservations(landingId) {
   });
 }
 
+async function captureScreenshot(landingId, kind, url) {
+  if (!url) {
+    alert("No hay URL disponible para capturar");
+    return;
+  }
+  
+  try {
+    const r = await fetch(`/api/projects/${PROJECT_ID}/landings/${landingId}/capture`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kind, url })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Error");
+    alert("✅ Captura en proceso. La imagen se guardará cuando esté lista.");
+    loadProject();
+  } catch(err) {
+    alert("❌ Error: " + err.message);
+  }
+}
+
 document.getElementById("form-feedback").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = e.target;
@@ -974,11 +1002,18 @@ async function addObservation(ev, landingId, form) {
   const by = form.by.value.trim();
   const text = form.text.value.trim();
   if (!by || !text) return;
+  
+  // Procesar múltiples líneas como observaciones separadas
+  const lines = text.split('\n').filter(line => line.trim());
+  
   try {
-    await postJSON(`/api/projects/${PROJECT_ID}/landings/${landingId}/observation`, { by, text },
-      { textContent: "", className: "form-msg" });
+    // Agregar cada línea como una observación separada
+    for (const line of lines) {
+      await postJSON(`/api/projects/${PROJECT_ID}/landings/${landingId}/observation`, { by, text: line.trim() },
+        { textContent: "", className: "form-msg" });
+    }
     form.reset();
-    loadProject(); // Recargar para mostrar la nueva observación
+    loadProject(); // Recargar para mostrar las nuevas observaciones
   } catch(err) {
     alert("Error: " + err.message);
   }
