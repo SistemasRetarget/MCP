@@ -64,14 +64,78 @@ function classifyAnthropicError(status, body) {
 }
 
 /**
- * Hace un health-check real contra la API de Anthropic.
- * Usa un prompt mínimo (1 token de output) para minimizar costo:
- * solo gastará créditos si hay créditos.
+ * Devuelve el último estado conocido SIN hacer ninguna llamada a Anthropic.
+ * Usado por /health y /greet por defecto — NO consume créditos.
+ */
+export function getCachedAnthropicStatus() {
+  if (lastCheck) return lastCheck;
+  return {
+    at: null,
+    status: "unknown",
+    critical: false,
+    action: "Estado desconocido — usar GET /health?force=1 para probar (consume ~1 token).",
+    detail: "Aún no se ha hecho ningún probe ni se ha llamado a /chat.",
+  };
+}
+
+/**
+ * Registra el estado de Anthropic a partir del resultado real de un /chat.
+ * Esta es la forma PASIVA de actualizar el estado: aprovechamos el llamado
+ * que el usuario ya hizo, sin gastar tokens extra.
+ */
+export function recordChatOutcome(result) {
+  if (result?.error) {
+    const txt = String(result.error).toLowerCase();
+    if (txt.includes("credit balance")) {
+      lastCheck = {
+        at: new Date().toISOString(),
+        status: "credit_balance_too_low",
+        critical: true,
+        action: "Cargar créditos en https://console.anthropic.com/settings/billing",
+        detail: result.error,
+      };
+    } else if (txt.includes("authentication") || txt.includes("invalid api key")) {
+      lastCheck = {
+        at: new Date().toISOString(),
+        status: "auth_error",
+        critical: true,
+        action: "Regenerar la API key.",
+        detail: result.error,
+      };
+    } else {
+      lastCheck = {
+        at: new Date().toISOString(),
+        status: "unknown_error",
+        critical: false,
+        action: "Revisar payload.",
+        detail: result.error,
+      };
+    }
+  } else {
+    lastCheck = {
+      at: new Date().toISOString(),
+      status: "ok",
+      critical: false,
+      action: null,
+      detail: "Anthropic respondió correctamente al último /chat.",
+    };
+  }
+  return lastCheck;
+}
+
+/**
+ * Hace un health-check REAL contra la API de Anthropic.
+ * ⚠️ CONSUME 1 TOKEN (~$0.0000003) — solo se invoca con ?force=1 explícito.
+ * Por defecto retorna el caché.
  */
 export async function checkAnthropic({ force = false } = {}) {
   // Cache: no chequear más seguido que `cachedFor`
   if (!force && lastCheck && Date.now() - new Date(lastCheck.at).getTime() < cachedFor) {
     return lastCheck;
+  }
+  // Sin force y sin caché previo: NO probamos, devolvemos "unknown"
+  if (!force && !lastCheck) {
+    return getCachedAnthropicStatus();
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -147,19 +211,25 @@ export async function checkAnthropic({ force = false } = {}) {
 }
 
 /**
- * Devuelve el snapshot completo de salud — apto para Cascade/Windsurf
- * para consultar cada cierto tiempo.
+ * Snapshot de salud — apto para Cascade/Windsurf.
+ * Por defecto NO consume créditos: lee el estado del caché.
+ * Si se pasa `probe: true`, fuerza una prueba real (consume ~1 token).
  */
-export async function getHealthSnapshot({ uptime, mcpAlive }) {
-  const anthropic = await checkAnthropic();
-  const overall = anthropic.critical ? "degraded" : (mcpAlive ? "healthy" : "degraded");
+export async function getHealthSnapshot({ uptime, mcpAlive, probe = false }) {
+  const anthropic = probe ? await checkAnthropic({ force: true }) : getCachedAnthropicStatus();
+  // overall: si no hemos probado nunca y MCP está vivo, lo damos como "healthy" optimista
+  const overall =
+    anthropic.critical ? "degraded" :
+    !mcpAlive ? "degraded" :
+    anthropic.status === "unknown" ? "healthy" :
+    "healthy";
   return {
-    overall,                // "healthy" | "degraded"
+    overall,
     at: new Date().toISOString(),
     mcp: { alive: mcpAlive, uptime_seconds: uptime },
     anthropic,              // { status, critical, action, detail, at }
     operational: {
-      chat_endpoint: anthropic.status === "ok",
+      chat_endpoint: anthropic.status === "ok" || anthropic.status === "unknown",
       validators:   true,    // independientes de Anthropic
       notify:       true,    // templates locales
     },
@@ -170,6 +240,9 @@ export async function getHealthSnapshot({ uptime, mcpAlive }) {
 function buildCascadeMessage(anthropic, mcpAlive) {
   if (!mcpAlive) {
     return "🔴 MCP DOWN — el proceso quality-gate no está corriendo. Reiniciar Cloud Run.";
+  }
+  if (anthropic.status === "unknown") {
+    return "🟢 MCP OPERATIVO — Anthropic no probado aún (no se ha gastado ningún crédito). Usa /chat o /health?force=1 para verificar.";
   }
   if (anthropic.status === "ok") {
     return "🟢 MCP OPERATIVO — todos los sistemas funcionando.";

@@ -18,7 +18,7 @@ import { validateGoogleAdsPolicies } from "./validators/google-ads-policies.mjs"
 import { validateSEOTechnical } from "./validators/seo-technical.mjs";
 import { validateMobileFirst } from "./validators/mobile-first.mjs";
 import { chatLoop, TOOLS as CHAT_TOOLS } from "./chat.mjs";
-import { getHealthSnapshot, getEvents, logEvent, checkAnthropic } from "./health-monitor.mjs";
+import { getHealthSnapshot, getEvents, logEvent, recordChatOutcome } from "./health-monitor.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -245,7 +245,9 @@ const server = createServer(async (req, res) => {
           maxTurns: maxTurns || 8
         });
 
-        // Detectar si el resultado fue un error de Anthropic (credit balance, etc.)
+        // Aprovechar el llamado real al /chat para actualizar el caché de salud
+        // SIN gastar tokens extra (recordChatOutcome NO llama a la API).
+        recordChatOutcome(result);
         if (result?.error) {
           const txt = String(result.error).toLowerCase();
           if (txt.includes("credit balance")) {
@@ -299,9 +301,11 @@ const server = createServer(async (req, res) => {
       const name = url.searchParams.get("name") || "";
       const email = url.searchParams.get("email") || "";
       const cfg = JSON.parse(readFileSync(join(__dirname, "mcp-subagents-config.json"), "utf8"));
+      // /greet por defecto NO consume créditos: lee caché.
       const snapshot = await getHealthSnapshot({
         uptime: Math.floor((Date.now() - new Date(STARTED_AT).getTime()) / 1000),
         mcpAlive: mcpProcess !== null && mcpProcess.exitCode === null,
+        probe: false,
       });
       // Proyectos activos (rápido)
       let projects = [];
@@ -350,11 +354,13 @@ const server = createServer(async (req, res) => {
   // Detecta créditos de Anthropic, API key inválida, MCP caído, etc.
   if (req.method === "GET" && url.pathname === "/health") {
     try {
+      // ?force=1 → CONSUME ~1 token de Anthropic para verificar de verdad
+      // (sin force) → NO consume, lee del caché actualizado por el último /chat
       const force = url.searchParams.get("force") === "1";
-      if (force) await checkAnthropic({ force: true });
       const snapshot = await getHealthSnapshot({
         uptime: Math.floor((Date.now() - new Date(STARTED_AT).getTime()) / 1000),
         mcpAlive: mcpProcess !== null && mcpProcess.exitCode === null,
+        probe: force,
       });
       res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
       return res.end(JSON.stringify(snapshot, null, 2));
@@ -555,10 +561,9 @@ server.listen(PORT, () => {
   console.log(`[wrapper] Health: GET http://localhost:${PORT}/health`);
   console.log(`[wrapper] Roadmap: GET http://localhost:${PORT}/roadmap`);
   logEvent("info", "boot", "MCP HTTP wrapper iniciado", { port: PORT });
-  // Health-check inicial (no bloquea el listen)
-  checkAnthropic({ force: true }).catch((e) => logEvent("warn", "boot_health_check_failed", e.message));
-  // Health-check periódico cada 5 minutos
-  setInterval(() => {
-    checkAnthropic({ force: true }).catch(() => {});
-  }, 5 * 60_000);
+  // NO hacemos health-checks automáticos a Anthropic para NO consumir créditos.
+  // El estado se actualiza únicamente:
+  //   1) Cuando alguien usa /chat (capturamos el resultado real)
+  //   2) Cuando alguien hace GET /health?force=1 (probe explícito)
+  // Por defecto /health y /greet leen del caché (status: "unknown" si nunca se probó).
 });
