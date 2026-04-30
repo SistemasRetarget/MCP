@@ -115,7 +115,7 @@
       "status": "completado",
       "progress": 100,
       "url_prod": "https://puebloladehesa.cl/",
-      "url_qa": "",
+      "url_qa": "https://puebloladehesa.cl/",
       "url_reference": "https://puebloladehesa.cl/",
       "header": { "status": "completado" },
       "footer": { "status": "completado" },
