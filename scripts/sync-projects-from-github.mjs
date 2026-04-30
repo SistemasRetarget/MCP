@@ -20,7 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const PROJECTS_DIR = join(ROOT, "mcp-projects");
 const ORG = "SistemasRetarget";
-const SKIP = new Set(["MCP"]); // este mismo proyecto
+const SKIP = new Set(); // ningún repo se excluye — el propio MCP es un proyecto meta
 
 if (!existsSync(PROJECTS_DIR)) mkdirSync(PROJECTS_DIR, { recursive: true });
 

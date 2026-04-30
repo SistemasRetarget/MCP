@@ -1,0 +1,115 @@
+{
+  "project_id": "MCP",
+  "project_name": "MCP · Sistemas Retarget",
+  "description": "Centro de control y orquestación de proyectos. Quality Gate + agente AI + dashboard de visibilidad para todos los proyectos de la org.",
+  "status": "active",
+  "is_meta_project": true,
+  "created_at": "2026-04-25T00:00:00Z",
+  "repositories": {
+    "source": {
+      "url": "https://github.com/SistemasRetarget/MCP",
+      "type": "node-rust-hybrid",
+      "description": "Wrapper HTTP en Node.js + servidor MCP Quality Gate en Rust"
+    },
+    "qa": {
+      "url": "https://cmsretargetv1-201530409487.europe-west1.run.app",
+      "type": "cloud-run",
+      "github": "https://github.com/SistemasRetarget/MCP",
+      "description": "Producción del MCP — Cloud Run en europe-west1"
+    },
+    "production": {
+      "url": "https://cmsretargetv1-201530409487.europe-west1.run.app",
+      "type": "cloud-run",
+      "description": "MCP en vivo — único entorno por ahora (no hay staging separado)"
+    }
+  },
+  "github": {
+    "url": "https://github.com/SistemasRetarget/MCP",
+    "default_branch": "main",
+    "is_private": false
+  },
+  "reconnaissance": {
+    "status": "completed",
+    "findings": {
+      "stack": "Node.js (http server) + Rust (MCP protocol) + HTML/CSS vanilla (UI)",
+      "deployment": "Cloud Run (Docker), Artifact Registry, Cloud Build",
+      "auth": "@retarget.cl domain allowlist",
+      "ai_provider": "Anthropic Claude (Haiku/Sonnet)",
+      "tools_count": 17,
+      "endpoints": ["/projects", "/salud", "/eventos", "/equipo", "/tests", "/chat", "/heartbeat", "/health", "/api/projects/*"]
+    }
+  },
+  "replication": {
+    "status": "in_progress",
+    "phase": "v0.4 — multi-project + UI completa",
+    "progress_percent": 75,
+    "completed_sections": [
+      "auth_layer",
+      "chat_endpoint",
+      "tests_suite_ieee829",
+      "prompt_grader",
+      "projects_dashboard",
+      "salud_eventos_equipo_ui",
+      "status_dropdown",
+      "github_sync"
+    ],
+    "pending_sections": [
+      "drive_integration",
+      "indications_panel",
+      "pagespeed_webvitals",
+      "auto_deploy_trigger_fix",
+      "firestore_persistence"
+    ]
+  },
+  "workflow": {
+    "current_step": "ui_consolidation",
+    "steps": [
+      { "id": 1, "name": "Quality Gate Rust", "status": "completed" },
+      { "id": 2, "name": "HTTP Wrapper Node", "status": "completed" },
+      { "id": 3, "name": "Chat con auth + tools", "status": "completed" },
+      { "id": 4, "name": "Dashboard de proyectos", "status": "completed" },
+      { "id": 5, "name": "Test Suite IEEE 829 + NIST AI RMF", "status": "completed" },
+      { "id": 6, "name": "Vistas /salud /eventos /equipo", "status": "completed" },
+      { "id": 7, "name": "Status management (active/paused/archived)", "status": "completed" },
+      { "id": 8, "name": "Sync con GitHub org", "status": "completed" },
+      { "id": 9, "name": "REQ-001 Panel de indicaciones", "status": "pending" },
+      { "id": 10, "name": "REQ-002 Drive integration", "status": "pending" },
+      { "id": 11, "name": "REQ-003 PageSpeed + Web Vitals", "status": "pending" },
+      { "id": 12, "name": "Persistencia Firestore (no ephemeral)", "status": "pending" }
+    ]
+  },
+  "deployment": {
+    "cloud_run_service": "cmsretargetv1",
+    "region": "europe-west1",
+    "url": "https://cmsretargetv1-201530409487.europe-west1.run.app",
+    "status": "deployed",
+    "build_status": "success",
+    "traffic_percent": 100
+  },
+  "team_assignments": {
+    "lead": "luis@retarget.cl",
+    "ai_pair": "cascade",
+    "qa": "luis@retarget.cl"
+  },
+  "landings": [],
+  "resources": {
+    "github_repo": "https://github.com/SistemasRetarget/MCP",
+    "production_url": "https://cmsretargetv1-201530409487.europe-west1.run.app",
+    "qa_url": "https://cmsretargetv1-201530409487.europe-west1.run.app",
+    "documentation": "https://github.com/SistemasRetarget/MCP/blob/main/ARCHITECTURE.html",
+    "backlog": "https://github.com/SistemasRetarget/MCP/blob/main/BACKLOG_LUIS.md",
+    "notes": "Meta-proyecto: el MCP orquesta el desarrollo de los demás proyectos de la org. Cualquier mejora aquí beneficia a todos."
+  },
+  "team": [
+    {
+      "name": "Luis Sebastian",
+      "role": "Lead / Arquitecto / Producto",
+      "email": "luis@retarget.cl",
+      "active": true
+    }
+  ],
+  "branding": {
+    "primary_color": "#FF6B35",
+    "accent_color": "#0a0c11"
+  }
+}
