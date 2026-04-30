@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Google Workspace · MCP Retarget</title>
+<style>
+  :root { --bg:#0a0c11; --panel:#11141b; --border:#1f2430; --muted:#7d8595; --text:#e8eaef; --accent:#FF6B35; --ok:#22c55e; --warn:#f59e0b; --crit:#ef4444; --info:#3b82f6; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  header{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px}
+  header .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff}
+  header h1{font-size:15px;margin:0;font-weight:700}
+  header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+  nav{margin-left:auto;display:flex;gap:8px}
+  nav a{color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500}
+  nav a.active{color:var(--text);background:var(--border)} nav a:hover{color:var(--text)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:24px;margin:0 0 4px}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+  
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .card h3{margin:0 0 16px;font-size:16px}
+  .stat-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px}
+  .stat-row .k{color:var(--muted)} .stat-row .v{font-weight:600}
+  
+  .event-item{padding:12px;background:var(--bg);border-radius:8px;margin-bottom:8px;border-left:3px solid var(--accent)}
+  .event-time{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .event-title{font-weight:600;margin-bottom:4px}
+  .event-desc{font-size:12px;color:var(--muted)}
+  
+  .summary-box{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+  .summary-box h4{margin:0 0 12px;font-size:14px;color:var(--accent)}
+  .summary-box p{margin:0 0 8px;font-size:13px;line-height:1.5}
+  .summary-box p:last-child{margin:0}
+  
+  .btn{background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px}
+  .btn:hover{background:#ff8047}
+  .btn.secondary{background:var(--panel);color:var(--text);border:1px solid var(--border)}
+  .btn.secondary:hover{background:var(--panel-3)}
+  
+  .empty{padding:60px;text-align:center;color:var(--muted)}
+  footer{padding:24px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px}
+  footer strong{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <h1>MCP · Sistemas Retarget<small>Google Workspace</small></h1>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/solicitudes">Solicitudes</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/salud">Salud</a>
+    <a href="/eventos">Eventos</a>
+    <a href="/equipo">Equipo</a>
+    <a href="/monitor">Monitor</a>
+    <a href="/google-workspace" class="active">Google Workspace</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Google Workspace</h2>
+  <div class="subtitle">Integración con Gmail, Google Meet y Google Chat para calendarización y resúmenes</div>
+  
+  <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px">
+    <strong>¿Qué es esta sección?</strong><br>
+    Centro de coordinación conectado a Google Workspace. Claude analiza tus emails, reuniones y chats para generar resúmenes automáticos y ayudarte con calendarización.<br><br>
+    <strong>¿Por qué es importante?</strong><br>
+    Centraliza toda la comunicación y coordinación en un solo lugar. Claude genera resúmenes diarios, semanales y mensuales para mantenerte al día con fechas de entrega, reuniones y progreso de proyectos.
+  </div>
+  
+  <div class="grid">
+    <div class="card">
+      <h3>📅 Calendario</h3>
+      <div class="stat-row"><span class="k">Reuniones hoy</span><span class="v" id="meetings-today">0</span></div>
+      <div class="stat-row"><span class="k">Esta semana</span><span class="v" id="meetings-week">0</span></div>
+      <div class="stat-row"><span class="k">Próxima reunión</span><span class="v" id="next-meeting">—</span></div>
+      <button class="btn" style="width:100%;margin-top:12px" onclick="syncCalendar()">🔄 Sincronizar calendario</button>
+    </div>
+    
+    <div class="card">
+      <h3>📧 Gmail</h3>
+      <div class="stat-row"><span class="k">Emails no leídos</span><span class="v" id="emails-unread">0</span></div>
+      <div class="stat-row"><span class="k">Prioritarios</span><span class="v" id="emails-priority">0</span></div>
+      <div class="stat-row"><span class="k">Proyectos</span><span class="v" id="emails-projects">0</span></div>
+      <button class="btn" style="width:100%;margin-top:12px" onclick="syncGmail()">🔄 Sincronizar Gmail</button>
+    </div>
+    
+    <div class="card">
+      <h3>💬 Google Chat</h3>
+      <div class="stat-row"><span class="k">Mensajes nuevos</span><span class="v" id="chats-new">0</span></div>
+      <div class="stat-row"><span class="k">Espacios activos</span><span class="v" id="chats-spaces">0</span></div>
+      <div class="stat-row"><span class="k">Menciones</span><span class="v" id="chats-mentions">0</span></div>
+      <button class="btn" style="width:100%;margin-top:12px" onclick="syncChat()">🔄 Sincronizar Chat</button>
+    </div>
+    
+    <div class="card">
+      <h3>🎯 Fechas de entrega</h3>
+      <div class="stat-row"><span class="k">Esta semana</span><span class="v" id="deadlines-week">0</span></div>
+      <div class="stat-row"><span class="k">Próximos 30 días</span><span class="v" id="deadlines-month">0</span></div>
+      <div class="stat-row"><span class="k">Vencidos</span><span class="v" id="deadlines-overdue">0</span></div>
+      <button class="btn" style="width:100%;margin-top:12px" onclick="viewDeadlines()">📋 Ver todas</button>
+    </div>
+  </div>
+  
+  <div style="margin-top:32px">
+    <h3 style="margin-bottom:16px">📊 Resúmenes automáticos</h3>
+    <div class="grid">
+      <div class="summary-box">
+        <h4>📅 Resumen Diario</h4>
+        <p id="summary-daily">Cargando resumen diario...</p>
+        <button class="btn secondary" onclick="generateDaily()">Generar nuevo</button>
+      </div>
+      
+      <div class="summary-box">
+        <h4>📆 Resumen Semanal</h4>
+        <p id="summary-weekly">Cargando resumen semanal...</p>
+        <button class="btn secondary" onclick="generateWeekly()">Generar nuevo</button>
+      </div>
+      
+      <div class="summary-box">
+        <h4>📈 Resumen Mensual</h4>
+        <p id="summary-monthly">Cargando resumen mensual...</p>
+        <button class="btn secondary" onclick="generateMonthly()">Generar nuevo</button>
+      </div>
+    </div>
+  </div>
+  
+  <div style="margin-top:32px">
+    <h3 style="margin-bottom:16px">📋 Próximas reuniones</h3>
+    <div id="meetings-list"><div class="empty">Cargando reuniones...</div></div>
+  </div>
+</main>
+
+<footer>Vista desarrollada por <strong>Luis</strong> con ❤ · Sistemas Retarget · MCP v0.4</footer>
+
+<script>
+function $(s){ return document.querySelector(s); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function load(){
+  try{
+    const r = await fetch("/api/google-workspace/stats");
+    const d = await r.json();
+    
+    $("#meetings-today").textContent = d.meetings?.today || 0;
+    $("#meetings-week").textContent = d.meetings?.week || 0;
+    $("#next-meeting").textContent = d.meetings?.next || "—";
+    
+    $("#emails-unread").textContent = d.emails?.unread || 0;
+    $("#emails-priority").textContent = d.emails?.priority || 0;
+    $("#emails-projects").textContent = d.emails?.projects || 0;
+    
+    $("#chats-new").textContent = d.chats?.new || 0;
+    $("#chats-spaces").textContent = d.chats?.spaces || 0;
+    $("#chats-mentions").textContent = d.chats?.mentions || 0;
+    
+    $("#deadlines-week").textContent = d.deadlines?.week || 0;
+    $("#deadlines-month").textContent = d.deadlines?.month || 0;
+    $("#deadlines-overdue").textContent = d.deadlines?.overdue || 0;
+    
+    // Cargar resúmenes
+    loadSummaries();
+    
+    // Cargar reuniones
+    loadMeetings();
+  } catch(err){
+    console.error("Error loading stats:", err);
+  }
+}
+
+async function loadSummaries(){
+  try{
+    const r = await fetch("/api/google-workspace/summaries");
+    const d = await r.json();
+    
+    $("#summary-daily").textContent = d.daily || "Sin resumen diario disponible.";
+    $("#summary-weekly").textContent = d.weekly || "Sin resumen semanal disponible.";
+    $("#summary-monthly").textContent = d.monthly || "Sin resumen mensual disponible.";
+  } catch(err){
+    console.error("Error loading summaries:", err);
+  }
+}
+
+async function loadMeetings(){
+  try{
+    const r = await fetch("/api/google-workspace/meetings");
+    const d = await r.json();
+    const meetings = d.meetings || [];
+    
+    if (meetings.length === 0) {
+      $("#meetings-list").innerHTML = '<div class="empty">No hay reuniones próximas.</div>';
+      return;
+    }
+    
+    $("#meetings-list").innerHTML = meetings.map(m => `
+      <div class="event-item">
+        <div class="event-time">${escapeHtml(m.time)} · ${escapeHtml(m.duration)}</div>
+        <div class="event-title">${escapeHtml(m.title)}</div>
+        <div class="event-desc">${escapeHtml(m.description || 'Sin descripción')}</div>
+        ${m.meet_link ? `<a href="${escapeHtml(m.meet_link)}" target="_blank" style="color:var(--accent);font-size:12px">Unirse a Meet →</a>` : ''}
+      </div>
+    `).join("");
+  } catch(err){
+    console.error("Error loading meetings:", err);
+    $("#meetings-list").innerHTML = '<div class="empty">Error al cargar reuniones.</div>';
+  }
+}
+
+function syncCalendar(){
+  alert("Sincronizando calendario con Google Calendar...");
+}
+
+function syncGmail(){
+  alert("Sincronizando Gmail...");
+}
+
+function syncChat(){
+  alert("Sincronizando Google Chat...");
+}
+
+function viewDeadlines(){
+  alert("Ver todas las fechas de entrega...");
+}
+
+function generateDaily(){
+  alert("Generando resumen diario...");
+}
+
+function generateWeekly(){
+  alert("Generando resumen semanal...");
+}
+
+function generateMonthly(){
+  alert("Generando resumen mensual...");
+}
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>

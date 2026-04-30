@@ -753,6 +753,18 @@ const server = createServer(async (req, res) => {
     }
   }
 
+  // Google Workspace — HTML para integración con Gmail, Meet, Chat
+  if (req.method === "GET" && (url.pathname === "/google-workspace" || url.pathname === "/google-workspace/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/google-workspace.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
   // ──────────── PROJECTS DASHBOARD ────────────
   // HTML: listado de proyectos
   if (req.method === "GET" && (url.pathname === "/projects" || url.pathname === "/projects/")) {
