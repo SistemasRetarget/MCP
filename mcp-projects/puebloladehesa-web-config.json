@@ -207,8 +207,8 @@
   ],
   "resources": {
     "github_repo": "https://github.com/SistemasRetarget/puebloladehesa-web",
-    "production_url": "",
-    "qa_url": "",
+    "production_url": "https://puebloladehesa.cl/",
+    "qa_url": "https://puebloladehesa.cl/",
     "notes": "Sincronizado desde GitHub el 2026-04-30. Editar este archivo para añadir landings, recursos y workflow."
   },
   "team": [],
