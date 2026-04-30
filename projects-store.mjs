@@ -96,6 +96,55 @@ export function addReasoning(id, { phase, decision, rationale, alternatives = []
   });
 }
 
+/**
+ * Anotación de revisión sobre una decisión específica del AI.
+ * El revisor puede marcar "este razonamiento estuvo mal porque X".
+ */
+export function addAnnotation(id, payload) {
+  if (!payload.target) throw new Error("target requerido (landing|reasoning|section)");
+  if (!payload.what_went_wrong) throw new Error("what_went_wrong requerido");
+  return pushItem(id, "annotations", {
+    target: payload.target,                          // ej: "landing:home/header" | "reasoning:<idx>"
+    target_id: payload.target_id || null,
+    what_went_wrong: String(payload.what_went_wrong).slice(0, 2000),
+    suggested_fix: payload.suggested_fix ? String(payload.suggested_fix).slice(0, 2000) : null,
+    severity: ["low","medium","high","critical"].includes(payload.severity) ? payload.severity : "medium",
+    reviewer: payload.reviewer || "anónimo",
+    reviewer_email: payload.reviewer_email || null,
+  });
+}
+
+/**
+ * Score reverso — el humano califica al AI por landing (0-100).
+ * Se promedia con el histórico (lectura justa del trabajo del AI).
+ */
+export function setReviewScore(id, landingId, payload) {
+  if (!landingId) throw new Error("landingId requerido");
+  if (typeof payload.score !== "number" || payload.score < 0 || payload.score > 100) {
+    throw new Error("score requerido (0-100)");
+  }
+  const d = getProjectData(id);
+  d.review_scores = d.review_scores || {};
+  d.review_scores[landingId] = d.review_scores[landingId] || { history: [] };
+  const entry = {
+    at: new Date().toISOString(),
+    score: payload.score,
+    reviewer: payload.reviewer || "anónimo",
+    reviewer_email: payload.reviewer_email || null,
+    notes: payload.notes ? String(payload.notes).slice(0, 1000) : null,
+  };
+  d.review_scores[landingId].history.push(entry);
+  if (d.review_scores[landingId].history.length > 50) {
+    d.review_scores[landingId].history = d.review_scores[landingId].history.slice(-50);
+  }
+  // Promedio actualizado
+  const hist = d.review_scores[landingId].history;
+  d.review_scores[landingId].average = Math.round(hist.reduce((s, h) => s + h.score, 0) / hist.length);
+  d.review_scores[landingId].count = hist.length;
+  saveToDisk(id, d);
+  return d.review_scores[landingId];
+}
+
 export function setLandingScreenshot(id, landingId, payload) {
   if (!landingId) throw new Error("landingId requerido");
   const d = getProjectData(id);
@@ -216,6 +265,8 @@ export function getProjectFull(id) {
         feedback: data.feedback.slice(-50).reverse(),
         errors: data.errors.slice(-50).reverse(),
         reasoning: data.reasoning.slice(-50).reverse(),
+        annotations: (data.annotations || []).slice(-100).reverse(),
+        review_scores: data.review_scores || {},
         deploy: data.deploy || cfg.deployment || null,
       },
     };

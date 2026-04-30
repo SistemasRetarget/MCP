@@ -12,7 +12,7 @@ import { createServer } from "http";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync as existsSyncCompat } from "fs";
 import { validateCoreWebVitals } from "./validators/core-web-vitals.mjs";
 import { validateGoogleAdsPolicies } from "./validators/google-ads-policies.mjs";
 import { validateSEOTechnical } from "./validators/seo-technical.mjs";
@@ -28,6 +28,8 @@ import {
   setDeploy,
   setLandingScreenshot,
   updateLandingProgress,
+  addAnnotation,
+  setReviewScore,
 } from "./projects-store.mjs";
 import { runAllTests } from "./tests/run-tests.mjs";
 import { gradePrompt, codeBasedGrade } from "./prompt-eval/grader.mjs";
@@ -43,14 +45,51 @@ let mcpProcess = null;
 let pendingRequests = new Map(); // id → { resolve, reject, timer }
 let buffer = "";
 
+// Tracking del estado del binario Rust para degradación graceful.
+// Si el binario falla, el wrapper HTTP sigue vivo pero marca mcp_process_alive=false.
+let mcpStartFailures = 0;
+const MAX_START_FAILURES = 5; // tras 5 fallos consecutivos, dejamos de reintentar
+
 function startMcpProcess() {
-  mcpProcess = spawn(MCP_BIN, [], {
-    env: {
-      ...process.env,
-      WORKSPACE_MCP_HOME: process.env.WORKSPACE_MCP_HOME || __dirname,
-      RETARGET_WORKSPACE: process.env.RETARGET_WORKSPACE || join(__dirname, "contracts"),
-    },
-    stdio: ["pipe", "pipe", "pipe"],
+  try {
+    if (!existsSyncCompat(MCP_BIN)) {
+      console.error(`[wrapper] MCP binary not found at ${MCP_BIN} — running in degraded mode (HTTP only, no rust MCP).`);
+      mcpProcess = null;
+      return;
+    }
+  } catch {}
+
+  try {
+    mcpProcess = spawn(MCP_BIN, [], {
+      env: {
+        ...process.env,
+        WORKSPACE_MCP_HOME: process.env.WORKSPACE_MCP_HOME || __dirname,
+        RETARGET_WORKSPACE: process.env.RETARGET_WORKSPACE || join(__dirname, "contracts"),
+      },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+  } catch (err) {
+    console.error(`[wrapper] spawn failed: ${err.message} — degraded mode.`);
+    mcpProcess = null;
+    mcpStartFailures++;
+    return;
+  }
+
+  // CRÍTICO: capturar 'error' event para que NO crashee el proceso Node
+  mcpProcess.on("error", (err) => {
+    console.error(`[wrapper] MCP process error: ${err.code || err.message} — degraded mode.`);
+    mcpStartFailures++;
+    mcpProcess = null;
+    pendingRequests.forEach(({ reject, timer }) => {
+      clearTimeout(timer);
+      reject(new Error("MCP process error: " + err.message));
+    });
+    pendingRequests.clear();
+    if (mcpStartFailures < MAX_START_FAILURES) {
+      setTimeout(startMcpProcess, 2000);
+    } else {
+      console.error(`[wrapper] giving up rust MCP after ${MAX_START_FAILURES} failures. HTTP wrapper continues.`);
+    }
   });
 
   mcpProcess.stdout.on("data", (chunk) => {
@@ -77,17 +116,26 @@ function startMcpProcess() {
   });
 
   mcpProcess.on("exit", (code) => {
-    console.error(`[wrapper] MCP process exited with code ${code}. Restarting in 1s...`);
+    console.error(`[wrapper] MCP process exited with code ${code}.`);
+    mcpStartFailures++;
     mcpProcess = null;
     pendingRequests.forEach(({ reject, timer }) => {
       clearTimeout(timer);
       reject(new Error("MCP process died"));
     });
     pendingRequests.clear();
-    setTimeout(startMcpProcess, 1000);
+    if (mcpStartFailures < MAX_START_FAILURES) {
+      console.error(`[wrapper] restarting in 2s (failure ${mcpStartFailures}/${MAX_START_FAILURES})`);
+      setTimeout(startMcpProcess, 2000);
+    } else {
+      console.error(`[wrapper] giving up rust MCP after ${MAX_START_FAILURES} failures. HTTP wrapper continues in degraded mode.`);
+    }
   });
 
-  console.log("[wrapper] MCP process started, PID:", mcpProcess.pid);
+  if (mcpProcess.pid) {
+    mcpStartFailures = 0; // reset on successful spawn
+    console.log("[wrapper] MCP process started, PID:", mcpProcess.pid);
+  }
 }
 
 function sendToMcp(message) {
@@ -542,6 +590,7 @@ const server = createServer(async (req, res) => {
           let saved;
           if (action === "screenshot") saved = setLandingScreenshot(projectId, landingId, payload);
           else if (action === "progress") saved = updateLandingProgress(projectId, landingId, payload);
+          else if (action === "review-score") saved = setReviewScore(projectId, landingId, payload);
           else throw new Error("Action no soportado: " + action);
           logEvent("info", `landing_${action}`, `${projectId}/${landingId}`, { project: projectId, landing: landingId });
           res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
@@ -554,18 +603,19 @@ const server = createServer(async (req, res) => {
       return;
     }
 
-    // POST /api/projects/<id>/{feedback|errors|reasoning|deploy}
-    if (req.method === "POST" && ["feedback", "errors", "reasoning", "deploy"].includes(sub)) {
+    // POST /api/projects/<id>/{feedback|errors|reasoning|deploy|annotations}
+    if (req.method === "POST" && ["feedback", "errors", "reasoning", "deploy", "annotations"].includes(sub)) {
       let body = "";
       req.on("data", (c) => (body += c));
       req.on("end", () => {
         try {
           const payload = JSON.parse(body || "{}");
           let saved;
-          if (sub === "feedback")  saved = addFeedback(projectId, payload);
-          if (sub === "errors")    saved = addError(projectId, payload);
-          if (sub === "reasoning") saved = addReasoning(projectId, payload);
-          if (sub === "deploy")    saved = setDeploy(projectId, payload);
+          if (sub === "feedback")    saved = addFeedback(projectId, payload);
+          if (sub === "errors")      saved = addError(projectId, payload);
+          if (sub === "reasoning")   saved = addReasoning(projectId, payload);
+          if (sub === "deploy")      saved = setDeploy(projectId, payload);
+          if (sub === "annotations") saved = addAnnotation(projectId, payload);
           logEvent("info", `project_${sub}`, `Nuevo ${sub} en ${projectId}`, { project: projectId });
           res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
           res.end(JSON.stringify({ ok: true, item: saved }));
