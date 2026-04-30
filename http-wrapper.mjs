@@ -276,7 +276,74 @@ const server = createServer(async (req, res) => {
 
   // POST /api/requests → crear nueva solicitud (sin auth: cualquiera puede pedir)
   if (req.method === "POST" && url.pathname === "/api/requests") {
+    const contentType = req.headers["content-type"] || "";
     let body = "";
+    
+    // Si es FormData (multipart/form-data), necesitamos parsear diferente
+    if (contentType.includes("multipart/form-data")) {
+      const chunks = [];
+      req.on("data", (c) => chunks.push(c));
+      req.on("end", async () => {
+        try {
+          // Para FormData, usamos una biblioteca o parseo manual
+          // Por simplicidad, convertimos a string y parseamos
+          const buffer = Buffer.concat(chunks);
+          const boundary = contentType.split("boundary=")[1];
+          const parts = buffer.toString().split(`--${boundary}`);
+          
+          const payload = {};
+          let fileData = null;
+          let fileName = null;
+          
+          parts.forEach(part => {
+            if (part.includes("Content-Disposition")) {
+              const nameMatch = part.match(/name="([^"]+)"/);
+              const filenameMatch = part.match(/filename="([^"]+)"/);
+              if (nameMatch) {
+                const name = nameMatch[1];
+                const value = part.split("\r\n\r\n")[1]?.split("\r\n")[0] || "";
+                if (filenameMatch) {
+                  fileName = filenameMatch[1];
+                  // Guardamos el contenido del archivo (simplificado)
+                  fileData = part.split("\r\n\r\n")[1]?.split("\r\n--")[0] || "";
+                } else {
+                  payload[name] = value;
+                }
+              }
+            }
+          });
+          
+          // Si hay archivo, guardarlo en disco
+          let attachmentUrl = payload.attachment_url || "";
+          if (fileData && fileName) {
+            const fs = await import("fs");
+            const path = await import("path");
+            const uploadsDir = path.join(__dirname, "uploads");
+            if (!fs.existsSync(uploadsDir)) {
+              fs.mkdirSync(uploadsDir, { recursive: true });
+            }
+            const filePath = path.join(uploadsDir, `${Date.now()}-${fileName}`);
+            fs.writeFileSync(filePath, Buffer.from(fileData, "binary"));
+            attachmentUrl = `/uploads/${path.basename(filePath)}`;
+          }
+          
+          payload.attachment_url = attachmentUrl;
+          
+          const created = addRequest(payload);
+          logEvent("info", "request_created", `${created.id} · ${created.client_name} → ${created.project_id}`, {
+            request_id: created.id, project: created.project_id, type: created.type, priority: created.priority,
+          });
+          res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({ ok: true, request: created }));
+        } catch (err) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
+    }
+    
+    // Si es JSON normal (backwards compatibility)
     req.on("data", (c) => (body += c));
     req.on("end", () => {
       try {
@@ -1083,6 +1150,37 @@ const server = createServer(async (req, res) => {
       }
     });
     return;
+  }
+
+  // Servir archivos subidos (uploads)
+  if (req.method === "GET" && url.pathname.startsWith("/uploads/")) {
+    const fs = await import("fs");
+    const path = await import("path");
+    const fileName = url.pathname.split("/")[2];
+    const filePath = path.join(__dirname, "uploads", fileName);
+    try {
+      const data = fs.readFileSync(filePath);
+      const ext = path.extname(fileName).toLowerCase();
+      const contentTypes = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".gif": "image/gif",
+        ".pdf": "application/pdf",
+        ".doc": "application/msword",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".xls": "application/vnd.ms-excel",
+        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".txt": "text/plain",
+        ".zip": "application/zip"
+      };
+      const contentType = contentTypes[ext] || "application/octet-stream";
+      res.writeHead(200, { "Content-Type": contentType });
+      return res.end(data);
+    } catch (err) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: "File not found" }));
+    }
   }
 
   res.writeHead(404, { "Content-Type": "application/json" });

@@ -349,6 +349,19 @@ function clearFilters(){
   loadRequests();
 }
 
+let selectedFile = null;
+
+function handleFileSelect(input){
+  const file = input.files[0];
+  if (file){
+    selectedFile = file;
+    $("#file-info").textContent = `Seleccionado: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+  } else {
+    selectedFile = null;
+    $("#file-info").textContent = "";
+  }
+}
+
 $("#form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const btn = $("#submit-btn");
@@ -374,20 +387,24 @@ $("#form").addEventListener("submit", async (ev) => {
       onProjectChange(projectId);
     }
 
-    const payload = {
-      client_name: $("#client_name").value.trim(),
-      client_email: $("#client_email").value.trim(),
-      project_id: projectId,
-      type: $("#type").value,
-      priority: $("#priority").value,
-      title: $("#title").value.trim(),
-      message: $("#message").value.trim(),
-      attachment_url: $("#attachment_url").value.trim(),
-    };
+    // Crear FormData para enviar archivo si existe
+    const formData = new FormData();
+    formData.append("client_name", $("#client_name").value.trim());
+    formData.append("client_email", $("#client_email").value.trim());
+    formData.append("project_id", projectId);
+    formData.append("type", $("#type").value);
+    formData.append("priority", $("#priority").value);
+    formData.append("title", $("#title").value.trim());
+    formData.append("message", $("#message").value.trim());
+    formData.append("attachment_url", $("#attachment_url").value.trim());
+    
+    if (selectedFile) {
+      formData.append("attachment_file", selectedFile);
+    }
+
     const r = await fetch("/api/requests", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: formData
     });
     if (!r.ok){ const e = await r.json().catch(()=>({})); throw new Error(e.error || `HTTP ${r.status}`); }
     const d = await r.json();
