@@ -40,7 +40,68 @@
   },
   "workflow": {
     "current_step": "landing_pages",
-    "steps": []
+    "steps": [
+      {
+        "id": 1,
+        "name": "Reconnaissance",
+        "details": "Análisis del sitio original",
+        "status": "completed"
+      },
+      {
+        "id": 2,
+        "name": "Assets",
+        "details": "Recopilación de imágenes y recursos",
+        "status": "completed"
+      },
+      {
+        "id": 3,
+        "name": "Content",
+        "details": "Extracción y adaptación de contenido",
+        "status": "completed"
+      },
+      {
+        "id": 4,
+        "name": "Header",
+        "details": "Implementación de header global",
+        "status": "completed"
+      },
+      {
+        "id": 5,
+        "name": "Footer",
+        "details": "Implementación de footer global",
+        "status": "completed"
+      },
+      {
+        "id": 6,
+        "name": "Landing Pages",
+        "details": "Implementación de landings principales",
+        "status": "in_progress"
+      },
+      {
+        "id": 7,
+        "name": "Contact Form",
+        "details": "Implementación de formulario de contacto",
+        "status": "pending"
+      },
+      {
+        "id": 8,
+        "name": "Integrations",
+        "details": "Integración con servicios externos",
+        "status": "pending"
+      },
+      {
+        "id": 9,
+        "name": "QA & Testing",
+        "details": "Pruebas y corrección de errores",
+        "status": "pending"
+      },
+      {
+        "id": 10,
+        "name": "Deploy",
+        "details": "Despliegue a producción",
+        "status": "pending"
+      }
+    ]
   },
   "team_assignments": {},
   "deployment": {
