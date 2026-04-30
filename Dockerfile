@@ -29,6 +29,7 @@ COPY http-wrapper.mjs ./
 COPY chat.mjs ./
 COPY health-monitor.mjs ./
 COPY projects-store.mjs ./
+COPY requests-store.mjs ./
 COPY onboarding ./onboarding
 COPY roadmap ./roadmap
 COPY projects-ui ./projects-ui
