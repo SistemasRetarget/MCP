@@ -18,6 +18,7 @@ import { validateGoogleAdsPolicies } from "./validators/google-ads-policies.mjs"
 import { validateSEOTechnical } from "./validators/seo-technical.mjs";
 import { validateMobileFirst } from "./validators/mobile-first.mjs";
 import { chatLoop, TOOLS as CHAT_TOOLS } from "./chat.mjs";
+import { getHealthSnapshot, getEvents, logEvent, checkAnthropic } from "./health-monitor.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -244,12 +245,27 @@ const server = createServer(async (req, res) => {
           maxTurns: maxTurns || 8
         });
 
+        // Detectar si el resultado fue un error de Anthropic (credit balance, etc.)
+        if (result?.error) {
+          const txt = String(result.error).toLowerCase();
+          if (txt.includes("credit balance")) {
+            logEvent("critical", "credit_balance_too_low", "Anthropic sin créditos durante /chat", { email });
+          } else if (txt.includes("authentication") || txt.includes("api key")) {
+            logEvent("critical", "auth_error", "Anthropic API key inválida durante /chat", { email });
+          } else {
+            logEvent("error", "chat_error", result.error, { email });
+          }
+        } else {
+          logEvent("info", "chat_ok", `Chat completado para ${email}`, { turns: result?.turns });
+        }
+
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({
           ...result,
           signature: cfg.identity?.signature
         }));
       } catch (err) {
+        logEvent("error", "chat_exception", err.message);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: err.message }));
       }
@@ -274,6 +290,97 @@ const server = createServer(async (req, res) => {
       mcp_process_alive: mcpProcess !== null && mcpProcess.exitCode === null,
       pending_requests: pendingRequests.size,
     }));
+  }
+
+  // Greet — saludo de inicio de conversación (Cascade lo invoca al abrir cada chat).
+  // Devuelve un mensaje breve + estado, para confirmar que el MCP está vivo.
+  if (req.method === "GET" && url.pathname === "/greet") {
+    try {
+      const name = url.searchParams.get("name") || "";
+      const email = url.searchParams.get("email") || "";
+      const cfg = JSON.parse(readFileSync(join(__dirname, "mcp-subagents-config.json"), "utf8"));
+      const snapshot = await getHealthSnapshot({
+        uptime: Math.floor((Date.now() - new Date(STARTED_AT).getTime()) / 1000),
+        mcpAlive: mcpProcess !== null && mcpProcess.exitCode === null,
+      });
+      // Proyectos activos (rápido)
+      let projects = [];
+      try {
+        const projectsDir = join(__dirname, "projects");
+        const files = readdirSync(projectsDir).filter(f => f.endsWith("-config.json"));
+        projects = files.map(f => {
+          const p = JSON.parse(readFileSync(join(projectsDir, f), "utf8"));
+          return {
+            id: p.id || f.replace("-config.json", ""),
+            name: p.project_name || p.id,
+            progress: p.replication?.progress_percent ?? 0,
+            current_step: p.workflow?.current_step || "—",
+          };
+        });
+      } catch {}
+
+      const icon = snapshot.overall === "healthy" ? "🟢" : (snapshot.mcp?.alive ? "🟠" : "🔴");
+      const who = name ? `Hola ${name}` : "Hola";
+      const status =
+        snapshot.overall === "healthy"
+          ? `MCP operativo. Anthropic OK. ${projects.length} proyecto(s) activo(s).`
+          : snapshot.cascade_message;
+
+      const greeting = `${icon} ${who}, soy el Asistente de Retarget. ${status}`;
+      logEvent("info", "greet", `Saludo emitido a ${name || email || "anon"}`);
+
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify({
+        greeting,
+        overall: snapshot.overall,
+        mcp_alive: snapshot.mcp?.alive,
+        anthropic_status: snapshot.anthropic?.status,
+        anthropic_action: snapshot.anthropic?.action || null,
+        active_projects: projects,
+        roadmap_url: `${url.protocol}//${req.headers.host}/roadmap`,
+        signature: cfg.identity?.signature || "— Sistemas Retarget ❤️",
+      }));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message, greeting: "🔴 MCP no respondió correctamente." }));
+    }
+  }
+
+  // Health — snapshot completo (para Cascade/Windsurf/dashboards)
+  // Detecta créditos de Anthropic, API key inválida, MCP caído, etc.
+  if (req.method === "GET" && url.pathname === "/health") {
+    try {
+      const force = url.searchParams.get("force") === "1";
+      if (force) await checkAnthropic({ force: true });
+      const snapshot = await getHealthSnapshot({
+        uptime: Math.floor((Date.now() - new Date(STARTED_AT).getTime()) / 1000),
+        mcpAlive: mcpProcess !== null && mcpProcess.exitCode === null,
+      });
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify(snapshot, null, 2));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // Events — log en memoria (últimos N eventos relevantes)
+  if (req.method === "GET" && url.pathname === "/events") {
+    const limit = parseInt(url.searchParams.get("limit") || "50", 10);
+    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    return res.end(JSON.stringify({ events: getEvents(limit), count: getEvents(limit).length }));
+  }
+
+  // Roadmap — HTML interactivo con estado del MCP, eventos y proyectos
+  if (req.method === "GET" && (url.pathname === "/roadmap" || url.pathname === "/roadmap/")) {
+    try {
+      const html = readFileSync(join(__dirname, "roadmap/index.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
   }
 
   // Projects — lista proyectos activos
@@ -445,4 +552,13 @@ server.listen(PORT, () => {
   console.log(`[wrapper] HTTP server listening on port ${PORT}`);
   console.log(`[wrapper] MCP endpoint: POST http://localhost:${PORT}/mcp`);
   console.log(`[wrapper] Status: GET http://localhost:${PORT}/status`);
+  console.log(`[wrapper] Health: GET http://localhost:${PORT}/health`);
+  console.log(`[wrapper] Roadmap: GET http://localhost:${PORT}/roadmap`);
+  logEvent("info", "boot", "MCP HTTP wrapper iniciado", { port: PORT });
+  // Health-check inicial (no bloquea el listen)
+  checkAnthropic({ force: true }).catch((e) => logEvent("warn", "boot_health_check_failed", e.message));
+  // Health-check periódico cada 5 minutos
+  setInterval(() => {
+    checkAnthropic({ force: true }).catch(() => {});
+  }, 5 * 60_000);
 });

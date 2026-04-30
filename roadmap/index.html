@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MCP Roadmap — Estado y Proceso de Pensamiento</title>
+<style>
+  :root {
+    --bg: #0b0d12;
+    --panel: #11141b;
+    --panel-2: #161a23;
+    --border: #232838;
+    --text: #e6e8ee;
+    --muted: #8a92a6;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --err: #f87171;
+    --crit: #ef4444;
+    --accent: #FF6B35;
+    --link: #93c5fd;
+    --mono: 'SF Mono', ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: 0.5px; }
+  header h1 small { color: var(--muted); font-weight: 400; margin-left: 8px; }
+  .status-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .status-pill.healthy { background: rgba(74,222,128,0.15); color: var(--ok); border: 1px solid var(--ok); }
+  .status-pill.degraded { background: rgba(251,191,36,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .status-pill.down { background: rgba(239,68,68,0.15); color: var(--crit); border: 1px solid var(--crit); }
+  main {
+    padding: 24px 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card h2 {
+    margin: 0 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .row:last-child { border-bottom: 0; }
+  .row .k { color: var(--muted); }
+  .row .v { font-family: var(--mono); font-size: 13px; }
+  .v.ok   { color: var(--ok); }
+  .v.warn { color: var(--warn); }
+  .v.err  { color: var(--err); }
+  .alert {
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--accent);
+    background: var(--panel-2);
+  }
+  .alert.crit { border-left-color: var(--crit); background: rgba(239,68,68,0.07); }
+  .alert.warn { border-left-color: var(--warn); background: rgba(251,191,36,0.07); }
+  .alert.ok   { border-left-color: var(--ok); background: rgba(74,222,128,0.07); }
+  .alert .action { display: block; margin-top: 6px; color: var(--link); font-size: 13px; }
+  ul.events { list-style: none; padding: 0; margin: 0; max-height: 380px; overflow-y: auto; font-family: var(--mono); font-size: 12px; }
+  ul.events li { padding: 8px 0; border-bottom: 1px dashed var(--border); display: grid; grid-template-columns: 70px 90px 1fr; gap: 10px; align-items: baseline; }
+  ul.events .lvl { font-weight: 700; text-transform: uppercase; font-size: 10px; }
+  ul.events .lvl.info  { color: var(--ok); }
+  ul.events .lvl.warn  { color: var(--warn); }
+  ul.events .lvl.error, ul.events .lvl.critical { color: var(--crit); }
+  ul.events .ts { color: var(--muted); font-size: 11px; }
+  ul.events .msg { color: var(--text); word-break: break-word; }
+  .phases { display: flex; flex-direction: column; gap: 10px; }
+  .phase { padding: 12px 14px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 12px; }
+  .phase .num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: var(--border); color: var(--muted); }
+  .phase.done .num { background: var(--ok); color: #0b0d12; }
+  .phase.active .num { background: var(--accent); color: white; }
+  .phase .title { font-size: 14px; }
+  .phase .state { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .phase.done .state { color: var(--ok); }
+  .phase.active .state { color: var(--accent); }
+  footer { padding: 20px 32px; color: var(--muted); font-size: 12px; text-align: center; border-top: 1px solid var(--border); }
+  code { font-family: var(--mono); background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  .endpoints a { color: var(--link); text-decoration: none; font-family: var(--mono); font-size: 12px; }
+  .endpoints a:hover { text-decoration: underline; }
+  .refresh { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>MCP Roadmap <small id="signature">— Sistemas Retarget</small></h1>
+  <div style="display:flex; align-items:center; gap:14px;">
+    <span class="refresh" id="last-refresh">—</span>
+    <span class="status-pill" id="overall-pill">checking…</span>
+  </div>
+</header>
+
+<main>
+  <!-- Estado del MCP -->
+  <section class="card full">
+    <h2>Mensaje para Cascade / Windsurf</h2>
+    <div id="cascade-alert" class="alert">Cargando estado…</div>
+  </section>
+
+  <section class="card">
+    <h2>Servicio MCP</h2>
+    <div class="row"><span class="k">Servicio</span><span class="v" id="mcp-service">—</span></div>
+    <div class="row"><span class="k">Versión</span><span class="v" id="mcp-version">—</span></div>
+    <div class="row"><span class="k">Proceso vivo</span><span class="v" id="mcp-alive">—</span></div>
+    <div class="row"><span class="k">Uptime</span><span class="v" id="mcp-uptime">—</span></div>
+    <div class="row"><span class="k">Pendientes</span><span class="v" id="mcp-pending">—</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Anthropic API</h2>
+    <div class="row"><span class="k">Estado</span><span class="v" id="anth-status">—</span></div>
+    <div class="row"><span class="k">Crítico</span><span class="v" id="anth-critical">—</span></div>
+    <div class="row"><span class="k">Última verificación</span><span class="v" id="anth-at">—</span></div>
+    <div class="row" style="display:block; padding-top:12px;">
+      <div class="k" style="margin-bottom:4px;">Acción recomendada</div>
+      <div class="v" id="anth-action" style="word-break:break-word;">—</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Operatividad</h2>
+    <div class="row"><span class="k">/chat (Claude tool-use)</span><span class="v" id="op-chat">—</span></div>
+    <div class="row"><span class="k">/notify (templates)</span><span class="v" id="op-notify">—</span></div>
+    <div class="row"><span class="k">Validadores quality-gate</span><span class="v" id="op-validators">—</span></div>
+  </section>
+
+  <!-- Proyectos -->
+  <section class="card full">
+    <h2>Proyectos activos</h2>
+    <div id="projects">Cargando…</div>
+  </section>
+
+  <!-- Eventos -->
+  <section class="card full">
+    <h2>Log de eventos (últimos 50)</h2>
+    <ul class="events" id="events"><li>Cargando…</li></ul>
+  </section>
+
+  <!-- Endpoints -->
+  <section class="card full endpoints">
+    <h2>Endpoints disponibles</h2>
+    <div class="row"><span class="k">Health snapshot (Cascade-friendly)</span><a href="/health" target="_blank">GET /health</a></div>
+    <div class="row"><span class="k">Eventos en memoria</span><a href="/events" target="_blank">GET /events</a></div>
+    <div class="row"><span class="k">Status básico</span><a href="/status" target="_blank">GET /status</a></div>
+    <div class="row"><span class="k">Equipo</span><a href="/team" target="_blank">GET /team</a></div>
+    <div class="row"><span class="k">Identidad</span><a href="/identity" target="_blank">GET /identity</a></div>
+    <div class="row"><span class="k">Proyectos</span><a href="/api/projects" target="_blank">GET /api/projects</a></div>
+    <div class="row"><span class="k">Herramientas Claude</span><a href="/chat/tools" target="_blank">GET /chat/tools</a></div>
+  </section>
+</main>
+
+<footer>
+  Auto-refresh cada 30s · Sistemas Retarget ❤️ · <code id="now"></code>
+</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+function fmtTs(iso){ if(!iso) return "—"; const d = new Date(iso); return d.toLocaleString("es-CL", { hour12:false }); }
+function fmtUptime(s){ if(s==null) return "—"; if(s<60) return s+"s"; if(s<3600) return Math.floor(s/60)+"m "+(s%60)+"s"; return Math.floor(s/3600)+"h "+Math.floor((s%3600)/60)+"m"; }
+
+async function loadHealth(){
+  try {
+    const r = await fetch("/health", { cache: "no-store" });
+    const h = await r.json();
+
+    // Pill
+    const pill = $("overall-pill");
+    pill.textContent = h.overall;
+    pill.className = "status-pill " + (h.overall === "healthy" ? "healthy" : (h.mcp?.alive ? "degraded" : "down"));
+
+    // Cascade alert
+    const al = $("cascade-alert");
+    al.textContent = h.cascade_message || "—";
+    al.className = "alert " + (h.overall === "healthy" ? "ok" : (h.anthropic?.critical ? "crit" : "warn"));
+    if (h.anthropic?.action && h.anthropic.status !== "ok") {
+      const a = document.createElement("a");
+      a.className = "action";
+      a.textContent = "→ " + h.anthropic.action;
+      if (h.anthropic.status === "credit_balance_too_low") a.href = "https://console.anthropic.com/settings/billing";
+      else if (h.anthropic.status === "auth_error" || h.anthropic.status === "no_api_key") a.href = "https://console.anthropic.com/settings/keys";
+      else a.href = "#";
+      a.target = "_blank";
+      al.appendChild(a);
+    }
+
+    // MCP
+    $("mcp-service").textContent = "quality-gate-mcp";
+    $("mcp-version").textContent = "0.3.1";
+    $("mcp-alive").innerHTML = h.mcp?.alive ? '<span class="ok">true</span>' : '<span class="err">false</span>';
+    $("mcp-uptime").textContent = fmtUptime(h.mcp?.uptime_seconds);
+    $("mcp-pending").textContent = "0";
+
+    // Anthropic
+    const a = h.anthropic || {};
+    const cls = a.status === "ok" ? "ok" : (a.critical ? "err" : "warn");
+    $("anth-status").innerHTML = `<span class="${cls}">${a.status||"—"}</span>`;
+    $("anth-critical").innerHTML = a.critical ? '<span class="err">YES</span>' : '<span class="ok">no</span>';
+    $("anth-at").textContent = fmtTs(a.at);
+    $("anth-action").textContent = a.action || "—";
+
+    // Operatividad
+    const op = h.operational || {};
+    $("op-chat").innerHTML = op.chat_endpoint ? '<span class="ok">✓ funciona</span>' : '<span class="err">✗ caído</span>';
+    $("op-notify").innerHTML = op.notify ? '<span class="ok">✓</span>' : '<span class="err">✗</span>';
+    $("op-validators").innerHTML = op.validators ? '<span class="ok">✓</span>' : '<span class="err">✗</span>';
+
+    $("last-refresh").textContent = "Actualizado " + fmtTs(h.at);
+  } catch(err) {
+    $("cascade-alert").textContent = "🔴 No se puede contactar al MCP: " + err.message;
+    $("cascade-alert").className = "alert crit";
+    $("overall-pill").textContent = "down";
+    $("overall-pill").className = "status-pill down";
+  }
+}
+
+async function loadEvents(){
+  try {
+    const r = await fetch("/events?limit=50", { cache:"no-store" });
+    const data = await r.json();
+    const ul = $("events");
+    ul.innerHTML = "";
+    if (!data.events || data.events.length === 0) {
+      ul.innerHTML = "<li><span class='lvl info'>info</span><span class='ts'>—</span><span class='msg'>Sin eventos aún.</span></li>";
+      return;
+    }
+    for (const e of data.events) {
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="lvl ${e.level}">${e.level}</span><span class="ts">${fmtTs(e.at)}</span><span class="msg"><strong>${e.type}</strong> — ${e.message}</span>`;
+      ul.appendChild(li);
+    }
+  } catch(err) {
+    $("events").innerHTML = `<li><span class="lvl error">error</span><span class="ts">—</span><span class="msg">${err.message}</span></li>`;
+  }
+}
+
+async function loadProjects(){
+  try {
+    const r = await fetch("/api/projects", { cache:"no-store" });
+    const data = await r.json();
+    const div = $("projects");
+    if (!data.projects || data.projects.length === 0) {
+      div.textContent = "Sin proyectos.";
+      return;
+    }
+    div.innerHTML = "";
+    for (const p of data.projects) {
+      const wrap = document.createElement("div");
+      wrap.className = "phases";
+      const title = document.createElement("div");
+      title.style.cssText = "font-size:15px; font-weight:600; margin-bottom:8px;";
+      title.innerHTML = `${p.project_name || p.id || "Proyecto"} <span style="color:var(--muted); font-size:12px; font-weight:400;">— ${p.replication?.progress_percent ?? 0}%</span>`;
+      wrap.appendChild(title);
+
+      const steps = p.workflow?.steps || [];
+      for (const s of steps) {
+        const ph = document.createElement("div");
+        ph.className = "phase " + (s.status === "completed" ? "done" : (s.status === "in_progress" ? "active" : ""));
+        ph.innerHTML = `<div class="num">${s.id}</div><div><div class="title">${s.name}</div><div class="state" style="color:var(--muted); font-size:11px;">${s.details||""}</div></div><div class="state">${s.status}</div>`;
+        wrap.appendChild(ph);
+      }
+      div.appendChild(wrap);
+    }
+  } catch(err) {
+    $("projects").textContent = "Error: " + err.message;
+  }
+}
+
+function tick(){ $("now").textContent = new Date().toISOString(); }
+
+async function refreshAll(){
+  await Promise.all([loadHealth(), loadEvents(), loadProjects()]);
+  tick();
+}
+
+refreshAll();
+setInterval(refreshAll, 30_000);
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
