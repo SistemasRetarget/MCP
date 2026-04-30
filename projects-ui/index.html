@@ -95,6 +95,27 @@
   .card-foot .item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
   .card-foot .item .dot.err { background: var(--err); }
   .card-foot .item .dot.warn { background: var(--warn); }
+  .card-tag.archived { background: rgba(125,133,149,0.15); color: var(--muted); }
+  .card-tag.paused { background: rgba(245,158,11,0.15); color: var(--warn); }
+  /* Status dropdown */
+  .status-wrap { position: relative; display: inline-block; }
+  .status-btn { background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
+  .status-btn:hover { border-color: var(--accent); color: var(--text); }
+  .status-btn.active { background: rgba(74,222,128,0.15); color: var(--ok); border-color: rgba(74,222,128,0.3); }
+  .status-btn.archived { background: rgba(125,133,149,0.15); color: var(--muted); }
+  .status-btn.paused { background: rgba(245,158,11,0.15); color: var(--warn); border-color: rgba(245,158,11,0.3); }
+  .status-btn .caret { font-size: 8px; opacity: 0.6; }
+  .status-menu { position: absolute; top: calc(100% + 4px); right: 0; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 4px; min-width: 160px; display: none; z-index: 10; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .status-menu.open { display: block; }
+  .status-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 12px; color: var(--text); border-radius: 4px; cursor: pointer; user-select: none; }
+  .status-menu-item:hover { background: var(--panel-3); }
+  .status-menu-item.danger { color: var(--err); }
+  .status-menu-item .icon { font-size: 14px; width: 16px; text-align: center; }
+  .status-menu-item.current { opacity: 0.5; cursor: default; }
+  .status-menu-item.current:hover { background: transparent; }
+  /* Estilo visual para proyectos archivados (cuando se muestran) */
+  body:not(.hide-archived) .card[data-status="archived"] { opacity: 0.55; }
+  body:not(.hide-archived) .card[data-status="archived"]:hover { opacity: 1; }
 
   .empty { text-align: center; padding: 80px 20px; color: var(--muted); }
   .empty h3 { color: var(--text); font-weight: 500; margin: 0 0 6px; }
@@ -131,6 +152,9 @@
       <p id="subtitle">Cargando…</p>
     </div>
     <div class="actions">
+      <label style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;margin-right:12px;cursor:pointer">
+        <input type="checkbox" id="show-archived" style="cursor:pointer"> Mostrar archivados
+      </label>
       <button onclick="location.reload()">⟲ Refrescar</button>
     </div>
   </div>
@@ -172,9 +196,11 @@ async function loadProjects(){
     const r = await fetch("/api/projects/list", { cache: "no-store" });
     const data = await r.json();
     const grid = $("#grid");
-    const projects = data.projects || [];
+    const allProjects = data.projects || [];
+    const showArchived = document.getElementById("show-archived")?.checked;
+    const projects = showArchived ? allProjects : allProjects.filter(p => p.status !== "archived");
 
-    if (projects.length === 0) {
+    if (allProjects.length === 0) {
       grid.innerHTML = `<div class="empty"><h3>No hay proyectos registrados</h3><p>Crea un archivo <code>projects/&lt;id&gt;-config.json</code> en el MCP.</p></div>`;
       $("#subtitle").textContent = "0 proyectos";
       $("#stats").innerHTML = "";
@@ -194,16 +220,32 @@ async function loadProjects(){
       <div class="stat"><div class="k">Feedback recibido</div><div class="v">${totalFeedback}</div></div>
     `;
 
-    $("#subtitle").textContent = projects.length + " proyecto(s) registrado(s) en el MCP";
+    const archivedCount = allProjects.filter(p => p.status === "archived").length;
+    $("#subtitle").textContent = `${projects.length} proyecto(s) visibles · ${archivedCount} archivado(s)`;
+    if (projects.length === 0) {
+      grid.innerHTML = `<div class="empty"><h3>Todos archivados</h3><p>Marca "Mostrar archivados" para verlos.</p></div>`;
+      return;
+    }
 
-    grid.innerHTML = projects.map(p => `
-      <a class="card" href="/projects/${encodeURIComponent(p.id)}">
+    grid.innerHTML = projects.map(p => {
+      const st = p.status || "active";
+      return `
+      <a class="card" data-status="${st}" href="/projects/${encodeURIComponent(p.id)}">
         <div class="card-head">
           <div>
             <h3>${p.name || p.id}</h3>
             <div class="desc">${p.description || "—"}</div>
           </div>
-          <span class="card-tag ${p.status==='active'?'active':''}">${p.status || "—"}</span>
+          <div class="status-wrap">
+            <button class="status-btn ${st}" onclick="openStatusMenu(event,'${p.id}')" title="Cambiar estado del proyecto">
+              ${st} <span class="caret">▼</span>
+            </button>
+            <div class="status-menu" id="menu-${p.id}">
+              <div class="status-menu-item ${st==='active'?'current':''}" onclick="${st==='active'?'':"changeStatus(event,'"+p.id+"','active')"}"><span class="icon">●</span> ${st==='active'?'Activo (actual)':'Activar'}</div>
+              <div class="status-menu-item ${st==='paused'?'current':''}" onclick="${st==='paused'?'':"changeStatus(event,'"+p.id+"','paused')"}"><span class="icon">⏸</span> ${st==='paused'?'En pausa (actual)':'Pausar'}</div>
+              <div class="status-menu-item danger ${st==='archived'?'current':''}" onclick="${st==='archived'?'':"changeStatus(event,'"+p.id+"','archived')"}"><span class="icon">🗄</span> ${st==='archived'?'Archivado (actual)':'Archivar'}</div>
+            </div>
+          </div>
         </div>
 
         <div class="progress">
@@ -224,13 +266,53 @@ async function loadProjects(){
           ${p.deployment?.last_commit ? `<span class="item">⌥ ${shortHash(p.deployment.last_commit)}</span>`:""}
         </div>
       </a>
-    `).join("");
+    `;
+    }).join("");
   } catch(err) {
     $("#grid").innerHTML = `<div class="empty"><h3>Error al cargar proyectos</h3><p>${err.message}</p></div>`;
   }
 }
 
 function tick(){ $("#now").textContent = new Date().toLocaleString("es-CL", { hour12:false }); }
+
+function closeAllStatusMenus(){
+  document.querySelectorAll(".status-menu.open").forEach(m => m.classList.remove("open"));
+}
+
+function openStatusMenu(ev, projectId){
+  ev.preventDefault();
+  ev.stopPropagation();
+  const menu = document.getElementById(`menu-${projectId}`);
+  const wasOpen = menu?.classList.contains("open");
+  closeAllStatusMenus();
+  if (!wasOpen) menu?.classList.add("open");
+}
+
+async function changeStatus(ev, projectId, newStatus){
+  ev.preventDefault();
+  ev.stopPropagation();
+  closeAllStatusMenus();
+  const verb = { active: "activar", paused: "pausar", archived: "archivar" }[newStatus] || "cambiar";
+  if (!confirm(`¿Seguro que quieres ${verb} el proyecto "${projectId}"?`)) return;
+  try {
+    const r = await fetch(`/api/projects/${encodeURIComponent(projectId)}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    await loadProjects();
+  } catch(err) {
+    alert(`No se pudo cambiar el estado: ${err.message}`);
+  }
+}
+
+// Cerrar dropdowns al hacer click fuera
+document.addEventListener("click", (ev) => {
+  if (!ev.target.closest(".status-wrap")) closeAllStatusMenus();
+});
+
+document.getElementById("show-archived")?.addEventListener("change", loadProjects);
 
 loadHealth();
 loadProjects();

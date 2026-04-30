@@ -189,6 +189,21 @@ export function setDeploy(id, deployInfo) {
   return d.deploy;
 }
 
+/**
+ * Permite al usuario archivar/reactivar un proyecto sin tocar el config del repo.
+ * Persiste en projects-data/<id>.json como status_override.
+ * Status válidos: "active", "archived", "paused".
+ */
+export function setProjectStatus(id, status) {
+  const valid = ["active", "archived", "paused"];
+  if (!valid.includes(status)) throw new Error(`status inválido: ${status}. Usa uno de ${valid.join(", ")}`);
+  const d = getProjectData(id);
+  d.status_override = status;
+  d.status_changed_at = new Date().toISOString();
+  saveToDisk(id, d);
+  return { id, status, status_changed_at: d.status_changed_at };
+}
+
 export function listProjects() {
   try {
     const files = readdirSync(PROJECTS_DIR).filter(f => f.endsWith("-config.json"));
@@ -196,11 +211,15 @@ export function listProjects() {
       const cfg = JSON.parse(readFileSync(join(PROJECTS_DIR, f), "utf8"));
       const id = cfg.project_id || cfg.id || f.replace("-config.json", "");
       const data = getProjectData(id);
+      const effectiveStatus = data.status_override || cfg.status || "active";
       return {
         id,
         name: cfg.project_name || id,
         description: cfg.description || "",
-        status: cfg.status || "active",
+        status: effectiveStatus,
+        config_status: cfg.status || "active",
+        status_override: data.status_override || null,
+        status_changed_at: data.status_changed_at || null,
         progress: cfg.replication?.progress_percent ?? 0,
         current_step: cfg.workflow?.current_step || cfg.replication?.phase || "—",
         repositories: cfg.repositories || {},

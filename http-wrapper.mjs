@@ -30,6 +30,7 @@ import {
   updateLandingProgress,
   addAnnotation,
   setReviewScore,
+  setProjectStatus,
 } from "./projects-store.mjs";
 import { runAllTests } from "./tests/run-tests.mjs";
 import { gradePrompt, codeBasedGrade } from "./prompt-eval/grader.mjs";
@@ -610,6 +611,25 @@ const server = createServer(async (req, res) => {
         res.writeHead(404, { "Content-Type": "application/json" });
         return res.end(JSON.stringify({ error: `Proyecto no encontrado: ${projectId}` }));
       }
+    }
+
+    // POST /api/projects/<id>/status — body: {status: "active"|"archived"|"paused"}
+    if (req.method === "POST" && sub === "status") {
+      let body = "";
+      req.on("data", (c) => (body += c));
+      req.on("end", () => {
+        try {
+          const payload = JSON.parse(body || "{}");
+          const result = setProjectStatus(projectId, payload.status);
+          logEvent("info", "project_status_changed", `${projectId} → ${payload.status}`, { project: projectId, status: payload.status });
+          res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({ ok: true, ...result }));
+        } catch (err) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
     }
 
     // POST /api/projects/<id>/landings/<landingId>/{screenshot|progress}
