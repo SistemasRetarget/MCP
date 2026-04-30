@@ -144,13 +144,12 @@
 <main>
   <h1>Tests + Prompt Evaluation</h1>
   <p class="hint">
-    El MCP se auto-evalúa contra <strong>17 casos de uso</strong> conformes a
-    <a href="https://standards.ieee.org/ieee/829/4414/" target="_blank">IEEE 829-2008</a>,
-    cada uno mapeado a un principio del
-    <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank">NIST AI Risk Management Framework 1.0</a>.
-    El <strong>Prompt Grader</strong> usa el workflow oficial del
-    <a href="https://anthropic.skilljar.com/claude-with-the-anthropic-api" target="_blank">curso de Anthropic</a>:
-    <em>Code-based grading</em> + <em>Model-based grading</em>.
+    <strong>¿Qué es esta sección?</strong><br>
+    Aquí validamos que el sistema MCP funciona correctamente. Los tests verifican que el sistema pueda crear proyectos, procesar solicitudes, manejar errores, etc.<br><br>
+    <strong>¿Por qué es importante?</strong><br>
+    Garantiza que los cambios que hacemos no rompan funcionalidades existentes. Es como un "check-up" automático del sistema antes de cada deploy.<br><br>
+    <strong>¿Cómo funciona?</strong><br>
+    El MCP se auto-evalúa contra <strong>17 casos de uso</strong> conformes a estándares internacionales. El <strong>Prompt Grader</strong> evalúa la calidad de los prompts que usamos para comunicarnos con la IA.
   </p>
 
   <div class="section-tabs">
