@@ -33,6 +33,9 @@ COPY onboarding ./onboarding
 COPY roadmap ./roadmap
 COPY projects-ui ./projects-ui
 COPY mcp-projects ./mcp-projects
+COPY tests ./tests
+COPY prompt-eval ./prompt-eval
+COPY prompt-engineering-rubric.json ./
 
 ENV NODE_ENV=production
 ENV PORT=8080

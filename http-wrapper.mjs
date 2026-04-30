@@ -29,6 +29,8 @@ import {
   setLandingScreenshot,
   updateLandingProgress,
 } from "./projects-store.mjs";
+import { runAllTests } from "./tests/run-tests.mjs";
+import { gradePrompt, codeBasedGrade } from "./prompt-eval/grader.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -136,6 +138,53 @@ const server = createServer(async (req, res) => {
       pid: process.pid,
     }));
   }
+
+  // ──────────── TESTS / PROMPT EVAL ────────────
+  // GET /tests → vista HTML
+  if (req.method === "GET" && (url.pathname === "/tests" || url.pathname === "/tests/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/tests.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+  // GET /api/tests/run → ejecuta los 17 tests
+  if (req.method === "GET" && url.pathname === "/api/tests/run") {
+    try {
+      const baseUrl = `http://localhost:${PORT}`; // self-test
+      const results = await runAllTests({ baseUrl });
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify(results, null, 2));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+  // POST /api/prompt/grade → evalúa un prompt
+  if (req.method === "POST" && url.pathname === "/api/prompt/grade") {
+    let body = "";
+    req.on("data", c => body += c);
+    req.on("end", async () => {
+      try {
+        const { prompt, useModel = false } = JSON.parse(body || "{}");
+        if (!prompt) throw new Error("falta prompt");
+        const result = await gradePrompt(prompt, {
+          useModel,
+          apiKey: process.env.ANTHROPIC_API_KEY,
+        });
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify(result, null, 2));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+  // ──────────── /TESTS ────────────
 
   // Identity — quién es el asistente
   if (req.method === "GET" && url.pathname === "/identity") {

@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tests + Prompt Eval · MCP Retarget</title>
+<style>
+  :root {
+    --bg:#0a0c11; --panel:#111419; --panel-2:#161a22; --panel-3:#1c2230;
+    --border:#232838; --border-strong:#2e3548;
+    --text:#e6e8ee; --muted:#8a92a6; --muted-2:#6b7280;
+    --ok:#4ade80; --warn:#fbbf24; --err:#f87171;
+    --accent:#FF6B35; --link:#93c5fd;
+    --mono:'SF Mono', ui-monospace, Menlo, monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;line-height:1.5}
+  a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:var(--mono);background:var(--panel-2);padding:2px 6px;border-radius:4px;font-size:12px}
+
+  .topbar{padding:14px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--panel);position:sticky;top:0;z-index:10}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#ff8e5a);display:grid;place-items:center;font-weight:800;color:#fff;font-size:13px}
+  .topbar nav{display:flex;gap:4px}
+  .topbar nav a{color:var(--muted);padding:7px 14px;border-radius:6px;font-size:13px}
+  .topbar nav a.active,.topbar nav a:hover{background:var(--panel-2);color:var(--text)}
+
+  main{max-width:1300px;margin:0 auto;padding:32px}
+  h1{font-size:28px;margin:0 0 6px;font-weight:700;letter-spacing:-0.5px}
+  .hint{color:var(--muted);font-size:13px;margin-bottom:24px;max-width:800px}
+  .hint a{color:var(--accent)}
+
+  .section-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:24px}
+  .stab{padding:11px 18px;cursor:pointer;font-size:13px;color:var(--muted);border:1px solid transparent;border-bottom:0;border-radius:6px 6px 0 0;user-select:none}
+  .stab.active{background:var(--panel);border-color:var(--border);color:var(--text);margin-bottom:-1px}
+  .stab:hover{color:var(--text)}
+  .stab-content{display:none}.stab-content.active{display:block}
+
+  /* Summary */
+  .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px}
+  .stat .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-0.5px}
+  .stat .v.ok{color:var(--ok)}.stat .v.warn{color:var(--warn)}.stat .v.err{color:var(--err)}
+
+  /* Test cases */
+  .case{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px;display:grid;grid-template-columns:50px 1fr auto;gap:14px;align-items:start}
+  .case.PASS{border-left:3px solid var(--ok)}
+  .case.FAIL{border-left:3px solid var(--err)}
+  .case.ERROR{border-left:3px solid var(--warn)}
+  .case .icon{font-size:22px;text-align:center}
+  .case .body .id{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .case .body .name{font-weight:600;font-size:14px;margin:2px 0 4px}
+  .case .body .desc{color:var(--muted);font-size:12px;margin-bottom:6px}
+  .case .body .framework{display:inline-block;background:var(--panel-3);padding:2px 8px;border-radius:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-right:6px}
+  .case .body .framework a{color:var(--accent);text-decoration:none}
+  .case .body .principle{display:inline-block;background:rgba(74,222,128,0.1);color:var(--ok);padding:2px 8px;border-radius:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.05em}
+  .case .body .err-msg{color:var(--err);font-size:12px;margin-top:6px;font-family:var(--mono);background:var(--bg);padding:8px 10px;border-radius:4px}
+  .case .body .details{color:var(--muted-2);font-size:11px;margin-top:6px;font-family:var(--mono)}
+  .case .meta{text-align:right;font-size:11px;color:var(--muted);font-family:var(--mono);min-width:80px}
+  .case .meta .severity{display:block;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px;font-size:10px}
+  .case .meta .severity.critical{color:var(--err)}
+  .case .meta .severity.high{color:var(--warn)}
+  .case .meta .severity.medium{color:var(--muted)}
+
+  /* Principles grid */
+  .principles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:24px}
+  .principle-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .principle-card .name{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text);margin-bottom:8px}
+  .principle-card .bar{height:6px;background:var(--panel-3);border-radius:3px;overflow:hidden;margin-bottom:6px}
+  .principle-card .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8e5a)}
+  .principle-card .bar-fill.complete{background:linear-gradient(90deg,var(--ok),#67e892)}
+  .principle-card .nums{font-size:12px;color:var(--muted)}
+
+  /* Prompt grader */
+  .grader-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:900px){.grader-grid{grid-template-columns:1fr}}
+  .grader-input{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px}
+  .grader-input h3{margin:0 0 12px;font-size:14px}
+  .grader-input textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:6px;font-family:var(--mono);font-size:13px;min-height:200px;resize:vertical}
+  .grader-input textarea:focus{outline:none;border-color:var(--accent)}
+  .grader-input .actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px}
+  .grader-input button{background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px}
+  .grader-input button:hover{background:#ff8047}
+  .grader-input button:disabled{opacity:0.5}
+  .grader-input label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer}
+
+  .grader-output{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;min-height:300px}
+  .grader-output .empty{color:var(--muted);text-align:center;padding:60px 20px}
+  .grader-output .score{text-align:center;padding:20px 0;border-bottom:1px solid var(--border);margin-bottom:16px}
+  .grader-output .score .num{font-size:64px;font-weight:800;letter-spacing:-2px;line-height:1}
+  .grader-output .score .num.expert{color:var(--ok)}
+  .grader-output .score .num.proficient{color:#84cc16}
+  .grader-output .score .num.intermediate{color:var(--warn)}
+  .grader-output .score .num.novice{color:var(--err)}
+  .grader-output .score .level{font-size:12px;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);margin-top:6px}
+
+  .crit-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:8px 0;font-size:13px}
+  .crit-row .label{color:var(--text)}
+  .crit-row .label .weight{color:var(--muted-2);font-size:10px;margin-left:6px}
+  .crit-row .bar{width:120px;height:5px;background:var(--panel-3);border-radius:3px;overflow:hidden;display:inline-block;margin-right:8px;vertical-align:middle}
+  .crit-row .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8e5a)}
+  .crit-row .v{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:35px;text-align:right;display:inline-block}
+
+  .tips{margin-top:18px;padding:14px;background:var(--panel-2);border-radius:8px;border-left:3px solid var(--accent)}
+  .tips .title{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:8px}
+  .tips ul{margin:0;padding-left:18px}
+  .tips li{margin:6px 0;font-size:12px;color:var(--text)}
+  .tips li small{color:var(--muted);display:block;margin-top:2px}
+
+  .src-tag{display:inline-block;background:var(--panel-3);color:var(--muted);padding:3px 8px;border-radius:4px;font-size:10px;font-family:var(--mono);margin-right:6px}
+  .src-tag a{color:var(--accent);text-decoration:none}
+
+  footer.luis{text-align:center;padding:32px 20px 24px;color:var(--muted-2);font-size:11px;border-top:1px solid var(--border);margin-top:48px;letter-spacing:0.02em}
+  footer.luis .heart{color:var(--accent);display:inline-block;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+  .frameworks-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:20px}
+  .fw-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px}
+  .fw-card .name{font-weight:600;margin-bottom:4px}
+  .fw-card .author{color:var(--muted);font-size:11px;margin-bottom:6px}
+  .fw-card a{font-size:11px;display:block}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">R</div>
+    <div><strong>MCP · Retarget</strong> — Tests &amp; Prompt Eval</div>
+  </div>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/tests" class="active">Tests</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/health" target="_blank">Salud</a>
+  </nav>
+  <div></div>
+</div>
+
+<main>
+  <h1>Tests + Prompt Evaluation</h1>
+  <p class="hint">
+    El MCP se auto-evalúa contra <strong>17 casos de uso</strong> conformes a
+    <a href="https://standards.ieee.org/ieee/829/4414/" target="_blank">IEEE 829-2008</a>,
+    cada uno mapeado a un principio del
+    <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank">NIST AI Risk Management Framework 1.0</a>.
+    El <strong>Prompt Grader</strong> usa el workflow oficial del
+    <a href="https://anthropic.skilljar.com/claude-with-the-anthropic-api" target="_blank">curso de Anthropic</a>:
+    <em>Code-based grading</em> + <em>Model-based grading</em>.
+  </p>
+
+  <div class="section-tabs">
+    <div class="stab active" data-stab="suite">🧪 Test Suite (17 casos)</div>
+    <div class="stab" data-stab="prompt">📝 Prompt Grader</div>
+    <div class="stab" data-stab="frameworks">📚 Frameworks aplicados</div>
+  </div>
+
+  <!-- TEST SUITE -->
+  <section class="stab-content active" data-stab="suite">
+    <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button id="btn-run" style="background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600">▶ Ejecutar suite completa</button>
+      <span id="last-run" style="color:var(--muted);font-size:12px"></span>
+    </div>
+    <div class="summary" id="summary"></div>
+    <div id="principles-grid" class="principles"></div>
+    <div id="cases-list"><div class="empty" style="text-align:center;padding:40px;color:var(--muted)">Click en <strong>Ejecutar suite completa</strong> para correr los 17 tests.</div></div>
+  </section>
+
+  <!-- PROMPT GRADER -->
+  <section class="stab-content" data-stab="prompt">
+    <p class="hint" style="margin-bottom:16px">
+      Pega un prompt y obtén un score 0–100 contra los 7 criterios del rubric oficial Anthropic.
+      <strong>Code-based</strong> es gratis (heurísticas).
+      <strong>Model-based</strong> usa Claude Haiku (~$0.0001 por evaluación).
+    </p>
+    <div class="grader-grid">
+      <div class="grader-input">
+        <h3>Prompt a evaluar</h3>
+        <textarea id="prompt-input" placeholder="Pega aquí el prompt que quieres evaluar...
+
+Ejemplo: 'Eres un experto en SEO. Genera 3 títulos H1 para un sitio de hotel termal en Puyehue. Cada título: máximo 60 caracteres, debe incluir &quot;termas&quot;, en español. Devuelve formato JSON: {titulos: [...]}'"></textarea>
+        <div class="actions">
+          <label><input type="checkbox" id="use-model" /> Usar también Model-based (Claude Haiku · ~1 token)</label>
+          <button id="btn-grade">Evaluar</button>
+        </div>
+      </div>
+      <div class="grader-output" id="grader-output">
+        <div class="empty">El score aparecerá aquí.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRAMEWORKS -->
+  <section class="stab-content" data-stab="frameworks">
+    <p class="hint">Frameworks oficiales aplicados (cada uno con autor + URL oficial + Wikipedia):</p>
+    <div class="frameworks-list" id="fw-list"></div>
+  </section>
+</main>
+
+<footer class="luis">
+  Vista desarrollada por <strong>Luis</strong> con <span class="heart">❤</span> ·
+  Tests basados en <a href="https://standards.ieee.org/ieee/829/4414/" target="_blank">IEEE 829</a> ·
+  Grader basado en <a href="https://anthropic.skilljar.com/claude-with-the-anthropic-api" target="_blank">Anthropic Course</a>
+</footer>
+
+<script>
+const $=(s)=>document.querySelector(s);
+
+document.querySelectorAll(".stab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".stab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".stab-content").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.querySelector(`.stab-content[data-stab="${t.dataset.stab}"]`).classList.add("active");
+}));
+
+function escapeHtml(s){if(s==null)return"";return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+document.getElementById("btn-run").addEventListener("click",async()=>{
+  const btn=document.getElementById("btn-run");btn.disabled=true;btn.textContent="Ejecutando...";
+  $("#cases-list").innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Corriendo 17 tests...</div>';
+  try{
+    const r=await fetch("/api/tests/run");
+    const data=await r.json();
+    renderSuiteResults(data);
+    $("#last-run").textContent="Última corrida: "+new Date(data.meta.ran_at).toLocaleString("es-CL",{hour12:false})+" · "+data.summary.elapsed_total_ms+"ms";
+  }catch(err){
+    $("#cases-list").innerHTML=`<div style="color:var(--err);padding:20px">Error: ${escapeHtml(err.message)}</div>`;
+  }finally{btn.disabled=false;btn.textContent="▶ Ejecutar suite completa"}
+});
+
+function renderSuiteResults(data){
+  const s=data.summary;
+  $("#summary").innerHTML=`
+    <div class="stat"><div class="k">Pass rate</div><div class="v ${s.pass_rate>=80?'ok':s.pass_rate>=50?'warn':'err'}">${s.pass_rate}%</div></div>
+    <div class="stat"><div class="k">PASS</div><div class="v ok">${s.pass}</div></div>
+    <div class="stat"><div class="k">FAIL</div><div class="v err">${s.fail}</div></div>
+    <div class="stat"><div class="k">ERROR</div><div class="v warn">${s.error}</div></div>
+    <div class="stat"><div class="k">Tiempo total</div><div class="v" style="font-size:20px">${s.elapsed_total_ms}ms</div></div>`;
+
+  $("#principles-grid").innerHTML=Object.entries(s.by_principle).map(([k,v])=>{
+    const pct=v.total?Math.round(v.pass/v.total*100):0;
+    return `<div class="principle-card">
+      <div class="name">${escapeHtml(k)}</div>
+      <div class="bar"><div class="bar-fill ${pct===100?'complete':''}" style="width:${pct}%"></div></div>
+      <div class="nums">${v.pass}/${v.total} pasaron · ${pct}%</div>
+    </div>`;
+  }).join("");
+
+  $("#cases-list").innerHTML=data.cases.map(c=>{
+    const icon=c.verdict==="PASS"?"✅":c.verdict==="FAIL"?"❌":"⚠️";
+    return `<div class="case ${c.verdict}">
+      <div class="icon">${icon}</div>
+      <div class="body">
+        <div class="id">${c.id}</div>
+        <div class="name">${escapeHtml(c.name)}</div>
+        <div class="desc">${escapeHtml(c.description||'')}</div>
+        <div>
+          <span class="principle">${escapeHtml(c.nist_principle)}</span>
+          <span class="framework">${escapeHtml(c.framework)} ${c.framework_url?`<a href="${c.framework_url}" target="_blank">↗</a>`:''}</span>
+        </div>
+        ${c.error?`<div class="err-msg">${escapeHtml(c.error)}</div>`:''}
+        ${c.details?`<div class="details">${escapeHtml(JSON.stringify(c.details))}</div>`:''}
+      </div>
+      <div class="meta">
+        ${c.elapsed_ms}ms
+        <span class="severity ${c.severity}">${c.severity}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// Prompt grader
+document.getElementById("btn-grade").addEventListener("click",async()=>{
+  const prompt=document.getElementById("prompt-input").value.trim();
+  if(!prompt){alert("Pega un prompt");return}
+  const useModel=document.getElementById("use-model").checked;
+  const btn=document.getElementById("btn-grade");btn.disabled=true;btn.textContent="Evaluando...";
+  $("#grader-output").innerHTML='<div class="empty">Evaluando...</div>';
+  try{
+    const r=await fetch("/api/prompt/grade",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,useModel})});
+    const data=await r.json();
+    renderGraderResult(data);
+  }catch(err){
+    $("#grader-output").innerHTML=`<div style="color:var(--err);padding:20px">${escapeHtml(err.message)}</div>`;
+  }finally{btn.disabled=false;btn.textContent="Evaluar"}
+});
+
+function renderGraderResult(d){
+  const cb=d.code_based||d;
+  const breakdown=cb.breakdown||{};
+  const weights={clear_direct:20,output_format:15,examples:15,role_assignment:10,xml_structure:10,chain_of_thought:15,context_complete:15};
+  const labels={clear_direct:"Clear & Direct",output_format:"Output Format",examples:"Few-Shot Examples",role_assignment:"Role Assignment",xml_structure:"XML Structure",chain_of_thought:"Chain-of-Thought",context_complete:"Context Complete"};
+  const score=d.score||0,level=d.level||"novice";
+  let html=`<div class="score">
+    <div class="num ${level}">${score}</div>
+    <div class="level">${level} · ${score>=85?'Excelente':score>=70?'Bueno':score>=40?'Mejorable':'Necesita trabajo'}</div>
+  </div>`;
+  html+="<div style=\"font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px\">Breakdown por criterio (Anthropic Rubric)</div>";
+  for(const k of Object.keys(weights)){
+    const v=breakdown[k]||0;
+    html+=`<div class="crit-row"><div class="label">${labels[k]}<span class="weight">${weights[k]}%</span></div><div><span class="bar"><span class="bar-fill" style="width:${v}%"></span></span><span class="v">${v}</span></div></div>`;
+  }
+  if(d.code_based&&d.model_based){
+    html+=`<div style="margin-top:14px;padding:10px;background:var(--panel-2);border-radius:6px;font-size:12px;color:var(--muted)">
+      <strong>Code-based:</strong> ${d.code_based.score} ·
+      <strong>Model-based:</strong> ${d.model_based.score} (${d.model_based.grader_model})
+      ${d.model_based.rationale?`<br><em>${escapeHtml(d.model_based.rationale)}</em>`:''}
+    </div>`;
+  }else if(d.partial){
+    html+=`<div style="margin-top:14px;padding:10px;background:var(--panel-2);border-radius:6px;font-size:11px;color:var(--muted)">⚠ ${escapeHtml(d.note||'partial')}</div>`;
+  }
+  const tips=cb.tips||d.tips||[];
+  if(tips.length){
+    html+=`<div class="tips"><div class="title">💡 Top tips para subir tu score</div><ul>${tips.map(t=>`<li>${escapeHtml(t.tip||t)}<small>${escapeHtml(t.criterion||'')} · fuente: ${escapeHtml(t.source||'')}</small></li>`).join("")}</ul></div>`;
+  }
+  html+=`<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted-2)">
+    <span class="src-tag">Workflow: <a href="${d.workflow_url||cb.grader_url||'https://anthropic.skilljar.com/claude-with-the-anthropic-api'}" target="_blank">Anthropic Course ↗</a></span>
+  </div>`;
+  $("#grader-output").innerHTML=html;
+}
+
+// Frameworks
+const FRAMEWORKS=[
+  {name:"NIST AI RMF 1.0",author:"NIST (2023)",official:"https://www.nist.gov/itl/ai-risk-management-framework",wiki:"https://en.wikipedia.org/wiki/National_Institute_of_Standards_and_Technology"},
+  {name:"EU AI Act",author:"Comisión Europea (2024)",official:"https://artificialintelligenceact.eu/",wiki:"https://en.wikipedia.org/wiki/Artificial_Intelligence_Act"},
+  {name:"OECD AI Principles",author:"OECD (2019, rev. 2024)",official:"https://oecd.ai/en/ai-principles",wiki:"https://en.wikipedia.org/wiki/OECD_AI_Principles"},
+  {name:"IEEE 7000-2021",author:"IEEE (2021)",official:"https://standards.ieee.org/ieee/7000/6781/",wiki:"https://en.wikipedia.org/wiki/IEEE"},
+  {name:"Asilomar AI Principles",author:"Future of Life Institute (2017)",official:"https://futureoflife.org/open-letter/ai-principles/",wiki:"https://en.wikipedia.org/wiki/Asilomar_Conference_on_Beneficial_AI"},
+  {name:"PDCA",author:"Walter Shewhart (1939) / W. Edwards Deming",official:"https://en.wikipedia.org/wiki/PDCA",wiki:"https://en.wikipedia.org/wiki/W._Edwards_Deming"},
+  {name:"SECI Model",author:"Nonaka & Takeuchi (1995)",official:"https://en.wikipedia.org/wiki/SECI_model_of_knowledge_dimensions",wiki:"https://en.wikipedia.org/wiki/Ikujiro_Nonaka"},
+  {name:"Design by Contract",author:"Bertrand Meyer (1988)",official:"https://en.wikipedia.org/wiki/Design_by_contract",wiki:"https://en.wikipedia.org/wiki/Bertrand_Meyer"},
+  {name:"Society of Mind",author:"Marvin Minsky (1986)",official:"https://en.wikipedia.org/wiki/Society_of_Mind",wiki:"https://en.wikipedia.org/wiki/Marvin_Minsky"},
+  {name:"Chain-of-Thought",author:"Wei et al, NeurIPS 2022",official:"https://arxiv.org/abs/2201.11903",wiki:"https://en.wikipedia.org/wiki/Prompt_engineering#Chain-of-thought"},
+  {name:"Constitutional AI",author:"Bai et al, Anthropic (2022)",official:"https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback",wiki:"https://en.wikipedia.org/wiki/Anthropic"},
+  {name:"Anthropic PE Course",author:"Anthropic Academy",official:"https://anthropic.skilljar.com/claude-with-the-anthropic-api",wiki:"https://github.com/anthropics/courses"},
+  {name:"TDD",author:"Kent Beck (2002)",official:"https://en.wikipedia.org/wiki/Test-driven_development",wiki:"https://en.wikipedia.org/wiki/Kent_Beck"},
+  {name:"BDD",author:"Dan North (2006)",official:"https://dannorth.net/introducing-bdd/",wiki:"https://en.wikipedia.org/wiki/Behavior-driven_development"},
+  {name:"Mobile First",author:"Luke Wroblewski (2011)",official:"https://www.lukew.com/ff/entry.asp?933",wiki:"https://en.wikipedia.org/wiki/Mobile_first"},
+  {name:"Core Web Vitals",author:"Google Chrome team (2020)",official:"https://web.dev/articles/vitals",wiki:"https://en.wikipedia.org/wiki/Web_Vitals"},
+  {name:"Zero-Trust",author:"John Kindervag, Forrester (2010)",official:"https://www.forrester.com/report/No-More-Chewy-Centers/RES56682",wiki:"https://en.wikipedia.org/wiki/Zero_trust_security_model"},
+  {name:"Lean Startup",author:"Eric Ries (2011)",official:"http://theleanstartup.com/",wiki:"https://en.wikipedia.org/wiki/Lean_startup"},
+  {name:"IEEE 829",author:"IEEE (2008)",official:"https://standards.ieee.org/ieee/829/4414/",wiki:"https://en.wikipedia.org/wiki/Software_test_documentation"},
+  {name:"Few-shot prompting (GPT-3)",author:"Brown et al, NeurIPS 2020",official:"https://arxiv.org/abs/2005.14165",wiki:"https://en.wikipedia.org/wiki/GPT-3"},
+];
+$("#fw-list").innerHTML=FRAMEWORKS.map(f=>`<div class="fw-card">
+  <div class="name">${escapeHtml(f.name)}</div>
+  <div class="author">${escapeHtml(f.author)}</div>
+  <a href="${f.official}" target="_blank">📄 Fuente oficial</a>
+  <a href="${f.wiki}" target="_blank">📖 Wikipedia</a>
+</div>`).join("");
+</script>
+</body>
+</html>
