@@ -28,9 +28,11 @@ COPY mcp-subagents-config.json ./
 COPY http-wrapper.mjs ./
 COPY chat.mjs ./
 COPY health-monitor.mjs ./
+COPY projects-store.mjs ./
 COPY onboarding ./onboarding
 COPY roadmap ./roadmap
-COPY projects ./projects
+COPY projects-ui ./projects-ui
+COPY mcp-projects ./mcp-projects
 
 ENV NODE_ENV=production
 ENV PORT=8080

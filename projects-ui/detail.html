@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title id="page-title">Proyecto · MCP Retarget</title>
+<style>
+  :root {
+    --bg: #0a0c11; --panel: #111419; --panel-2: #161a22; --panel-3: #1c2230;
+    --border: #232838; --border-strong: #2e3548;
+    --text: #e6e8ee; --muted: #8a92a6; --muted-2: #6b7280;
+    --ok: #4ade80; --warn: #fbbf24; --err: #f87171; --crit: #ef4444;
+    --accent: #FF6B35; --link: #93c5fd;
+    --mono: 'SF Mono', ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; line-height: 1.5; }
+  a { color: var(--link); text-decoration: none; } a:hover { text-decoration: underline; }
+  code { font-family: var(--mono); background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+  .topbar { padding: 14px 32px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    background: var(--panel); position: sticky; top: 0; z-index: 10; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .logo { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--accent), #ff8e5a); display: grid; place-items: center; font-weight: 800; color: white; font-size: 13px; }
+  .topbar nav { display: flex; gap: 4px; }
+  .topbar nav a { color: var(--muted); padding: 7px 14px; border-radius: 6px; font-size: 13px; }
+  .topbar nav a.active, .topbar nav a:hover { background: var(--panel-2); color: var(--text); }
+
+  main { max-width: 1400px; margin: 0 auto; padding: 32px; }
+  .breadcrumb { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+  .breadcrumb a { color: var(--muted); } .breadcrumb a:hover { color: var(--text); }
+
+  .hero { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end;
+    padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .hero h1 { margin: 8px 0 4px; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+  .hero .desc { color: var(--muted); font-size: 14px; max-width: 700px; }
+  .hero-meta { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; font-size: 12px; }
+  .hero-meta .item { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); }
+  .hero-meta .item strong { color: var(--text); font-weight: 500; }
+
+  /* Progress hero */
+  .hero-progress { background: var(--panel); border: 1px solid var(--border); padding: 16px 22px; border-radius: 10px; min-width: 280px; }
+  .hero-progress .pct { font-size: 36px; font-weight: 700; letter-spacing: -1px; }
+  .hero-progress .bar { height: 6px; background: var(--panel-3); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .hero-progress .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #ff8e5a); transition: width 0.4s; }
+  .hero-progress .step { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .tab { padding: 11px 18px; cursor: pointer; font-size: 13px; color: var(--muted);
+    border: 1px solid transparent; border-bottom: 0; border-radius: 6px 6px 0 0; user-select: none; }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--panel); border-color: var(--border); color: var(--text); margin-bottom: -1px; }
+  .tab .badge { background: var(--panel-3); color: var(--muted); border-radius: 10px; padding: 1px 7px; margin-left: 6px; font-size: 11px; font-weight: 600; }
+  .tab.active .badge { background: var(--accent); color: white; }
+
+  .tab-content { display: none; } .tab-content.active { display: block; }
+
+  /* Overview - cards */
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .card h3 { margin: 0 0 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; }
+  .card .row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px dashed var(--border); }
+  .card .row:last-child { border-bottom: 0; }
+  .card .row .k { color: var(--muted); }
+  .card .row .v { font-family: var(--mono); font-size: 12px; }
+
+  /* Phases / workflow */
+  .phases { display: flex; flex-direction: column; gap: 8px; }
+  .phase { padding: 12px 14px; border-radius: 8px; background: var(--panel-2);
+    border: 1px solid var(--border); display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 12px; }
+  .phase .num { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 11px; font-weight: 700; background: var(--panel-3); color: var(--muted); }
+  .phase.completed .num { background: var(--ok); color: #0a0c11; }
+  .phase.in_progress .num { background: var(--accent); color: white; }
+  .phase .title { font-size: 14px; font-weight: 500; }
+  .phase .det { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .phase .state { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .phase.completed .state { color: var(--ok); }
+  .phase.in_progress .state { color: var(--accent); }
+
+  /* Reasoning timeline */
+  .timeline { position: relative; padding-left: 22px; }
+  .timeline::before { content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .timeline-item { position: relative; padding-bottom: 18px; }
+  .timeline-item::before { content: ""; position: absolute; left: -22px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); }
+  .timeline-item .ts { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .timeline-item .phase-tag { display: inline-block; font-size: 10px; padding: 2px 8px; background: var(--panel-3); border-radius: 4px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .timeline-item h4 { margin: 6px 0; font-size: 15px; }
+  .timeline-item p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+  .timeline-item .alts { margin-top: 6px; font-size: 12px; color: var(--muted-2); }
+
+  /* Feedback list */
+  .item-list { display: flex; flex-direction: column; gap: 10px; }
+  .item { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .item .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 8px; }
+  .item .author { font-weight: 600; font-size: 13px; }
+  .item .ts { color: var(--muted); font-size: 11px; font-family: var(--mono); }
+  .item .kind { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; padding: 2px 8px; border-radius: 4px; background: var(--panel-3); color: var(--muted); }
+  .item .msg { color: var(--text); font-size: 13px; white-space: pre-wrap; word-break: break-word; }
+  .item.error { border-left: 3px solid var(--err); }
+  .item.warning { border-left: 3px solid var(--warn); }
+  .item .source { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .item .stack { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--bg); padding: 8px 10px; border-radius: 4px; margin-top: 8px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
+
+  /* Forms */
+  .form-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .form-card h3 { margin: 0 0 12px; font-size: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-row.full { grid-template-columns: 1fr; }
+  input, textarea, select {
+    width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 12px; border-radius: 6px; font-size: 13px; font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+  button.primary { background: var(--accent); color: white; border: 0; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
+  button.primary:hover { background: #ff8047; }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .form-msg { margin-top: 8px; font-size: 12px; }
+  .form-msg.ok { color: var(--ok); }
+  .form-msg.err { color: var(--err); }
+
+  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+
+  .pill { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pill.healthy, .pill.success, .pill.ok, .pill.deployed { background: rgba(74,222,128,0.12); color: var(--ok); }
+  .pill.warn { background: rgba(251,191,36,0.12); color: var(--warn); }
+  .pill.err, .pill.failure, .pill.error { background: rgba(239,68,68,0.12); color: var(--err); }
+
+  .deploy-card { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+  .deploy-card .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px; }
+  .deploy-card .meta-grid .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .deploy-card .meta-grid .v { font-family: var(--mono); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">R</div>
+    <div><strong>MCP · Retarget</strong></div>
+  </div>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/health" target="_blank">Salud</a>
+    <a href="/team" target="_blank">Equipo</a>
+  </nav>
+  <div></div>
+</div>
+
+<main>
+  <div class="breadcrumb">
+    <a href="/projects">Proyectos</a> / <span id="bc-name">cargando…</span>
+  </div>
+
+  <div class="hero">
+    <div>
+      <h1 id="proj-name">…</h1>
+      <div class="desc" id="proj-desc"></div>
+      <div class="hero-meta" id="proj-meta"></div>
+    </div>
+    <div class="hero-progress">
+      <div class="pct"><span id="prog-pct">0</span>%</div>
+      <div class="bar"><div class="bar-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="step" id="prog-step">—</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="overview">Overview</div>
+    <div class="tab" data-tab="reasoning">Razonamiento <span class="badge" id="cnt-reasoning">0</span></div>
+    <div class="tab" data-tab="feedback">Feedback <span class="badge" id="cnt-feedback">0</span></div>
+    <div class="tab" data-tab="errors">Errores <span class="badge" id="cnt-errors">0</span></div>
+    <div class="tab" data-tab="deploy">Deploy</div>
+  </div>
+
+  <!-- Overview -->
+  <section class="tab-content active" data-tab="overview">
+    <div class="grid-cards">
+      <div class="card">
+        <h3>Workflow</h3>
+        <div class="phases" id="phases"></div>
+      </div>
+      <div class="card">
+        <h3>Repositorios</h3>
+        <div id="repos"></div>
+      </div>
+      <div class="card">
+        <h3>Reconnaissance</h3>
+        <div id="recon"></div>
+      </div>
+      <div class="card">
+        <h3>Sections (replicación)</h3>
+        <div id="sections"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reasoning -->
+  <section class="tab-content" data-tab="reasoning">
+    <div class="form-card">
+      <h3>Registrar decisión / razonamiento</h3>
+      <form id="form-reasoning">
+        <div class="form-row">
+          <input name="phase" placeholder="Fase (ej: hero_section)" />
+          <input name="alternatives" placeholder="Alternativas (separadas por coma)" />
+        </div>
+        <div class="form-row full">
+          <input name="decision" required placeholder="Decisión (resumen — qué se hizo)" />
+        </div>
+        <div class="form-row full">
+          <textarea name="rationale" placeholder="Razonamiento — por qué se tomó esa decisión"></textarea>
+        </div>
+        <button type="submit" class="primary">Registrar decisión</button>
+        <span class="form-msg" id="msg-reasoning"></span>
+      </form>
+    </div>
+    <div class="timeline" id="timeline-reasoning"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <!-- Feedback -->
+  <section class="tab-content" data-tab="feedback">
+    <div class="form-card">
+      <h3>Enviar feedback al proyecto</h3>
+      <form id="form-feedback">
+        <div class="form-row">
+          <input name="author" placeholder="Tu nombre" />
+          <input name="email" type="email" placeholder="Tu email (opcional)" />
+        </div>
+        <div class="form-row">
+          <select name="kind">
+            <option value="general">General</option>
+            <option value="bug">Bug</option>
+            <option value="ui">UI / UX</option>
+            <option value="content">Contenido</option>
+            <option value="performance">Performance</option>
+            <option value="suggestion">Sugerencia</option>
+          </select>
+          <select name="rating">
+            <option value="">Rating (opcional)</option>
+            <option value="5">★★★★★ (5)</option>
+            <option value="4">★★★★☆ (4)</option>
+            <option value="3">★★★☆☆ (3)</option>
+            <option value="2">★★☆☆☆ (2)</option>
+            <option value="1">★☆☆☆☆ (1)</option>
+          </select>
+        </div>
+        <div class="form-row full">
+          <textarea name="message" required placeholder="Tu feedback…"></textarea>
+        </div>
+        <button type="submit" class="primary">Enviar feedback</button>
+        <span class="form-msg" id="msg-feedback"></span>
+      </form>
+    </div>
+    <div class="item-list" id="list-feedback"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <!-- Errors -->
+  <section class="tab-content" data-tab="errors">
+    <div class="form-card">
+      <h3>Reportar error manualmente</h3>
+      <form id="form-error">
+        <div class="form-row">
+          <input name="source" placeholder="Source (ej: frontend, build, deploy)" />
+          <select name="level">
+            <option value="error">error</option>
+            <option value="warning">warning</option>
+            <option value="critical">critical</option>
+          </select>
+        </div>
+        <div class="form-row full">
+          <input name="url" placeholder="URL donde ocurrió (opcional)" />
+        </div>
+        <div class="form-row full">
+          <input name="message" required placeholder="Mensaje del error" />
+        </div>
+        <div class="form-row full">
+          <textarea name="stack" placeholder="Stack trace (opcional)"></textarea>
+        </div>
+        <button type="submit" class="primary">Reportar error</button>
+        <span class="form-msg" id="msg-error"></span>
+      </form>
+    </div>
+    <div class="item-list" id="list-errors"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <!-- Deploy -->
+  <section class="tab-content" data-tab="deploy">
+    <div class="card">
+      <h3>Deploy actual</h3>
+      <div class="deploy-card" id="deploy-info">Cargando…</div>
+    </div>
+    <div style="height: 16px"></div>
+    <div class="card">
+      <h3>Commits recientes</h3>
+      <div id="commits-list">—</div>
+    </div>
+  </section>
+</main>
+
+<script>
+const PROJECT_ID = location.pathname.split("/").pop();
+const $ = (s) => document.querySelector(s);
+
+// Tabs
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  document.querySelector(`.tab-content[data-tab="${t.dataset.tab}"]`).classList.add("active");
+}));
+
+function fmtTs(iso){ if(!iso) return "—"; const d = new Date(iso); return d.toLocaleString("es-CL", { hour12:false }); }
+function ago(iso){ if(!iso) return "—"; const diff = (Date.now()-new Date(iso).getTime())/1000;
+  if(diff<60) return "hace " + Math.floor(diff) + "s"; if(diff<3600) return "hace " + Math.floor(diff/60) + "m";
+  if(diff<86400) return "hace " + Math.floor(diff/3600) + "h"; return "hace " + Math.floor(diff/86400) + "d"; }
+function escapeHtml(s){ if(s==null) return ""; return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function shortHash(h){ return h ? String(h).slice(0,7) : "—"; }
+
+async function loadProject(){
+  try {
+    const r = await fetch(`/api/projects/${encodeURIComponent(PROJECT_ID)}/full`, { cache:"no-store" });
+    if (!r.ok) {
+      document.body.innerHTML = `<div class="empty"><h2>Proyecto no encontrado: ${escapeHtml(PROJECT_ID)}</h2><a href="/projects">← Volver a proyectos</a></div>`;
+      return;
+    }
+    const p = await r.json();
+
+    document.getElementById("page-title").textContent = (p.project_name || PROJECT_ID) + " · MCP Retarget";
+    $("#bc-name").textContent = p.project_name || PROJECT_ID;
+    $("#proj-name").textContent = p.project_name || PROJECT_ID;
+    $("#proj-desc").textContent = p.description || "";
+    const pct = p.replication?.progress_percent ?? 0;
+    $("#prog-pct").textContent = pct;
+    $("#prog-fill").style.width = pct + "%";
+    $("#prog-step").textContent = p.workflow?.current_step || p.replication?.phase || "—";
+
+    // Hero meta
+    const meta = [];
+    if (p.status) meta.push(`<span class="item"><span class="pill ${p.status==='active'?'healthy':''}">${p.status}</span></span>`);
+    if (p.repositories?.qa?.url) meta.push(`<span class="item">QA: <a href="${p.repositories.qa.url}" target="_blank">${p.repositories.qa.url.replace(/^https?:\/\//, '')}</a></span>`);
+    if (p.repositories?.qa?.github) meta.push(`<span class="item">GitHub: <a href="${p.repositories.qa.github}" target="_blank">${p.repositories.qa.github.replace('https://github.com/', '')}</a></span>`);
+    if (p.created_at) meta.push(`<span class="item">Creado: <strong>${fmtTs(p.created_at)}</strong></span>`);
+    $("#proj-meta").innerHTML = meta.join("");
+
+    // Phases
+    const steps = p.workflow?.steps || [];
+    $("#phases").innerHTML = steps.length === 0 ? '<div class="empty">Sin fases definidas</div>' : steps.map(s => `
+      <div class="phase ${s.status||''}">
+        <div class="num">${s.id}</div>
+        <div><div class="title">${escapeHtml(s.name||'-')}</div>${s.details?`<div class="det">${escapeHtml(s.details)}</div>`:''}</div>
+        <div class="state">${s.status||'-'}</div>
+      </div>
+    `).join("");
+
+    // Repos
+    const repos = p.repositories || {};
+    $("#repos").innerHTML = Object.entries(repos).map(([key, v]) => `
+      <div class="row"><span class="k">${key}</span><span class="v"><a href="${v.url}" target="_blank">${(v.url||'').replace(/^https?:\/\//,'')}</a></span></div>
+    `).join("") || "—";
+
+    // Reconnaissance
+    const recon = p.reconnaissance?.findings || {};
+    $("#recon").innerHTML = `
+      <div class="row"><span class="k">Identidad</span><span class="v">${escapeHtml(recon.identity||'—')}</span></div>
+      <div class="row"><span class="k">Plataforma</span><span class="v">${escapeHtml(recon.platform||'—')}</span></div>
+      <div class="row"><span class="k">Idioma</span><span class="v">${escapeHtml(recon.language||'—')}</span></div>
+      <div class="row"><span class="k">Status reconnaissance</span><span class="v"><span class="pill ${p.reconnaissance?.status==='completed'?'healthy':'warn'}">${p.reconnaissance?.status||'—'}</span></span></div>
+    `;
+
+    // Sections
+    const completed = p.replication?.completed_sections || [];
+    const pending = p.replication?.pending_sections || [];
+    $("#sections").innerHTML = `
+      <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">Completadas (${completed.length})</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${completed.map(s=>`<code style="color:var(--ok);background:rgba(74,222,128,0.08)">${escapeHtml(s)}</code>`).join("") || '<span style="color:var(--muted)">—</span>'}</div>
+      <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">Pendientes (${pending.length})</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${pending.map(s=>`<code style="color:var(--warn);background:rgba(251,191,36,0.08)">${escapeHtml(s)}</code>`).join("") || '<span style="color:var(--muted)">—</span>'}</div>
+    `;
+
+    // Reasoning
+    const reasoning = p.runtime?.reasoning || [];
+    $("#cnt-reasoning").textContent = reasoning.length;
+    $("#timeline-reasoning").innerHTML = reasoning.length === 0
+      ? '<div class="empty">Aún no hay decisiones registradas para este proyecto.</div>'
+      : reasoning.map(r => `
+        <div class="timeline-item">
+          <span class="ts">${fmtTs(r.at)} · ${ago(r.at)}</span>
+          <span class="phase-tag">${escapeHtml(r.phase||'—')}</span>
+          <h4>${escapeHtml(r.decision||'')}</h4>
+          ${r.rationale?`<p>${escapeHtml(r.rationale)}</p>`:''}
+          ${r.alternatives && r.alternatives.length ? `<div class="alts">Alternativas consideradas: ${r.alternatives.map(escapeHtml).join(", ")}</div>` : ''}
+        </div>
+      `).join("");
+
+    // Feedback
+    const feedback = p.runtime?.feedback || [];
+    $("#cnt-feedback").textContent = feedback.length;
+    $("#list-feedback").innerHTML = feedback.length === 0
+      ? '<div class="empty">Sin feedback aún. Sé el primero usando el formulario.</div>'
+      : feedback.map(f => `
+        <div class="item">
+          <div class="head">
+            <div><span class="author">${escapeHtml(f.author||'anónimo')}</span> ${f.rating?'· '+'★'.repeat(f.rating):''}</div>
+            <div><span class="kind">${escapeHtml(f.kind||'general')}</span> <span class="ts">${ago(f.at)}</span></div>
+          </div>
+          <div class="msg">${escapeHtml(f.message||'')}</div>
+          ${f.email?`<div class="ts" style="margin-top:4px">${escapeHtml(f.email)}</div>`:''}
+        </div>
+      `).join("");
+
+    // Errors
+    const errors = p.runtime?.errors || [];
+    $("#cnt-errors").textContent = errors.length;
+    $("#list-errors").innerHTML = errors.length === 0
+      ? '<div class="empty">Sin errores registrados. 🎉</div>'
+      : errors.map(e => `
+        <div class="item ${e.level||'error'}">
+          <div class="head">
+            <div><span class="pill err">${escapeHtml(e.level||'error')}</span> <span class="source">${escapeHtml(e.source||'unknown')}</span></div>
+            <span class="ts">${ago(e.at)}</span>
+          </div>
+          <div class="msg">${escapeHtml(e.message||'')}</div>
+          ${e.url?`<div class="ts" style="margin-top:4px">URL: <code>${escapeHtml(e.url)}</code></div>`:''}
+          ${e.stack?`<pre class="stack">${escapeHtml(e.stack)}</pre>`:''}
+        </div>
+      `).join("");
+
+    // Deploy
+    const dep = p.runtime?.deploy || p.deployment || {};
+    $("#deploy-info").innerHTML = `
+      <div class="meta-grid">
+        <div class="k">Estado</div><div class="v"><span class="pill ${dep.status||'warn'}">${dep.status||'unknown'}</span></div>
+        <div class="k">URL</div><div class="v"><a href="${dep.url||'#'}" target="_blank">${(dep.url||'—').replace(/^https?:\/\//,'')}</a></div>
+        <div class="k">Último commit</div><div class="v">${shortHash(dep.last_commit)}</div>
+        <div class="k">Versión / revisión</div><div class="v">${escapeHtml(dep.version || dep.last_revision || dep.revision || '—')}</div>
+        <div class="k">Build</div><div class="v">${escapeHtml(dep.build_status || dep.build_id || '—')}</div>
+        <div class="k">Last deploy</div><div class="v">${fmtTs(dep.last_deploy_at || dep.last_deploy)}</div>
+        <div class="k">Region</div><div class="v">${escapeHtml(dep.region||'—')}</div>
+        <div class="k">Service</div><div class="v">${escapeHtml(dep.cloud_run_service||'—')}</div>
+      </div>
+      ${dep.url ? `<a class="primary" href="${dep.url}" target="_blank" style="display:inline-block;padding:9px 14px;background:var(--accent);color:white;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600">Abrir deploy →</a>` : ''}
+    `;
+
+    // Commits
+    const commits = p.replication?.commits || [];
+    $("#commits-list").innerHTML = commits.length === 0
+      ? '<div class="empty">Sin commits registrados.</div>'
+      : commits.slice().reverse().map(c => `
+        <div class="row">
+          <span class="k"><code>${shortHash(c.hash)}</code></span>
+          <span class="v" style="text-align:left;flex:1;margin-left:14px">${escapeHtml(c.message||'')}</span>
+          <span class="v" style="margin-left:14px">${fmtTs(c.date)}</span>
+        </div>
+      `).join("");
+
+  } catch(err) {
+    document.body.innerHTML = `<div class="empty"><h3>Error al cargar el proyecto</h3><p>${escapeHtml(err.message)}</p><a href="/projects">← Volver</a></div>`;
+  }
+}
+
+// Form submitters
+async function postJSON(url, body, msgEl) {
+  msgEl.textContent = "Enviando…";
+  msgEl.className = "form-msg";
+  try {
+    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Error " + r.status);
+    msgEl.textContent = "✅ Guardado.";
+    msgEl.className = "form-msg ok";
+    return data;
+  } catch(err) {
+    msgEl.textContent = "❌ " + err.message;
+    msgEl.className = "form-msg err";
+    throw err;
+  }
+}
+
+document.getElementById("form-feedback").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const body = { author: f.author.value.trim(), email: f.email.value.trim(), kind: f.kind.value, rating: f.rating.value ? Number(f.rating.value) : null, message: f.message.value.trim() };
+  try { await postJSON(`/api/projects/${PROJECT_ID}/feedback`, body, document.getElementById("msg-feedback")); f.reset(); loadProject(); } catch {}
+});
+
+document.getElementById("form-error").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const body = { source: f.source.value.trim() || "manual", level: f.level.value, url: f.url.value.trim() || null, message: f.message.value.trim(), stack: f.stack.value.trim() || null };
+  try { await postJSON(`/api/projects/${PROJECT_ID}/errors`, body, document.getElementById("msg-error")); f.reset(); loadProject(); } catch {}
+});
+
+document.getElementById("form-reasoning").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const alts = f.alternatives.value.split(",").map(s => s.trim()).filter(Boolean);
+  const body = { phase: f.phase.value.trim() || "general", decision: f.decision.value.trim(), rationale: f.rationale.value.trim() || null, alternatives: alts };
+  try { await postJSON(`/api/projects/${PROJECT_ID}/reasoning`, body, document.getElementById("msg-reasoning")); f.reset(); loadProject(); } catch {}
+});
+
+loadProject();
+setInterval(loadProject, 60_000);
+</script>
+</body>
+</html>

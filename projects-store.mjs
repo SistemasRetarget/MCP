@@ -1,0 +1,175 @@
+/**
+ * Projects Store — vive en el SERVIDOR MCP. Es genérico para cualquier
+ * proyecto registrado en /app/projects/<id>-config.json.
+ *
+ * Gestiona por cada proyecto:
+ *   - feedback   (recibido desde la UI)
+ *   - errors     (logs de errores reportados al MCP)
+ *   - reasoning  (razonamiento/decisiones de cada fase)
+ *   - deploy     (último commit, versión, build status)
+ *
+ * Persistencia: best-effort en /app/projects-data/<id>.json
+ * Cloud Run filesystem es ephemeral entre revisiones — al redeployear
+ * se pierde. Para producción real conviene mover a GCS/Firestore.
+ */
+
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const DATA_DIR = join(__dirname, "projects-data");
+const PROJECTS_DIR = join(__dirname, "mcp-projects");
+
+const MAX_ITEMS = 200;
+const memCache = new Map();
+
+function ensureDir() {
+  try { mkdirSync(DATA_DIR, { recursive: true }); } catch {}
+}
+
+function loadFromDisk(id) {
+  ensureDir();
+  const file = join(DATA_DIR, `${id}.json`);
+  if (!existsSync(file)) return null;
+  try { return JSON.parse(readFileSync(file, "utf8")); } catch { return null; }
+}
+
+function saveToDisk(id, data) {
+  ensureDir();
+  try {
+    writeFileSync(join(DATA_DIR, `${id}.json`), JSON.stringify(data, null, 2), "utf8");
+  } catch (err) {
+    console.error(`[projects-store] save failed for ${id}: ${err.message}`);
+  }
+}
+
+function defaults() {
+  return { feedback: [], errors: [], reasoning: [], deploy: null };
+}
+
+export function getProjectData(id) {
+  if (memCache.has(id)) return memCache.get(id);
+  const data = loadFromDisk(id) || defaults();
+  memCache.set(id, data);
+  return data;
+}
+
+function pushItem(id, key, item) {
+  const d = getProjectData(id);
+  d[key] = d[key] || [];
+  d[key].push({ at: new Date().toISOString(), ...item });
+  if (d[key].length > MAX_ITEMS) d[key] = d[key].slice(-MAX_ITEMS);
+  saveToDisk(id, d);
+  return d[key][d[key].length - 1];
+}
+
+export function addFeedback(id, { author, email, message, kind = "general", rating }) {
+  if (!message || !String(message).trim()) throw new Error("message requerido");
+  return pushItem(id, "feedback", {
+    author: author || "anónimo",
+    email: email || null,
+    message: String(message).slice(0, 4000),
+    kind,
+    rating: typeof rating === "number" ? Math.max(1, Math.min(5, rating)) : null,
+  });
+}
+
+export function addError(id, { source = "unknown", message, stack, level = "error", url }) {
+  if (!message) throw new Error("message requerido");
+  return pushItem(id, "errors", {
+    source,
+    level,
+    message: String(message).slice(0, 4000),
+    stack: stack ? String(stack).slice(0, 8000) : null,
+    url: url || null,
+  });
+}
+
+export function addReasoning(id, { phase, decision, rationale, alternatives = [] }) {
+  if (!decision) throw new Error("decision requerida");
+  return pushItem(id, "reasoning", {
+    phase: phase || "general",
+    decision: String(decision).slice(0, 2000),
+    rationale: rationale ? String(rationale).slice(0, 4000) : null,
+    alternatives: Array.isArray(alternatives) ? alternatives.slice(0, 10) : [],
+  });
+}
+
+export function setDeploy(id, deployInfo) {
+  const d = getProjectData(id);
+  d.deploy = {
+    at: new Date().toISOString(),
+    last_commit: deployInfo.last_commit || null,
+    last_deploy_at: deployInfo.last_deploy_at || new Date().toISOString(),
+    status: deployInfo.status || "unknown",
+    build_id: deployInfo.build_id || null,
+    version: deployInfo.version || null,
+    url: deployInfo.url || null,
+    revision: deployInfo.revision || null,
+  };
+  saveToDisk(id, d);
+  return d.deploy;
+}
+
+export function listProjects() {
+  try {
+    const files = readdirSync(PROJECTS_DIR).filter(f => f.endsWith("-config.json"));
+    return files.map(f => {
+      const cfg = JSON.parse(readFileSync(join(PROJECTS_DIR, f), "utf8"));
+      const id = cfg.project_id || cfg.id || f.replace("-config.json", "");
+      const data = getProjectData(id);
+      return {
+        id,
+        name: cfg.project_name || id,
+        description: cfg.description || "",
+        status: cfg.status || "active",
+        progress: cfg.replication?.progress_percent ?? 0,
+        current_step: cfg.workflow?.current_step || cfg.replication?.phase || "—",
+        repositories: cfg.repositories || {},
+        deployment: data.deploy || cfg.deployment || null,
+        counts: {
+          feedback: data.feedback.length,
+          errors: data.errors.length,
+          reasoning: data.reasoning.length,
+        },
+        last_error: data.errors[data.errors.length - 1] || null,
+        last_feedback: data.feedback[data.feedback.length - 1] || null,
+      };
+    });
+  } catch (err) {
+    console.error(`[projects-store] listProjects: ${err.message}`);
+    return [];
+  }
+}
+
+export function getProjectFull(id) {
+  try {
+    // 1) Intentar archivo directo: <id>-config.json
+    let cfg = null;
+    const directFile = join(PROJECTS_DIR, `${id}-config.json`);
+    if (existsSync(directFile)) {
+      cfg = JSON.parse(readFileSync(directFile, "utf8"));
+    } else {
+      // 2) Buscar por project_id en cualquier *-config.json
+      const files = readdirSync(PROJECTS_DIR).filter(f => f.endsWith("-config.json"));
+      for (const f of files) {
+        const c = JSON.parse(readFileSync(join(PROJECTS_DIR, f), "utf8"));
+        if (c.project_id === id || c.id === id) { cfg = c; break; }
+      }
+    }
+    if (!cfg) return null;
+    const data = getProjectData(id);
+    return {
+      ...cfg,
+      runtime: {
+        feedback: data.feedback.slice(-50).reverse(),
+        errors: data.errors.slice(-50).reverse(),
+        reasoning: data.reasoning.slice(-50).reverse(),
+        deploy: data.deploy || cfg.deployment || null,
+      },
+    };
+  } catch (err) {
+    return null;
+  }
+}

@@ -19,6 +19,14 @@ import { validateSEOTechnical } from "./validators/seo-technical.mjs";
 import { validateMobileFirst } from "./validators/mobile-first.mjs";
 import { chatLoop, TOOLS as CHAT_TOOLS } from "./chat.mjs";
 import { getHealthSnapshot, getEvents, logEvent, recordChatOutcome } from "./health-monitor.mjs";
+import {
+  listProjects,
+  getProjectFull,
+  addFeedback,
+  addError,
+  addReasoning,
+  setDeploy,
+} from "./projects-store.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -112,6 +120,19 @@ const server = createServer(async (req, res) => {
   if (req.method === "GET" && url.pathname === "/") {
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ status: "ok", service: "quality-gate-mcp" }));
+  }
+
+  // Heartbeat — ultraligero, sin I/O, para que Cascade pueda hacer polling
+  // y saber si el MCP esta vivo / si una nueva revision ya esta sirviendo.
+  if (req.method === "GET" && url.pathname === "/heartbeat") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify({
+      alive: true,
+      ts: Date.now(),
+      started_at: STARTED_AT,
+      uptime_seconds: Math.floor((Date.now() - new Date(STARTED_AT).getTime()) / 1000),
+      pid: process.pid,
+    }));
   }
 
   // Identity — quién es el asistente
@@ -310,7 +331,7 @@ const server = createServer(async (req, res) => {
       // Proyectos activos (rápido)
       let projects = [];
       try {
-        const projectsDir = join(__dirname, "projects");
+        const projectsDir = join(__dirname, "mcp-projects");
         const files = readdirSync(projectsDir).filter(f => f.endsWith("-config.json"));
         projects = files.map(f => {
           const p = JSON.parse(readFileSync(join(projectsDir, f), "utf8"));
@@ -389,16 +410,39 @@ const server = createServer(async (req, res) => {
     }
   }
 
-  // Projects — lista proyectos activos
-  if (req.method === "GET" && url.pathname === "/api/projects") {
+  // ──────────── PROJECTS DASHBOARD ────────────
+  // HTML: listado de proyectos
+  if (req.method === "GET" && (url.pathname === "/projects" || url.pathname === "/projects/")) {
     try {
-      const projectsDir = join(__dirname, "projects");
-      const files = readdirSync(projectsDir).filter(f => f.endsWith("-config.json"));
-      const projects = files.map(f => {
-        const content = readFileSync(join(projectsDir, f), "utf8");
-        return JSON.parse(content);
-      });
-      res.writeHead(200, { "Content-Type": "application/json" });
+      const html = readFileSync(join(__dirname, "projects-ui/index.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+  // HTML: detalle de un proyecto (requiere :id)
+  // Cualquier ruta /projects/<id> que no sea API se sirve con detail.html (SPA-style).
+  if (req.method === "GET" && url.pathname.startsWith("/projects/") && !url.pathname.startsWith("/projects/api")) {
+    const id = url.pathname.split("/")[2];
+    if (id && id !== "api") {
+      try {
+        const html = readFileSync(join(__dirname, "projects-ui/detail.html"), "utf8");
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        return res.end(html);
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: err.message }));
+      }
+    }
+  }
+
+  // API: listar proyectos (con counts de feedback/errors/reasoning)
+  if (req.method === "GET" && (url.pathname === "/api/projects/list" || url.pathname === "/api/projects")) {
+    try {
+      const projects = listProjects();
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
       return res.end(JSON.stringify({ projects, count: projects.length }));
     } catch (err) {
       res.writeHead(500, { "Content-Type": "application/json" });
@@ -406,19 +450,70 @@ const server = createServer(async (req, res) => {
     }
   }
 
-  // Project Status — estado de un proyecto específico
-  if (req.method === "GET" && url.pathname.startsWith("/api/projects/")) {
-    const projectId = url.pathname.split("/")[3];
-    try {
-      const configPath = join(__dirname, `projects/${projectId}-config.json`);
-      const config = JSON.parse(readFileSync(configPath, "utf8"));
-      res.writeHead(200, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify(config));
-    } catch (err) {
-      res.writeHead(404, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: `Project ${projectId} not found` }));
+  // API: rutas /api/projects/<id>/...
+  if (url.pathname.startsWith("/api/projects/")) {
+    const parts = url.pathname.split("/").filter(Boolean); // ["api","projects","<id>","<sub?>"]
+    const projectId = parts[2];
+    const sub = parts[3];
+
+    // GET /api/projects/<id>/full → config + feedback + errors + reasoning
+    if (req.method === "GET" && sub === "full") {
+      const data = getProjectFull(projectId);
+      if (!data) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: `Proyecto no encontrado: ${projectId}` }));
+      }
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify(data));
+    }
+
+    // GET /api/projects/<id> → solo config (legacy)
+    if (req.method === "GET" && !sub) {
+      try {
+        const config = JSON.parse(readFileSync(join(__dirname, `mcp-projects/${projectId}-config.json`), "utf8"));
+        res.writeHead(200, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify(config));
+      } catch {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: `Proyecto no encontrado: ${projectId}` }));
+      }
+    }
+
+    // POST /api/projects/<id>/{feedback|errors|reasoning|deploy}
+    if (req.method === "POST" && ["feedback", "errors", "reasoning", "deploy"].includes(sub)) {
+      let body = "";
+      req.on("data", (c) => (body += c));
+      req.on("end", () => {
+        try {
+          const payload = JSON.parse(body || "{}");
+          let saved;
+          if (sub === "feedback")  saved = addFeedback(projectId, payload);
+          if (sub === "errors")    saved = addError(projectId, payload);
+          if (sub === "reasoning") saved = addReasoning(projectId, payload);
+          if (sub === "deploy")    saved = setDeploy(projectId, payload);
+          logEvent("info", `project_${sub}`, `Nuevo ${sub} en ${projectId}`, { project: projectId });
+          res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({ ok: true, item: saved }));
+        } catch (err) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
+    }
+
+    // GET /api/projects/<id>/{feedback|errors|reasoning} → listas individuales
+    if (req.method === "GET" && ["feedback", "errors", "reasoning"].includes(sub)) {
+      const data = getProjectFull(projectId);
+      if (!data) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: `Proyecto no encontrado: ${projectId}` }));
+      }
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify({ items: data.runtime?.[sub] || [] }));
     }
   }
+  // ──────────── /PROJECTS DASHBOARD ────────────
 
   // MCP proxy endpoint
   if (req.method === "POST" && url.pathname === "/mcp") {
