@@ -202,7 +202,13 @@ async function loadDetail() {
         progreso = landing.progress || 0;
         descripcion = landing.description || '';
         observaciones = landing.observations || [];
-        urlQa = landing.url_qa || landing.screenshots?.actual_url || null;
+        // Prioridad: url_qa > screenshots.actual_url > url_qa (de screenshots) > url_prod
+        urlQa = landing.url_qa || landing.screenshots?.actual_url || landing.screenshots?.url_qa || landing.url_prod || null;
+      } else {
+        // Si no se encuentra la landing pero es una sección predefinida, marcar como pendiente
+        descripcion = 'Sección por crear - aún no configurada en el proyecto';
+        estado = 'referencia';
+        progreso = 0;
       }
     }
 

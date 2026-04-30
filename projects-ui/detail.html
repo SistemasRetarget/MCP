@@ -310,6 +310,10 @@
         <h3>Sections (replicación global)</h3>
         <div id="sections"></div>
       </div>
+      <div class="card">
+        <h3>Performance vs Sitio Original</h3>
+        <div id="performance"></div>
+      </div>
     </div>
   </section>
 
@@ -541,6 +545,18 @@ function renderOverview(p){
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${completed.map(s=>`<code style="color:var(--ok)">${escapeHtml(s)}</code>`).join("") || '—'}</div>
     <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">Pendientes (${pending.length})</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">${pending.map(s=>`<code style="color:var(--warn)">${escapeHtml(s)}</code>`).join("") || '—'}</div>`;
+
+  // Performance comparativa vs sitio original
+  const originalUrl = p.reconnaissance?.findings?.url || p.repositories?.source?.url || '';
+  const perf = p.performance || {};
+  $("#performance").innerHTML = originalUrl ? `
+    <div class="row"><span class="k">Sitio original</span><span class="v"><a href="${escapeHtml(originalUrl)}" target="_blank">${escapeHtml(originalUrl.replace(/^https?:\/\//,''))}</a></span></div>
+    <div class="row"><span class="k">Estado original</span><span class="v">${perf.original_status || '—'}</span></div>
+    <div class="row"><span class="k">Performance original</span><span class="v">${perf.original_score || '—'}</span></div>
+    <div class="row"><span class="k">Estado MCP</span><span class="v">${perf.mcp_status || '—'}</span></div>
+    <div class="row"><span class="k">Performance MCP</span><span class="v">${perf.mcp_score || '—'}</span></div>
+    <div class="row"><span class="k">Mejora</span><span class="v">${perf.improvement || '—'}</span></div>
+  ` : '<div style="color:var(--muted);font-size:12px">No hay URL del sitio original configurada para comparar performance.</div>';
 }
 
 function renderLandings(p){

@@ -139,13 +139,32 @@ async function loadSitemap() {
     document.getElementById("project-name").textContent = p.name || PROJECT_ID;
     document.getElementById("project-desc").textContent = p.description || "Sitemap de QA para revisión de secciones";
 
-    // Mapear estado de landings y header/footer
+    // Obtener todas las landings del proyecto
     const landings = p.landings || [];
-    const sections = SITE_SECTIONS.map(s => {
+    
+    // Crear lista de secciones: Header/Footer (globales) + todas las landings del proyecto
+    let sections = [
+      { id: 'header', nombre: 'Header', tipo: 'global' },
+      { id: 'footer', nombre: 'Footer', tipo: 'global' }
+    ];
+    
+    // Agregar todas las landings del proyecto
+    landings.forEach(l => {
+      sections.push({
+        id: l.id,
+        nombre: l.name || l.id,
+        tipo: 'landing',
+        esLandingProyecto: true // Marcar como landing del proyecto
+      });
+    });
+    
+    // Mapear estado de landings y header/footer
+    sections = sections.map(s => {
       let estado = 'referencia';
       let progreso = 0;
       let observaciones = [];
       let descripcion = '';
+      let urlQa = null;
 
       if (s.tipo === 'global') {
         // Header/Footer están en cada landing
@@ -162,6 +181,7 @@ async function loadSitemap() {
           progreso = Math.round((completados / footerStatus.length) * 100);
           estado = progreso === 100 ? 'completado' : (progreso > 0 ? 'qa' : 'referencia');
         }
+        descripcion = s.id === 'header' ? 'Elemento global Header - presente en todas las landings' : 'Elemento global Footer - presente en todas las landings';
       } else {
         // Secciones de landing
         const landing = landings.find(l => l.id === s.id);
@@ -170,10 +190,11 @@ async function loadSitemap() {
           progreso = landing.progress || 0;
           descripcion = landing.description || '';
           observaciones = landing.observations || [];
+          urlQa = landing.url_qa || landing.screenshots?.actual_url || null;
         }
       }
 
-      return { ...s, estado, progreso, descripcion, observaciones };
+      return { ...s, estado, progreso, descripcion, observaciones, urlQa };
     });
 
     const container = document.getElementById("sitemap-content");
