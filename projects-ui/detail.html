@@ -216,6 +216,14 @@
   .ss-item img { width: 100%; height: 160px; object-fit: cover; cursor: zoom-in; display: block; }
   .ss-item .ss-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: white; font-size: 10px; padding: 4px 8px; text-transform: uppercase; }
 
+  /* ======================= QA PREVIEW ======================= */
+  .qa-preview { margin-top: 18px; padding: 16px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; }
+  .qa-preview .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
+  .qa-frame { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--bg); }
+  .qa-frame img { width: 100%; height: auto; min-height: 200px; max-height: 500px; object-fit: contain; display: block; cursor: zoom-in; }
+  .qa-link { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.8); color: white; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600; }
+  .qa-link:hover { background: var(--accent); }
+
   /* ======================= MISC ======================= */
   .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
   .pill { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
@@ -558,6 +566,16 @@ function renderLandings(p){
           <div class="bar"><div class="bar-fill" style="width:${l.progress||0}%"></div></div>
         </div>
       </div>
+
+      <!-- Preview QA -->
+      ${l.url_qa ? `
+      <div class="qa-preview">
+        <div class="label">🔵 Preview QA</div>
+        <div class="qa-frame">
+          <img src="${l.url_qa}" alt="QA Preview" onclick="openLightbox('${l.url_qa}')" loading="lazy" />
+          <a href="${l.url_qa}" target="_blank" class="qa-link">Abrir en nueva pestaña →</a>
+        </div>
+      </div>` : ''}
 
       <div class="hf-grid">
         <div class="hf-item ${l.header?.status||'pending'}">
