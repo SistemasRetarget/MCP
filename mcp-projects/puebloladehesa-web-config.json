@@ -46,7 +46,92 @@
   "deployment": {
     "status": "not_deployed"
   },
-  "landings": [],
+  "landings": [
+    {
+      "id": "home",
+      "name": "Home",
+      "description": "Landing principal del sitio de termas Puyehue",
+      "status": "completado",
+      "progress": 100,
+      "url_prod": "https://puebloladehesa.cl/",
+      "url_qa": "",
+      "header": { "status": "completado" },
+      "footer": { "status": "completado" },
+      "observations": []
+    },
+    {
+      "id": "promociones",
+      "name": "Promociones",
+      "description": "Landing de promociones y ofertas especiales",
+      "status": "completado",
+      "progress": 100,
+      "url_prod": "https://puebloladehesa.cl/promociones",
+      "url_qa": "",
+      "header": { "status": "completado" },
+      "footer": { "status": "completado" },
+      "observations": []
+    },
+    {
+      "id": "habitaciones",
+      "name": "Habitaciones",
+      "description": "Landing de habitaciones y suites",
+      "status": "completado",
+      "progress": 100,
+      "url_prod": "https://puebloladehesa.cl/habitaciones",
+      "url_qa": "",
+      "header": { "status": "completado" },
+      "footer": { "status": "completado" },
+      "observations": []
+    },
+    {
+      "id": "servicios",
+      "name": "Servicios",
+      "description": "Landing de servicios del hotel y termas",
+      "status": "completado",
+      "progress": 100,
+      "url_prod": "https://puebloladehesa.cl/servicios",
+      "url_qa": "",
+      "header": { "status": "completado" },
+      "footer": { "status": "completado" },
+      "observations": []
+    },
+    {
+      "id": "contacto",
+      "name": "Contacto",
+      "description": "Landing de contacto y reservas",
+      "status": "completado",
+      "progress": 100,
+      "url_prod": "https://puebloladehesa.cl/contacto",
+      "url_qa": "",
+      "header": { "status": "completado" },
+      "footer": { "status": "completado" },
+      "observations": []
+    },
+    {
+      "id": "galeria",
+      "name": "Galería",
+      "description": "Landing de galería de fotos",
+      "status": "en_progreso",
+      "progress": 60,
+      "url_prod": "https://puebloladehesa.cl/galeria",
+      "url_qa": "",
+      "header": { "status": "completado" },
+      "footer": { "status": "completado" },
+      "observations": []
+    },
+    {
+      "id": "reservas",
+      "name": "Reservas",
+      "description": "Landing de sistema de reservas",
+      "status": "referencia",
+      "progress": 0,
+      "url_prod": "",
+      "url_qa": "",
+      "header": { "status": "referencia" },
+      "footer": { "status": "referencia" },
+      "observations": []
+    }
+  ],
   "resources": {
     "github_repo": "https://github.com/SistemasRetarget/puebloladehesa-web",
     "production_url": "",

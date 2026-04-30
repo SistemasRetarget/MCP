@@ -162,7 +162,13 @@
         </div>
 
         <div class="field">
-          <label for="attachment_url">URL de archivo/imagen (opcional)</label>
+          <label for="attachment_file">Adjuntar archivo (opcional)</label>
+          <input type="file" id="attachment_file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip" onchange="handleFileSelect(this)">
+          <div id="file-info" style="font-size:12px;color:var(--muted);margin-top:4px"></div>
+        </div>
+
+        <div class="field">
+          <label for="attachment_url">O URL de archivo/imagen (opcional)</label>
           <input type="url" id="attachment_url" maxlength="500" placeholder="https://drive.google.com/... o https://imagen.png">
         </div>
 
