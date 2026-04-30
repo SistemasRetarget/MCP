@@ -425,6 +425,86 @@ const server = createServer(async (req, res) => {
     }
   }
 
+  // Team — agregar miembro (POST /team)
+  if (req.method === "POST" && url.pathname === "/team") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const member = JSON.parse(body);
+        if (!member.name || !member.email) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify({ error: "Nombre y email son requeridos" }));
+        }
+        const teamPath = join(__dirname, "contracts/team.json");
+        const team = JSON.parse(readFileSync(teamPath, "utf8"));
+        const newMember = {
+          id: member.email.toLowerCase().replace(/[^a-z0-9@._-]/g, ""),
+          ...member,
+          active: member.active !== undefined ? member.active : true
+        };
+        team.members = team.members || [];
+        team.members.push(newMember);
+        writeFileSync(teamPath, JSON.stringify(team, null, 2), "utf8");
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ member: newMember }));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Team — actualizar miembro (PUT /team/:id)
+  if (req.method === "PUT" && url.pathname.startsWith("/team/")) {
+    const id = url.pathname.split("/")[2];
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const updates = JSON.parse(body);
+        const teamPath = join(__dirname, "contracts/team.json");
+        const team = JSON.parse(readFileSync(teamPath, "utf8"));
+        const idx = team.members.findIndex(m => (m.id || m.email) === id);
+        if (idx === -1) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify({ error: "Miembro no encontrado" }));
+        }
+        team.members[idx] = { ...team.members[idx], ...updates };
+        writeFileSync(teamPath, JSON.stringify(team, null, 2), "utf8");
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ member: team.members[idx] }));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Team — eliminar miembro (DELETE /team/:id)
+  if (req.method === "DELETE" && url.pathname.startsWith("/team/")) {
+    const id = url.pathname.split("/")[2];
+    try {
+      const teamPath = join(__dirname, "contracts/team.json");
+      const team = JSON.parse(readFileSync(teamPath, "utf8"));
+      const idx = team.members.findIndex(m => (m.id || m.email) === id);
+      if (idx === -1) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: "Miembro no encontrado" }));
+      }
+      team.members.splice(idx, 1);
+      writeFileSync(teamPath, JSON.stringify(team, null, 2), "utf8");
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ success: true }));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
   // Notify — el asistente redacta el mensaje listo para copiar/pegar al colaborador correcto
   if (req.method === "POST" && url.pathname === "/notify") {
     let body = "";

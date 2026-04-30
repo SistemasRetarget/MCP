@@ -17,8 +17,27 @@
   main{padding:24px;max-width:1100px;margin:0 auto}
   h2{font-size:24px;margin:0 0 4px}
   .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px}
+  
+  /* Formulario */
+  .form-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px}
+  .form-card h3{margin:0 0 16px;font-size:16px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  .form-row.full{grid-template-columns:1fr}
+  input,textarea,select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:6px;font-size:13px;font-family:inherit}
+  textarea{resize:vertical;min-height:80px}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  .btn{background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px}
+  .btn:hover{background:#ff8047}
+  .btn.secondary{background:var(--panel);color:var(--text);border:1px solid var(--border)}
+  .btn.secondary:hover{background:var(--panel-3)}
+  .btn.danger{background:var(--crit);border-color:var(--crit)}
+  .btn.danger:hover{background:#dc2626}
+  .btn-group{display:flex;gap:8px;margin-top:12px}
+  
+  /* Grid de miembros */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border .15s}
+  .card:hover{border-color:var(--accent)}
   .head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
   .avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff;font-size:22px}
   .name{font-weight:700;font-size:16px}
@@ -28,12 +47,18 @@
   .info .row:last-child{border-bottom:0}
   .info .k{color:var(--muted)} .info .v{font-weight:500}
   .tone{display:inline-block;padding:3px 10px;border-radius:20px;background:rgba(59,130,246,.15);color:#60a5fa;font-size:11px;font-weight:600}
-  .templates{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-  .templates h4{margin:0 0 8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-  .template{font-family:ui-monospace,SF Mono,monospace;font-size:11px;color:var(--muted);background:var(--bg);padding:8px 10px;border-radius:6px;margin-bottom:6px;border-left:2px solid var(--accent)}
+  .section{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+  .section h4{margin:0 0 8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .section p{margin:0 0 8px;font-size:12px;color:var(--text);line-height:1.5}
+  .section p:last-child{margin:0}
   .empty{padding:60px;text-align:center;color:var(--muted)}
   footer{padding:24px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px}
   footer strong{color:var(--accent)}
+  
+  .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:1000}
+  .modal-overlay.active{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto}
+  .modal h3{margin:0 0 16px;font-size:18px}
 </style>
 </head>
 <body>
@@ -53,19 +78,82 @@
 
 <main>
   <h2>Equipo</h2>
-  <div class="subtitle" id="sub">Cargando miembros del equipo desde <code>contracts/team.json</code>…</div>
+  <div class="subtitle" id="sub">Cargando miembros del equipo…</div>
+  
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
     <strong>¿Qué es esta sección?</strong><br>
-    Directorio del equipo de trabajo: roles, contactos, y plantillas de comunicación personalizadas para cada miembro.<br><br>
+    Directorio del equipo de trabajo: roles, contactos, tono de comunicación, expertise y propuestas de mejora para cada miembro.<br><br>
     <strong>¿Por qué es importante?</strong><br>
-    Facilita la coordinación al tener la información de contacto y estilo de comunicación de cada persona en un solo lugar.
+    Facilita la coordinación al tener la información de contacto, estilo de comunicación y áreas de especialización de cada persona en un solo lugar. El MCP usa esta información para personalizar sus respuestas.
   </div>
+  
+  <!-- Formulario para agregar nuevo miembro -->
+  <div class="form-card">
+    <h3>➕ Agregar nuevo miembro al equipo</h3>
+    <form id="add-form" onsubmit="addMember(event)">
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Nombre completo" required />
+        <input type="text" name="role" placeholder="Rol (ej: Diseñadora, Desarrollador, PM)" required />
+      </div>
+      <div class="form-row">
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="text" name="tone" placeholder="Tono de comunicación (ej: amigable, profesional)" required />
+      </div>
+      <div class="form-row full">
+        <textarea name="expertise" placeholder="Áreas de expertise (ej: Diseño UI/UX, Frontend, Backend, QA, etc.)" required></textarea>
+      </div>
+      <div class="form-row full">
+        <textarea name="best_practices" placeholder="Buenas prácticas que aplica (ej: Mobile-first, Accesibilidad, etc.)"></textarea>
+      </div>
+      <div class="form-row full">
+        <textarea name="proposals" placeholder="Propuestas de mejora para evaluar por dev Luis"></textarea>
+      </div>
+      <div class="btn-group">
+        <button type="submit" class="btn">💾 Guardar miembro</button>
+        <button type="button" class="btn secondary" onclick="document.getElementById('add-form').reset()">Limpiar</button>
+      </div>
+    </form>
+  </div>
+  
   <div class="grid" id="grid"><div class="empty">Cargando…</div></div>
 </main>
+
+<!-- Modal para editar miembro -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h3>✏️ Editar miembro</h3>
+    <form id="edit-form" onsubmit="updateMember(event)">
+      <input type="hidden" name="id" id="edit-id" />
+      <div class="form-row">
+        <input type="text" name="name" id="edit-name" placeholder="Nombre completo" required />
+        <input type="text" name="role" id="edit-role" placeholder="Rol" required />
+      </div>
+      <div class="form-row">
+        <input type="email" name="email" id="edit-email" placeholder="Email" required />
+        <input type="text" name="tone" id="edit-tone" placeholder="Tono" required />
+      </div>
+      <div class="form-row full">
+        <textarea name="expertise" id="edit-expertise" placeholder="Expertise" required></textarea>
+      </div>
+      <div class="form-row full">
+        <textarea name="best_practices" id="edit-best_practices" placeholder="Buenas prácticas"></textarea>
+      </div>
+      <div class="form-row full">
+        <textarea name="proposals" id="edit-proposals" placeholder="Propuestas de mejora"></textarea>
+      </div>
+      <div class="btn-group">
+        <button type="submit" class="btn">💾 Actualizar</button>
+        <button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <footer>Vista desarrollada por <strong>Luis</strong> con ❤ · Sistemas Retarget · MCP v0.4</footer>
 
 <script>
+function $(s){ return document.querySelector(s); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function initials(name){ return name.split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase(); }
 
 async function load(){
@@ -74,37 +162,128 @@ async function load(){
     const d = await r.json();
     const members = Array.isArray(d.members) ? d.members : (Array.isArray(d) ? d : []);
     const grid = document.getElementById("grid");
-    if (!members.length){ grid.innerHTML = `<div class="empty">No hay miembros configurados.</div>`; return; }
+    if (!members.length){ grid.innerHTML = `<div class="empty">No hay miembros configurados. Agrega el primero arriba.</div>`; return; }
     document.getElementById("sub").textContent = `${members.length} miembro(s) en el equipo`;
     grid.innerHTML = members.map(m => {
       const name = m.name || m.id || "—";
       const role = m.role || m.title || "—";
-      const email = m.email || "";
-      const tone = m.tone || m.communication_tone || "";
-      const templates = m.message_templates || m.templates || {};
-      const tplHtml = Object.entries(templates).slice(0,3).map(([k,v]) =>
-        `<div class="template"><strong>${k}:</strong> ${typeof v === "string" ? v : JSON.stringify(v)}</div>`
-      ).join("");
       return `<div class="card">
         <div class="head">
           <div class="avatar">${initials(name)}</div>
           <div>
-            <div class="name">${name}</div>
-            <div class="role">${role}</div>
+            <div class="name">${escapeHtml(name)}</div>
+            <div class="role">${escapeHtml(role)}</div>
           </div>
         </div>
         <div class="info">
-          ${email ? `<div class="row"><span class="k">Email</span><span class="v">${email}</span></div>` : ""}
-          ${tone ? `<div class="row"><span class="k">Tono</span><span class="v"><span class="tone">${tone}</span></span></div>` : ""}
-          ${m.active !== undefined ? `<div class="row"><span class="k">Activo</span><span class="v">${m.active ? "✅ Sí" : "❌ No"}</span></div>` : ""}
+          <div class="row"><span class="k">Email</span><span class="v">${escapeHtml(m.email||"")}</span></div>
+          <div class="row"><span class="k">Tono</span><span class="v"><span class="tone">${escapeHtml(m.tone||m.communication_tone||"")}</span></span></div>
         </div>
-        ${tplHtml ? `<div class="templates"><h4>Plantillas de comunicación</h4>${tplHtml}</div>` : ""}
+        ${m.expertise ? `<div class="section"><h4>🎯 Expertise</h4><p>${escapeHtml(m.expertise)}</p></div>` : ''}
+        ${m.best_practices ? `<div class="section"><h4>✨ Buenas prácticas</h4><p>${escapeHtml(m.best_practices)}</p></div>` : ''}
+        ${m.proposals ? `<div class="section"><h4>💡 Propuestas de mejora</h4><p>${escapeHtml(m.proposals)}</p></div>` : ''}
+        <div class="btn-group">
+          <button class="btn secondary" onclick="editMember('${m.id||m.email}')">✏️ Editar</button>
+          <button class="btn danger" onclick="deleteMember('${m.id||m.email}')">🗑️ Eliminar</button>
+        </div>
       </div>`;
     }).join("");
   } catch(err){
     document.getElementById("grid").innerHTML = `<div class="empty">Error: ${err.message}</div>`;
   }
 }
+
+async function addMember(ev){
+  ev.preventDefault();
+  const form = ev.target;
+  const payload = {
+    name: form.name.value.trim(),
+    role: form.role.value.trim(),
+    email: form.email.value.trim(),
+    tone: form.tone.value.trim(),
+    expertise: form.expertise.value.trim(),
+    best_practices: form.best_practices.value.trim(),
+    proposals: form.proposals.value.trim(),
+    active: true
+  };
+  try{
+    const r = await fetch("/team", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error("Error al guardar miembro");
+    form.reset();
+    load();
+    alert("✅ Miembro agregado correctamente");
+  } catch(err){
+    alert("❌ Error: " + err.message);
+  }
+}
+
+function editMember(id){
+  const r = fetch("/team").then(r => r.json()).then(d => {
+    const members = Array.isArray(d.members) ? d.members : (Array.isArray(d) ? d : []);
+    const m = members.find(x => (x.id || x.email) === id);
+    if (!m) return alert("Miembro no encontrado");
+    
+    $("#edit-id").value = m.id || m.email;
+    $("#edit-name").value = m.name || "";
+    $("#edit-role").value = m.role || m.title || "";
+    $("#edit-email").value = m.email || "";
+    $("#edit-tone").value = m.tone || m.communication_tone || "";
+    $("#edit-expertise").value = m.expertise || "";
+    $("#edit-best_practices").value = m.best_practices || "";
+    $("#edit-proposals").value = m.proposals || "";
+    
+    $("#edit-modal").classList.add("active");
+  });
+}
+
+async function updateMember(ev){
+  ev.preventDefault();
+  const form = ev.target;
+  const id = form.id.value;
+  const payload = {
+    name: form.name.value.trim(),
+    role: form.role.value.trim(),
+    email: form.email.value.trim(),
+    tone: form.tone.value.trim(),
+    expertise: form.expertise.value.trim(),
+    best_practices: form.best_practices.value.trim(),
+    proposals: form.proposals.value.trim()
+  };
+  try{
+    const r = await fetch(`/team/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error("Error al actualizar miembro");
+    closeModal();
+    load();
+    alert("✅ Miembro actualizado correctamente");
+  } catch(err){
+    alert("❌ Error: " + err.message);
+  }
+}
+
+async function deleteMember(id){
+  if (!confirm("¿Estás seguro de eliminar este miembro del equipo?")) return;
+  try{
+    const r = await fetch(`/team/${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (!r.ok) throw new Error("Error al eliminar miembro");
+    load();
+    alert("✅ Miembro eliminado correctamente");
+  } catch(err){
+    alert("❌ Error: " + err.message);
+  }
+}
+
+function closeModal(){
+  $("#edit-modal").classList.remove("active");
+}
+
 load();
 </script>
 </body>
