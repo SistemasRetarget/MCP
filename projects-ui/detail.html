@@ -654,8 +654,7 @@ function renderLandings(p){
               <div style="font-size:11px;color:var(--muted)">${escapeHtml(l.pagespeed_at || '')}</div>
             </div>
           ` : ''}
-          <input type="url" id="pagespeed-url-${l.id}" placeholder="URL de la landing (ej: https://puebloladehesa.cl/)" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;margin-bottom:8px" value="${escapeHtml(l.pagespeed_url || '')}">
-          <button onclick="runPageSpeed('${l.id}')" class="btn secondary" style="font-size:12px;padding:6px 12px">⚡ Ejecutar Page Speed</button>
+          <button onclick="runPageSpeed('${l.id}', '${l.url_qa || l.url_prod}')" class="btn secondary" style="font-size:12px;padding:6px 12px" ${!l.url_qa && !l.url_prod ? 'disabled style="opacity:0.5"' : ''}>⚡ Ejecutar Page Speed ${l.url_qa ? '(QA)' : '(Prod)'}</button>
           ${l.pagespeed_notes ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);white-space:pre-wrap">${escapeHtml(l.pagespeed_notes)}</div>` : ''}
         </div>
         
@@ -886,11 +885,9 @@ async function postJSON(url, body, msgEl) {
   }
 }
 
-async function runPageSpeed(landingId) {
-  const input = document.getElementById(`pagespeed-url-${landingId}`);
-  const url = input.value.trim();
+async function runPageSpeed(landingId, url) {
   if (!url) {
-    alert("Por favor ingresa la URL de la landing");
+    alert("No hay URL de QA o Prod disponible para esta landing");
     return;
   }
   
@@ -912,7 +909,7 @@ async function runPageSpeed(landingId) {
     alert("❌ Error: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = "⚡ Ejecutar Page Speed";
+    btn.textContent = `⚡ Ejecutar Page Speed ${url.includes('qa') ? '(QA)' : '(Prod)'}`;
   }
 }
 
