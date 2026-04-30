@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Monitor de Solicitudes · MCP Retarget</title>
+<style>
+  :root { --bg:#0a0c11; --panel:#11141b; --border:#1f2430; --muted:#7d8595; --text:#e8eaef; --accent:#FF6B35; --ok:#22c55e; --warn:#f59e0b; --crit:#ef4444; --info:#3b82f6; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  header{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px}
+  header .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff8d65);display:grid;place-items:center;font-weight:800;color:#fff}
+  header h1{font-size:15px;margin:0;font-weight:700}
+  header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+  nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  nav a{color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500}
+  nav a.active{color:var(--text);background:var(--border)} nav a:hover{color:var(--text)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:24px;margin:0 0 4px}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+
+  .toolbar{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+  .toolbar select{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font:inherit;min-width:180px}
+  .toolbar .stats{margin-left:auto;display:flex;gap:16px;font-size:12px;color:var(--muted)}
+  .toolbar .stats strong{color:var(--text)}
+
+  .project-section{margin-bottom:32px}
+  .project-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .project-header h3{margin:0;font-size:16px;font-weight:600}
+  .project-header .badge{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--accent);color:#fff}
+  .project-header .stats-mini{margin-left:auto;display:flex;gap:12px;font-size:12px;color:var(--muted)}
+  .project-header .stats-mini span strong{color:var(--text)}
+
+  .req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px}
+  .req-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;transition:border .15s}
+  .req-card:hover{border-color:var(--accent)}
+  .req-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .req-title{font-weight:600;font-size:14px;color:var(--text);margin:0 0 4px}
+  .req-meta{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+  .req-msg{color:var(--muted);font-size:13px;margin:8px 0;white-space:pre-wrap;line-height:1.5}
+  .req-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .pill.priority-baja{background:rgba(59,130,246,.15);color:var(--info)}
+  .pill.priority-media{background:rgba(125,133,149,.2);color:var(--muted)}
+  .pill.priority-alta{background:rgba(245,158,11,.15);color:var(--warn)}
+  .pill.priority-critica{background:rgba(239,68,68,.18);color:var(--crit)}
+  .pill.status-nuevo{background:rgba(168,85,247,.15);color:#a855f7}
+  .pill.status-revisando{background:rgba(59,130,246,.15);color:var(--info)}
+  .pill.status-en_progreso{background:rgba(245,158,11,.15);color:var(--warn)}
+  .pill.status-resuelto{background:rgba(34,197,94,.15);color:var(--ok)}
+  .pill.status-descartado{background:rgba(125,133,149,.15);color:var(--muted)}
+  .pill.type{background:var(--bg);color:var(--text)}
+  .req-actions{margin-left:auto}
+  .req-actions select{width:auto;font-size:11px;padding:4px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text)}
+  .attachment{margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+  .attachment a{color:var(--accent);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px}
+  .attachment a:hover{text-decoration:underline}
+
+  .empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:12px}
+  footer{padding:24px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px}
+  footer strong{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <h1>MCP · Sistemas Retarget<small>Monitor de Solicitudes por Proyecto</small></h1>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/solicitudes">Solicitudes</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/salud">Salud</a>
+    <a href="/eventos">Eventos</a>
+    <a href="/equipo">Equipo</a>
+    <a href="/monitor" class="active">Monitor</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Monitor de Solicitudes</h2>
+  <div class="subtitle">Solicitudes agrupadas por proyecto con estado de completitud</div>
+
+  <div class="toolbar">
+    <select id="filter-project" onchange="loadData()">
+      <option value="">Todos los proyectos</option>
+    </select>
+    <select id="filter-status" onchange="loadData()">
+      <option value="">Todos los estados</option>
+      <option value="nuevo">Nuevo</option>
+      <option value="revisando">Revisando</option>
+      <option value="en_progreso">En progreso</option>
+      <option value="resuelto">Resuelto</option>
+      <option value="descartado">Descartado</option>
+    </select>
+    <div class="stats">
+      <span>Total: <strong id="stat-total">0</strong></span>
+      <span>Resueltas: <strong id="stat-resolved" style="color:var(--ok)">0</strong></span>
+      <span>En progreso: <strong id="stat-progress" style="color:var(--warn)">0</strong></span>
+    </div>
+  </div>
+
+  <div id="projects-container"><div class="empty">Cargando...</div></div>
+</main>
+
+<footer>Vista desarrollada por <strong>Luis</strong> con ❤ · Sistemas Retarget · MCP v0.4 · Auto-refresh 30s</footer>
+
+<script>
+function $(s){ return document.querySelector(s); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtTs(iso){
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return "hace " + Math.floor(diff) + "s";
+  if (diff < 3600) return "hace " + Math.floor(diff/60) + "m";
+  if (diff < 86400) return "hace " + Math.floor(diff/3600) + "h";
+  if (diff < 604800) return "hace " + Math.floor(diff/86400) + "d";
+  return d.toLocaleDateString("es-CL");
+}
+
+async function loadData(){
+  try {
+    const [projectsR, requestsR] = await Promise.all([
+      fetch("/api/projects/list"),
+      fetch("/api/requests")
+    ]);
+    const projectsData = await projectsR.json();
+    const requestsData = await requestsR.json();
+    
+    const projects = projectsData.projects || [];
+    const requests = requestsData.requests || [];
+    
+    // Llenar select de proyectos
+    const sel = $("#filter-project");
+    const keep = sel.value;
+    sel.innerHTML = `<option value="">Todos los proyectos</option>` + projects.map(p => `<option value="${p.id}">${p.name || p.id}</option>`).join("");
+    sel.value = keep;
+    
+    // Filtros
+    const filterProject = $("#filter-project").value;
+    const filterStatus = $("#filter-status").value;
+    
+    let filteredRequests = requests;
+    if (filterProject) filteredRequests = filteredRequests.filter(r => r.project_id === filterProject);
+    if (filterStatus) filteredRequests = filteredRequests.filter(r => r.status === filterStatus);
+    
+    // Stats globales
+    $("#stat-total").textContent = filteredRequests.length;
+    $("#stat-resolved").textContent = filteredRequests.filter(r => r.status === "resuelto").length;
+    $("#stat-progress").textContent = filteredRequests.filter(r => r.status === "en_progreso").length;
+    
+    // Agrupar por proyecto
+    const byProject = {};
+    filteredRequests.forEach(r => {
+      const pid = r.project_id || "general";
+      if (!byProject[pid]) byProject[pid] = [];
+      byProject[pid].push(r);
+    });
+    
+    // Renderizar
+    const container = $("#projects-container");
+    if (Object.keys(byProject).length === 0) {
+      container.innerHTML = '<div class="empty">Sin solicitudes para los filtros actuales.</div>';
+      return;
+    }
+    
+    container.innerHTML = Object.entries(byProject).map(([pid, reqs]) => {
+      const project = projects.find(p => p.id === pid);
+      const projectName = project?.name || pid;
+      const resolved = reqs.filter(r => r.status === "resuelto").length;
+      const total = reqs.length;
+      const progress = total > 0 ? Math.round((resolved / total) * 100) : 0;
+      
+      return `
+      <div class="project-section">
+        <div class="project-header">
+          <h3>${escapeHtml(projectName)}</h3>
+          <span class="badge">${pid === "general" ? "General" : "Proyecto"}</span>
+          <div class="stats-mini">
+            <span>Total: <strong>${total}</strong></span>
+            <span>Resueltas: <strong>${resolved}</strong></span>
+            <span>Progreso: <strong>${progress}%</strong></span>
+          </div>
+        </div>
+        <div class="req-grid">
+          ${reqs.map(r => `
+            <div class="req-card">
+              <div class="req-head">
+                <div style="flex:1;min-width:0">
+                  <h4 class="req-title">${escapeHtml(r.title)}</h4>
+                  <div class="req-meta">
+                    <span>👤 ${escapeHtml(r.client_name)}</span>
+                    <span>🕐 ${fmtTs(r.created_at)}</span>
+                    <span style="font-family:ui-monospace,SF Mono,monospace;font-size:10px">#${r.id}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="req-msg">${escapeHtml(r.message)}</div>
+              ${r.attachment_url ? `
+              <div class="attachment">
+                <a href="${escapeHtml(r.attachment_url)}" target="_blank">📎 Archivo adjunto</a>
+              </div>` : ''}
+              <div class="req-foot">
+                <span class="pill type">${escapeHtml(r.type)}</span>
+                <span class="pill priority-${r.priority}">${r.priority}</span>
+                <span class="pill status-${r.status}">${r.status.replace("_", " ")}</span>
+                <span class="req-actions">
+                  <select onchange="changeStatus('${r.id}', this.value)">
+                    <option value="">Cambiar estado…</option>
+                    <option value="nuevo">→ Nuevo</option>
+                    <option value="revisando">→ Revisando</option>
+                    <option value="en_progreso">→ En progreso</option>
+                    <option value="resuelto">→ Resuelto</option>
+                    <option value="descartado">→ Descartado</option>
+                  </select>
+                </span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>`;
+    }).join("");
+  } catch(err){
+    $("#projects-container").innerHTML = `<div class="empty">Error: ${err.message}</div>`;
+  }
+}
+
+async function changeStatus(id, status){
+  if (!status) return;
+  try {
+    const r = await fetch(`/api/requests/${encodeURIComponent(id)}/update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+    if (!r.ok) throw new Error("Error al actualizar estado");
+    loadData();
+  } catch(err){
+    alert("Error: " + err.message);
+  }
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
+</body>
+</html>

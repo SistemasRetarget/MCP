@@ -32,6 +32,7 @@ import {
   setReviewScore,
   setProjectStatus,
   quickCreateProject,
+  addLandingObservation,
 } from "./projects-store.mjs";
 import { runAllTests } from "./tests/run-tests.mjs";
 import { gradePrompt, codeBasedGrade } from "./prompt-eval/grader.mjs";
@@ -636,6 +637,18 @@ const server = createServer(async (req, res) => {
     }
   }
 
+  // Monitor — HTML para ver solicitudes por proyecto
+  if (req.method === "GET" && (url.pathname === "/monitor" || url.pathname === "/monitor/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/monitor.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
   // ──────────── PROJECTS DASHBOARD ────────────
   // HTML: listado de proyectos
   if (req.method === "GET" && (url.pathname === "/projects" || url.pathname === "/projects/")) {
@@ -762,6 +775,26 @@ const server = createServer(async (req, res) => {
           logEvent("info", `landing_${action}`, `${projectId}/${landingId}`, { project: projectId, landing: landingId });
           res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
           res.end(JSON.stringify({ ok: true, landing: landingId, item: saved }));
+        } catch (err) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
+    }
+
+    // POST /api/projects/<id>/landings/<lid>/observation — agregar observación a landing
+    if (req.method === "POST" && sub === "landings" && parts[4] && parts[5] === "observation") {
+      const landingId = parts[4];
+      let body = "";
+      req.on("data", (c) => (body += c));
+      req.on("end", () => {
+        try {
+          const payload = JSON.parse(body || "{}");
+          const obs = addLandingObservation(projectId, landingId, payload);
+          logEvent("info", "landing_observation", `Observación en ${projectId}/${landingId}`);
+          res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({ ok: true, observation: obs }));
         } catch (err) {
           res.writeHead(400, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: err.message }));

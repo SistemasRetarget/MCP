@@ -160,6 +160,11 @@
           <textarea id="message" required maxlength="4000" placeholder="Cuenta qué hay que ajustar, dónde, contexto, links si aplica…"></textarea>
         </div>
 
+        <div class="field">
+          <label for="attachment_url">URL de archivo/imagen (opcional)</label>
+          <input type="url" id="attachment_url" maxlength="500" placeholder="https://drive.google.com/... o https://imagen.png">
+        </div>
+
         <button type="submit" class="btn" id="submit-btn">📨 Enviar solicitud</button>
       </form>
     </div>
@@ -370,6 +375,7 @@ $("#form").addEventListener("submit", async (ev) => {
       priority: $("#priority").value,
       title: $("#title").value.trim(),
       message: $("#message").value.trim(),
+      attachment_url: $("#attachment_url").value.trim(),
     };
     const r = await fetch("/api/requests", {
       method: "POST",

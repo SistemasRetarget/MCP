@@ -293,6 +293,23 @@ export function quickCreateProject(name, description = "") {
   }
 }
 
+/**
+ * Agrega una observación a una landing específica del proyecto.
+ */
+export function addLandingObservation(id, landingId, payload) {
+  const d = getProjectData(id);
+  d.landings_observations = d.landings_observations || {};
+  d.landings_observations[landingId] = d.landings_observations[landingId] || [];
+  const obs = {
+    at: new Date().toISOString(),
+    by: payload.by || "anónimo",
+    text: String(payload.text || "").slice(0, 1000),
+  };
+  d.landings_observations[landingId].push(obs);
+  saveToDisk(id, d);
+  return obs;
+}
+
 export function getProjectFull(id) {
   try {
     // 1) Intentar archivo directo: <id>-config.json
@@ -310,7 +327,7 @@ export function getProjectFull(id) {
     }
     if (!cfg) return null;
     const data = getProjectData(id);
-    // Mergear landings con su estado runtime (screenshots, progreso editado en vivo)
+    // Mergear landings con su estado runtime (screenshots, progreso, observaciones)
     const landings = (cfg.landings || []).map((l) => {
       const state = data.landings_state?.[l.id] || {};
       return {
@@ -328,6 +345,7 @@ export function getProjectFull(id) {
           captured_at: state.captured_at || l.screenshots?.captured_at || null,
           notes: state.notes || l.screenshots?.notes || null,
         },
+        observations: data.landings_observations?.[l.id] || [],
         updated_at: state.updated_at || null,
       };
     });

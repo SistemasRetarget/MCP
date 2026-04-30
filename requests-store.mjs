@@ -17,6 +17,7 @@
  *   priority        — "baja" | "media" | "alta" | "critica"
  *   title           — resumen corto (1 línea)
  *   message         — detalle completo
+ *   attachment_url  — URL de archivo/imagen (Drive, etc.) — opcional
  *   status          — "nuevo" | "revisando" | "en_progreso" | "resuelto" | "descartado"
  *   assigned_to     — email (default "luis@retarget.cl")
  *   work_log        — array de eventos { at, type, detail } para audit trail
@@ -86,6 +87,7 @@ export function addRequest(payload) {
     priority,
     title: payload.title.slice(0, 200).trim(),
     message: payload.message.slice(0, 4000).trim(),
+    attachment_url: (payload.attachment_url || "").slice(0, 500).trim(),
     status: "nuevo",
     assigned_to: payload.assigned_to || "luis@retarget.cl",
     notes: [],
