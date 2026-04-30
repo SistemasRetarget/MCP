@@ -649,6 +649,30 @@ const server = createServer(async (req, res) => {
     }
   }
 
+  // Sitemap — HTML para ver estructura del sitio y QA
+  if (req.method === "GET" && (url.pathname === "/sitemap" || url.pathname === "/sitemap/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/sitemap.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // Sitemap Detail — HTML para ver detalle QA de una sección
+  if (req.method === "GET" && (url.pathname === "/sitemap-detail" || url.pathname === "/sitemap-detail/")) {
+    try {
+      const html = readFileSync(join(__dirname, "projects-ui/sitemap-detail.html"), "utf8");
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
   // ──────────── PROJECTS DASHBOARD ────────────
   // HTML: listado de proyectos
   if (req.method === "GET" && (url.pathname === "/projects" || url.pathname === "/projects/")) {

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QA Detalle · MCP Retarget</title>
+<style>
+  :root {
+    --bg: #0a0c11; --panel: #111419; --panel-2: #161a22; --panel-3: #1c2230;
+    --border: #232838; --border-strong: #2e3548;
+    --text: #e6e8ee; --muted: #8a92a6; --muted-2: #6b7280;
+    --ok: #4ade80; --warn: #fbbf24; --err: #f87171; --accent: #FF6B35; --link: #93c5fd; --info: #3b82f6;
+    --mono: 'SF Mono', ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; line-height: 1.5; }
+  a { color: var(--link); text-decoration: none; } a:hover { text-decoration: underline; }
+  code { font-family: var(--mono); background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  img { max-width: 100%; }
+
+  .topbar { padding: 14px 32px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    background: var(--panel); position: sticky; top: 0; z-index: 10; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .logo { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--accent), #ff8e5a); display: grid; place-items: center; font-weight: 800; color: white; font-size: 13px; }
+  .topbar nav { display: flex; gap: 4px; }
+  .topbar nav a { color: var(--muted); padding: 7px 14px; border-radius: 6px; font-size: 13px; }
+  .topbar nav a.active, .topbar nav a:hover { background: var(--panel-2); color: var(--text); }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 32px; }
+  .breadcrumb { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+  .breadcrumb a { color: var(--muted); } .breadcrumb a:hover { color: var(--text); }
+
+  .hero { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .hero h1 { margin: 8px 0 4px; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+  .hero .desc { color: var(--muted); font-size: 14px; max-width: 700px; }
+
+  .btn { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .btn:hover { background: var(--panel-3); border-color: var(--border-strong); }
+  .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn.primary:hover { background: #ff8047; }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .card h3 { margin: 0 0 16px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .status-badge.completado { background: rgba(74,222,128,0.15); color: var(--ok); }
+  .status-badge.referencia { background: rgba(239,68,68,0.15); color: var(--err); }
+  .status-badge.qa { background: rgba(59,130,246,0.15); color: var(--info); }
+
+  .obs-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; max-height: 400px; overflow-y: auto; }
+  .obs-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .obs-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
+  .obs-by { font-weight: 600; color: var(--accent); }
+  .obs-at { color: var(--muted); font-family: var(--mono); }
+  .obs-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .obs-empty { font-size: 13px; color: var(--muted-2); font-style: italic; padding: 12px 0; }
+
+  .obs-form { display: flex; flex-direction: column; gap: 12px; }
+  .obs-form input, .obs-form textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; font-size: 13px; font-family: inherit; }
+  .obs-form textarea { resize: vertical; min-height: 80px; }
+  .obs-form input:focus, .obs-form textarea:focus { outline: none; border-color: var(--accent); }
+  .obs-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .preview-box { margin-top: 16px; padding: 16px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; }
+  .preview-box img { width: 100%; height: auto; max-height: 400px; object-fit: contain; border-radius: 6px; cursor: zoom-in; }
+
+  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .loading { text-align: center; padding: 48px 20px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">R</div>
+    <div>
+      <strong>MCP · Retarget</strong>
+      <div style="font-size:11px;color:var(--muted)">QA Detalle</div>
+    </div>
+  </div>
+  <nav>
+    <a href="/projects">Proyectos</a>
+    <a href="/solicitudes">Solicitudes</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/salud">Salud</a>
+    <a href="/monitor">Monitor</a>
+  </nav>
+</div>
+
+<main>
+  <div class="breadcrumb">
+    <a href="/projects">Proyectos</a> / <a id="project-link">...</a> / <a id="sitemap-link">Sitemap</a> / <strong id="section-name">...</strong>
+  </div>
+
+  <div class="hero">
+    <div>
+      <h1 id="page-title">QA - Cargando...</h1>
+      <div class="desc" id="section-desc">Cargando información de la sección...</div>
+    </div>
+    <a id="back-btn" class="btn">← Volver al Sitemap</a>
+  </div>
+
+  <div id="content"><div class="loading">Cargando detalles de QA...</div></div>
+</main>
+
+<script>
+const PROJECT_ID = new URLSearchParams(window.location.search).get("id");
+const SECTION_ID = new URLSearchParams(window.location.search).get("section");
+
+if (!PROJECT_ID || !SECTION_ID) {
+  document.getElementById("content").innerHTML = '<div class="empty">Faltan parámetros. <a href="/projects">Volver a proyectos</a></div>';
+}
+
+function $(s){ return document.querySelector(s); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtTs(iso){
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return "hace " + Math.floor(diff) + "s";
+  if (diff < 3600) return "hace " + Math.floor(diff/60) + "m";
+  if (diff < 86400) return "hace " + Math.floor(diff/3600) + "h";
+  return d.toLocaleDateString("es-CL");
+}
+
+const SITE_SECTIONS = [
+  { id: 'header', nombre: 'Header', tipo: 'global' },
+  { id: 'footer', nombre: 'Footer', tipo: 'global' },
+  { id: 'hero', nombre: 'Hero', tipo: 'landing' },
+  { id: 'promociones', nombre: 'Promociones', tipo: 'landing' },
+  { id: 'destino', nombre: 'Destino', tipo: 'landing' },
+  { id: 'hotel', nombre: 'Hotel', tipo: 'landing' },
+  { id: 'que-hacer', nombre: 'Qué Hacer', tipo: 'landing' },
+  { id: 'programas', nombre: 'Programas', tipo: 'landing' },
+  { id: 'eventos', nombre: 'Eventos', tipo: 'landing' },
+  { id: 'sostenibilidad', nombre: 'Sostenibilidad', tipo: 'landing' },
+  { id: 'ven-por-el-dia', nombre: 'Ven por el Día', tipo: 'landing' },
+];
+
+async function loadDetail() {
+  if (!PROJECT_ID || !SECTION_ID) return;
+  try {
+    const r = await fetch(`/api/projects/${encodeURIComponent(PROJECT_ID)}`);
+    const p = await r.json();
+    
+    if (!p) {
+      document.getElementById("content").innerHTML = '<div class="empty">Proyecto no encontrado. <a href="/projects">Volver a proyectos</a></div>';
+      return;
+    }
+
+    const sectionInfo = SITE_SECTIONS.find(s => s.id === SECTION_ID);
+    if (!sectionInfo) {
+      document.getElementById("content").innerHTML = '<div class="empty">Sección no encontrada. <a href="/sitemap?id='+PROJECT_ID+'">Volver al Sitemap</a></div>';
+      return;
+    }
+
+    document.getElementById("project-link").textContent = p.name || PROJECT_ID;
+    document.getElementById("project-link").href = `/projects/${encodeURIComponent(PROJECT_ID)}`;
+    document.getElementById("sitemap-link").href = `/sitemap?id=${PROJECT_ID}`;
+    document.getElementById("section-name").textContent = sectionInfo.nombre;
+    document.getElementById("page-title").textContent = `QA - ${sectionInfo.nombre}`;
+    document.getElementById("back-btn").href = `/sitemap?id=${PROJECT_ID}`;
+
+    // Obtener datos de la sección
+    const landings = p.landings || [];
+    let estado = 'referencia';
+    let progreso = 0;
+    let observaciones = [];
+    let descripcion = '';
+    let urlQa = null;
+
+    if (sectionInfo.tipo === 'global') {
+      if (SECTION_ID === 'header') {
+        const headerStatus = landings.map(l => l.header?.status).filter(Boolean);
+        if (headerStatus.length > 0) {
+          const completados = headerStatus.filter(st => st === 'completado').length;
+          progreso = Math.round((completados / headerStatus.length) * 100);
+          estado = progreso === 100 ? 'completado' : (progreso > 0 ? 'qa' : 'referencia');
+        }
+        descripcion = 'Elemento global Header - presente en todas las landings';
+      }
+      if (SECTION_ID === 'footer') {
+        const footerStatus = landings.map(l => l.footer?.status).filter(Boolean);
+        if (footerStatus.length > 0) {
+          const completados = footerStatus.filter(st => st === 'completado').length;
+          progreso = Math.round((completados / footerStatus.length) * 100);
+          estado = progreso === 100 ? 'completado' : (progreso > 0 ? 'qa' : 'referencia');
+        }
+        descripcion = 'Elemento global Footer - presente en todas las landings';
+      }
+    } else {
+      const landing = landings.find(l => l.id === SECTION_ID);
+      if (landing) {
+        estado = landing.status === 'completado' ? 'completado' : (landing.status === 'qa' ? 'qa' : 'referencia');
+        progreso = landing.progress || 0;
+        descripcion = landing.description || '';
+        observaciones = landing.observations || [];
+        urlQa = landing.url_qa || landing.screenshots?.actual_url || null;
+      }
+    }
+
+    document.getElementById("section-desc").textContent = descripcion || sectionInfo.tipo === 'global' ? 'Elemento global' : 'Sección de landing';
+
+    const container = document.getElementById("content");
+    container.innerHTML = `
+      <div class="card">
+        <h3>Estado Actual</h3>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+          <span class="status-badge ${estado}">${estado}</span>
+          <div style="flex:1;height:6px;background:var(--panel-3);border-radius:3px;overflow:hidden">
+            <div style="width:${progreso}%;height:100%;background:linear-gradient(90deg,var(--accent),#ff8e5a)"></div>
+          </div>
+          <span style="font-family:var(--mono);color:var(--muted)">${progreso}%</span>
+        </div>
+      </div>
+
+      ${urlQa ? `
+      <div class="card">
+        <h3>Preview QA</h3>
+        <div class="preview-box">
+          <img src="${escapeHtml(urlQa)}" alt="QA Preview" onclick="openLightbox('${escapeHtml(urlQa)}')" />
+          <a href="${escapeHtml(urlQa)}" target="_blank" style="display:inline-block;margin-top:12px;color:var(--accent);text-decoration:none;font-size:13px">Abrir en nueva pestaña →</a>
+        </div>
+      </div>` : ''}
+
+      <div class="card">
+        <h3>Observaciones del Equipo</h3>
+        <div class="obs-list" id="obs-list">
+          ${observaciones.length === 0 
+            ? '<div class="obs-empty">Sin observaciones aún. Sé el primero en comentar.</div>'
+            : observaciones.map(obs => `
+              <div class="obs-item">
+                <div class="obs-head">
+                  <span class="obs-by">${escapeHtml(obs.by || 'Anónimo')}</span>
+                  <span class="obs-at">${fmtTs(obs.at)}</span>
+                </div>
+                <div class="obs-text">${escapeHtml(obs.text)}</div>
+              </div>
+            `).join('')
+          }
+        </div>
+        <form class="obs-form" onsubmit="addObservation(event)">
+          <div class="row">
+            <input type="text" name="by" placeholder="Tu nombre" required />
+            <input type="text" name="text" placeholder="Escribe una observación..." required style="flex:1" />
+          </div>
+          <button type="submit" class="btn primary" style="width:100%">💬 Guardar observación</button>
+        </form>
+      </div>
+    `;
+  } catch(err) {
+    document.getElementById("content").innerHTML = `<div class="empty">Error: ${err.message}</div>`;
+  }
+}
+
+async function addObservation(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const by = form.by.value.trim();
+  const text = form.text.value.trim();
+  if (!by || !text) return;
+  try {
+    // Guardar observación en la landing correspondiente
+    const r = await fetch(`/api/projects/${encodeURIComponent(PROJECT_ID)}/landings/${encodeURIComponent(SECTION_ID)}/observation`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ by, text })
+    });
+    if (!r.ok) throw new Error("No se pudo guardar la observación");
+    form.reset();
+    loadDetail(); // Recargar para mostrar la nueva observación
+  } catch(err) {
+    alert("Error: " + err.message);
+  }
+}
+
+function openLightbox(url) {
+  window.open(url, '_blank');
+}
+
+loadDetail();
+</script>
+</body>
+</html>

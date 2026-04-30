@@ -255,6 +255,7 @@
     <a href="/roadmap">Roadmap</a>
     <a href="/health" target="_blank">Salud</a>
     <a href="/team" target="_blank">Equipo</a>
+    <a id="nav-sitemap" href="#">Sitemap QA</a>
   </nav>
   <div></div>
 </div>
@@ -894,6 +895,12 @@ async function addObservation(ev, landingId, form) {
   } catch(err) {
     alert("Error: " + err.message);
   }
+}
+
+// Actualizar link de Sitemap
+const sitemapLink = document.getElementById("nav-sitemap");
+if (sitemapLink) {
+  sitemapLink.href = `/sitemap?id=${PROJECT_ID}`;
 }
 
 loadProject();
