@@ -588,10 +588,16 @@ function renderLandings(p){
       <!-- Preview QA -->
       ${l.url_qa ? `
       <div class="qa-preview">
-        <div class="label">🔵 Preview QA</div>
+        <div class="label">🔵 Preview QA <a href="${l.url_qa}" target="_blank" class="qa-link" style="font-size:12px;font-weight:normal">→ Abrir</a></div>
         <div class="qa-frame">
-          <img src="${l.url_qa}" alt="QA Preview" onclick="openLightbox('${l.url_qa}')" loading="lazy" />
-          <a href="${l.url_qa}" target="_blank" class="qa-link">Abrir en nueva pestaña →</a>
+          ${l.screenshots?.actual_url ? `
+            <img src="${l.screenshots.actual_url}" alt="QA Screenshot" onclick="openLightbox('${l.screenshots.actual_url}')" loading="lazy" />
+          ` : `
+            <div style="display:flex;align-items:center;justify-content:center;height:400px;background:var(--panel-2);border-radius:8px;color:var(--muted);flex-direction:column;gap:12px">
+              <div>No hay captura aún</div>
+              <button onclick="captureScreenshot('${l.id}', 'actual', '${l.url_qa}')" class="btn secondary">📷 Capturar ahora</button>
+            </div>
+          `}
         </div>
       </div>` : ''}
 
