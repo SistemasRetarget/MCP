@@ -1,9 +1,101 @@
-# Handoff - Continuar mañana
+# Handoff para Claude Code
 
-## Fecha
-30 de abril de 2026
+## Fecha última actualización
+30 de abril de 2026 — 22:40 UTC-04
 
-## Resumen de cambios realizados
+## 🔥 ESTADO ACTUAL — LO MÁS IMPORTANTE
+
+### ✅ MCP en producción (funciona 100%)
+- **URL**: https://cmsretargetv1-201530409487.europe-west1.run.app
+- **Health**: 🟢 healthy — `/health?force=1` devuelve `anthropic.status: "ok"`
+- **Anthropic API**: con créditos (API key del jefe configurada hoy como env var directa, NO secret)
+- **Modelos**: `claude-haiku-4-5` (health), `claude-sonnet-4-5` (chat)
+- **Proyecto GCP**: `retarget-mcp` (region `europe-west1`, service `cmsretargetv1`)
+
+### ✅ puebloladehesa-web QA desplegado HOY
+- **URL QA**: https://puebloladehesa-web-635392253567.europe-west1.run.app
+- **Proyecto GCP**: `pueblo-494618` (region `europe-west1`, service `puebloladehesa-web`)
+- **Imagen actual**: tag `7eb61c52-2ef9-44f9-86d0-fa8acc3504bf`
+- **Estado**: HTTP 200 ✅ pero **NO replica visualmente puebloladehesa.cl**
+- **Stack**: Next.js 15 + Payload CMS 3 (el prod es Shopify)
+- **Env vars temporales**: `PAYLOAD_SECRET=temp-secret-for-qa`, `DATABASE_URL=temp-db-for-qa` ⚠️ reemplazar con Secret Manager
+
+### 🚨 TAREA PENDIENTE PRINCIPAL
+**Replicar puebloladehesa.cl 1-a-1 visualmente en el QA.**
+
+El usuario eligió "Replicación visual completa (1-1)" pero hizo handoff antes de empezar. Plan acordado:
+1. Comparar prod vs QA sección por sección
+2. Empezar por Hero/Home, arreglar, redeploy, siguiente sección
+3. Usar Visual QA del MCP para tracking
+
+## Cambios técnicos de esta sesión (30/04)
+
+### 1. MCP — fix modelo Anthropic deprecated
+- `health-monitor.mjs:17`: `claude-3-5-haiku-20241022` → `claude-haiku-4-5`
+- Razón: la API key nueva no tiene acceso al modelo viejo
+- Commit: `8245777`
+
+### 2. MCP — API key reconfigurada en Cloud Run
+- Antes: Secret Manager (`anthropic-api-key-prod:latest`) sin permisos al SA
+- Ahora: env var directa `ANTHROPIC_API_KEY` (set-env-vars)
+- ⚠️ **Idealmente migrar a Secret Manager** dándole `roles/secretmanager.secretAccessor` al SA `201530409487-compute@developer.gserviceaccount.com`
+
+### 3. puebloladehesa-web — primer deploy a Cloud Run QA
+- Nuevo: `cloudbuild-qa.yaml` (sin secretos, `$BUILD_ID` en vez de `$COMMIT_SHA`)
+- Issue resuelto: `PORT` es env reservada en Cloud Run (removida de set-env-vars)
+- Repo clonado en: `/Users/spam11/github/puebloladehesa-web`
+
+### 4. URLs QA en MCP config
+- `mcp-projects/puebloladehesa-web-config.json`: todas las landings tienen `url_qa = https://pld-635392253567.europe-west1.run.app/...`
+- ⚠️ **Hay mismatch**: deploy real quedó en `puebloladehesa-web-635392253567...`. **Actualizar config.**
+
+## Comandos útiles
+
+### Health MCP
+```bash
+curl -s "https://cmsretargetv1-201530409487.europe-west1.run.app/health?force=1" | jq
+```
+
+### Redeploy MCP
+```bash
+cd /Users/spam11/github/MCP
+gcloud builds submit --config=cloudbuild.yaml --project=retarget-mcp --timeout=10m --async .
+```
+
+### Redeploy puebloladehesa-web
+```bash
+cd /Users/spam11/github/puebloladehesa-web
+gcloud builds submit --config=cloudbuild-qa.yaml --project=pueblo-494618 --async
+```
+
+### Deploy manual a Cloud Run (si falla el step 3 de cloudbuild)
+```bash
+gcloud run deploy puebloladehesa-web \
+  --image="europe-west1-docker.pkg.dev/pueblo-494618/cloud-run-source-deploy/puebloladehesa/puebloladehesa-web:BUILD_ID" \
+  --region=europe-west1 --platform=managed --allow-unauthenticated \
+  --port=8080 --memory=1Gi --cpu=1 --min-instances=0 --max-instances=3 \
+  --set-env-vars="NODE_ENV=production,PAYLOAD_SECRET=temp-secret-for-qa,DATABASE_URL=temp-db-for-qa" \
+  --project=pueblo-494618
+```
+
+## Para Claude Code: dónde retomar
+
+1. **Verificar QA viva**: `curl -I https://puebloladehesa-web-635392253567.europe-west1.run.app`
+2. **Comparar visualmente** con https://puebloladehesa.cl/
+3. **Iterar sección por sección** empezando por Hero (`src/components/sections/Hero.tsx`)
+4. **Estructura puebloladehesa-web**:
+   - Sections: `src/components/sections/` (Hero, Casas, ExperienciasGrid, FAQ, Features, CTABlock, ContactForm, ImageWithText, Narrativa, Pilares)
+   - Pages ES: `src/app/(frontend)/(es)/` (page.tsx home, casas/, contacto/, experiencias/, la-casita/, nosotros/, ubicacion/, etc.)
+   - Public assets: `public/` (solo 7 archivos, faltan muchísimos)
+   - Payload config: `payload.config.ts`
+5. **Actualizar MCP config**: cambiar `pld-635392253567` por `puebloladehesa-web-635392253567` en `mcp-projects/puebloladehesa-web-config.json`
+6. **Idealmente**: configurar Secret Manager para `PAYLOAD_SECRET` y `DATABASE_URL` reales antes de presentar
+
+---
+
+## Cambios sesiones previas (ya en main, ya desplegados)
+
+### Resumen de cambios realizados
 
 ### 1. Subida de archivos en solicitudes
 - **Archivo:** `solicitudes.html`
