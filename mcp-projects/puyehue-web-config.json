@@ -1,0 +1,130 @@
+{
+  "project_id": "puyehue-web",
+  "project_name": "puyehue-web",
+  "description": "Hotel Termas de Puyehue — replicación web 1-1",
+  "status": "active",
+  "created_at": "2026-04-30T22:50:00.000Z",
+  "repositories": {
+    "source": {
+      "url": "https://puyehue.cl",
+      "type": "wordpress",
+      "description": "Sitio prod en WordPress"
+    },
+    "qa": {
+      "url": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app",
+      "type": "cloud-run",
+      "github": "",
+      "description": "Cloud Run QA — Next.js 15 + Payload CMS 3"
+    },
+    "production": {
+      "url": "https://puyehue.cl",
+      "type": "wordpress",
+      "description": "Producción WordPress (Apache/Ubuntu)"
+    }
+  },
+  "github": {
+    "url": "",
+    "default_branch": "main",
+    "is_private": false
+  },
+  "reconnaissance": { "status": "completed" },
+  "replication": {
+    "status": "in_progress",
+    "progress_percent": 30,
+    "completed_sections": ["assets", "hero", "pilares"],
+    "pending_sections": ["excursiones", "cocina", "spa", "historia", "footer"]
+  },
+  "workflow": {
+    "current_step": "landing_pages",
+    "steps": [
+      { "id": 1, "name": "Reconnaissance", "status": "completed" },
+      { "id": 2, "name": "Assets", "status": "completed" },
+      { "id": 3, "name": "Content", "status": "in_progress" },
+      { "id": 4, "name": "Header", "status": "pending" },
+      { "id": 5, "name": "Footer", "status": "pending" },
+      { "id": 6, "name": "Landing Pages", "status": "in_progress" },
+      { "id": 7, "name": "Contact Form", "status": "pending" },
+      { "id": 8, "name": "Integrations", "status": "pending" },
+      { "id": 9, "name": "QA & Testing", "status": "pending" },
+      { "id": 10, "name": "Deploy", "status": "in_progress" }
+    ]
+  },
+  "landings": [
+    {
+      "id": "home",
+      "name": "Home",
+      "description": "Página principal — Hero + Pilares + Excursiones + Cocina + Spa + Historia",
+      "status": "in_progress",
+      "progress": 50,
+      "url_prod": "https://puyehue.cl/",
+      "url_qa": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app/",
+      "url_reference": "https://puyehue.cl/",
+      "header": { "status": "pending", "notes": "—" },
+      "footer": { "status": "pending", "notes": "—" },
+      "screenshots": { "reference_url": null, "actual_url": null, "diff_url": null },
+      "sections": [
+        { "name": "Hero", "status": "completed", "notes": "Imagen + título + CTAs" },
+        { "name": "Pilares de Experiencia", "status": "in_progress", "notes": "3 columnas: Bosque, Cocina, Spa" },
+        { "name": "Excursiones en el Bosque", "status": "in_progress", "notes": "Sección parallax con imagen" },
+        { "name": "Cocina con Identidad", "status": "in_progress", "notes": "Image + text 2 cols" },
+        { "name": "SPA y Aguas Termales", "status": "in_progress", "notes": "Sección oscura con imagen" },
+        { "name": "Un Hotel con Historia", "status": "in_progress", "notes": "Centered text" },
+        { "name": "CTA Final", "status": "in_progress", "notes": "Reservar" }
+      ]
+    },
+    {
+      "id": "experiencias",
+      "name": "Experiencias",
+      "description": "Excursiones, trekking, spa",
+      "status": "pending",
+      "progress": 0,
+      "url_prod": "https://puyehue.cl/experiencias/",
+      "url_qa": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app/experiencias",
+      "url_reference": "https://puyehue.cl/experiencias/",
+      "header": { "status": "pending" },
+      "footer": { "status": "pending" }
+    },
+    {
+      "id": "habitaciones",
+      "name": "Habitaciones",
+      "description": "Tipos de habitaciones del hotel",
+      "status": "pending",
+      "progress": 0,
+      "url_prod": "https://puyehue.cl/habitaciones/",
+      "url_qa": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app/habitaciones",
+      "url_reference": "https://puyehue.cl/habitaciones/",
+      "header": { "status": "pending" },
+      "footer": { "status": "pending" }
+    },
+    {
+      "id": "spa",
+      "name": "SPA",
+      "description": "Tratamientos y aguas termales",
+      "status": "pending",
+      "progress": 0,
+      "url_prod": "https://puyehue.cl/spa/",
+      "url_qa": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app/spa",
+      "url_reference": "https://puyehue.cl/spa/",
+      "header": { "status": "pending" },
+      "footer": { "status": "pending" }
+    },
+    {
+      "id": "contacto",
+      "name": "Contacto",
+      "description": "Formulario de contacto",
+      "status": "pending",
+      "progress": 0,
+      "url_prod": "https://puyehue.cl/contacto/",
+      "url_qa": "https://puyehue-web-rf3w6ybqeq-ew.a.run.app/contacto",
+      "url_reference": "https://puyehue.cl/contacto/",
+      "header": { "status": "pending" },
+      "footer": { "status": "pending" }
+    }
+  ],
+  "deployment": {
+    "platform": "google-cloud-run",
+    "region": "europe-west1",
+    "project": "retarget-mcp",
+    "service": "puyehue-web"
+  }
+}
