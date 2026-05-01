@@ -14,7 +14,7 @@
  */
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-const CHECK_MODEL = "claude-3-5-haiku-20241022"; // el más barato para health-checks
+const CHECK_MODEL = "claude-haiku-4-5"; // el más barato para health-checks
 let lastCheck = null;          // { at, status, detail, raw }
 let cachedFor = 60_000;         // 60s — evita gastar tokens en cada poll
 const events = [];              // ring buffer
