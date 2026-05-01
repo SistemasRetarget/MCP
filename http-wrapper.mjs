@@ -34,6 +34,7 @@ import {
   quickCreateProject,
   addLandingObservation,
   setLandingPageSpeed,
+  captureLandingScreenshot,
 } from "./projects-store.mjs";
 import { runAllTests } from "./tests/run-tests.mjs";
 import { gradePrompt, codeBasedGrade } from "./prompt-eval/grader.mjs";

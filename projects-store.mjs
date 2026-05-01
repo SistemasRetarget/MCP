@@ -167,7 +167,7 @@ export async function setLandingPageSpeed(id, landingId, payload) {
   // Si se proporciona URL, ejecutar prueba automática de Page Speed
   if (payload.url) {
     try {
-      const { validateCoreWebVitals } = await import("../validators/core-web-vitals.mjs");
+      const { validateCoreWebVitals } = await import("./validators/core-web-vitals.mjs");
       const apiKey = process.env.PAGESPEED_API_KEY || null;
       const result = await validateCoreWebVitals(payload.url, apiKey);
       
