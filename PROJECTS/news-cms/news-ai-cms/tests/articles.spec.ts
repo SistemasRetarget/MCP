@@ -205,7 +205,7 @@ test.describe('Articles Collection', () => {
     let prevDate = new Date().toISOString();
     data.docs.forEach((doc: any) => {
       if (doc.publishedAt) {
-        expect(doc.publishedAt).toBeLessThanOrEqual(prevDate);
+        expect(doc.publishedAt <= prevDate).toBeTruthy();
         prevDate = doc.publishedAt;
       }
     });
