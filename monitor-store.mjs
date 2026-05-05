@@ -1,7 +1,7 @@
 /**
  * Monitor Store — vigila campañas activas (prioridad puyehue.cl).
  *
- * Schedule: 3 checks/día (07:00, 12:00, 18:00) vía Cloud Scheduler → endpoint MCP.
+ * Schedule: 4 checks/día (00:00, 07:00, 12:00, 18:00) vía Cloud Scheduler → endpoint MCP.
  *
  * Qué se vigila por URL:
  *   - Disponibilidad (HTTP status, latencia)

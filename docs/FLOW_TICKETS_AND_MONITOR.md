@@ -88,12 +88,15 @@ Una vez validado:
 
 ### 3.2 Schedule
 
-3 checks/día — programado para coincidir con momentos clave del negocio:
+4 checks/día — programado para coincidir con momentos clave del negocio:
+- **00:00** — chequeo nocturno (detecta deploys/cambios hechos a deshora)
 - **07:00** — al despertar el equipo
-- **12:00** — chequeo intermedio (post-update si hubo)
+- **12:00** — chequeo intermedio (post-update si hubo) — incluye Lighthouse
 - **18:00** — cierre del día
 
 Implementación: Cloud Scheduler → invoca endpoint del MCP → ejecuta los checks.
+
+> **Nota:** los 4 checks son livianos (HTTP + screenshot). Solo el de las **12:00** incluye Lighthouse para no saturar puyehue.cl.
 
 ### 3.3 Qué se vigila
 
